@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/devcontainers/python:3.11-bullseye
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /backend
+
+RUN pip install poetry
+
+# tensorflowに必要　Install HDF5 and other dependencies
+# RUN apt-get update && apt-get install -y libpq-dev libhdf5-dev
+
+COPY pyproject.toml* poetry.lock* /backend/
+
+RUN poetry config virtualenvs.in-project true && \
+    poetry install --no-root
+
+COPY . /backend/
+
+EXPOSE 8000
+
+ENTRYPOINT ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

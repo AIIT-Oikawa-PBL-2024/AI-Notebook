@@ -1,0 +1,116 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write  
+  pull-requests: write
+
+jobs:
+  ci-backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      pull-requests: write
+      contents: write
+      id-token: write
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2
+
+    - name: Setup a local virtual environment (if no poetry.toml file)
+      run: |
+        poetry config virtualenvs.create true --local
+        poetry config virtualenvs.in-project true --local
+
+    - uses: actions/cache@v3
+      name: Define a cache for the virtual environment based on the dependencies lock file
+      with:
+        path: ./backend/.venv
+        key: venv-${{ hashFiles('poetry.lock') }}
+
+    - name: Install the project dependencies
+      run: |
+        poetry install --no-root
+        poetry add pytest pytest-cov
+
+    - name: Test with pytest
+      run: |        
+        poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
+
+    - name: Pytest coverage comment
+      uses: MishaKav/pytest-coverage-comment@main     
+      with:
+          coverage-path-prefix: backend/
+          title: Backend Coverage Report
+          pytest-coverage-path: ./backend/pytest-coverage.txt
+          junitxml-path: ./backend/pytest.xml  
+
+  ci-frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      pull-requests: write
+      contents: write
+      id-token: write
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2
+
+    - name: Setup a local virtual environment (if no poetry.toml file)
+      run: |
+        poetry config virtualenvs.create true --local
+        poetry config virtualenvs.in-project true --local
+
+    - uses: actions/cache@v3
+      name: Define a cache for the virtual environment based on the dependencies lock file
+      with:
+        path: ./frontend/.venv
+        key: venv-${{ hashFiles('poetry.lock') }}
+
+    - name: Install the project dependencies
+      run: |
+        poetry install --no-root
+        poetry add pytest pytest-cov
+
+    - name: Test with pytest
+      run: |        
+        poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
+
+    - name: Pytest coverage comment
+      uses: MishaKav/pytest-coverage-comment@main     
+      with:
+          coverage-path-prefix: frontend/
+          title: Frontend Coverage Report
+          pytest-coverage-path: ./frontend/pytest-coverage.txt
+          junitxml-path: ./frontend/pytest.xml   
+
+  

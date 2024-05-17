@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/devcontainers/python:3.11-bullseye
+
+WORKDIR /frontend
+
+RUN pip install poetry
+
+COPY pyproject.toml poetry.lock /frontend/
+
+RUN poetry config virtualenvs.in-project true && \    
+    poetry install --no-root
+
+COPY . /frontend/
+
+EXPOSE 8501
+
+CMD ["poetry", "run", "streamlit", "run", "app/main.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
