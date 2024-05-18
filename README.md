@@ -85,7 +85,7 @@ copilot-practice2
    `$ docker compose run --entrypoint "poetry install --no-root" frontend`<br>
 - `pyproject.toml`ファイルをもとに`.venv`ディレクトリにパッケージがインストールされる。
 
-- `$ docker compose up`でコンテナを立ち上げ
+- ルートディレクトリから`$ docker compose up`でコンテナを立ち上げ
 - エラーが出る場合は、`$ docker compose build --no-cache`でDockerイメージを再度ビルドしてみる。
 
 - ブラウザから動作確認 8000番ポートにFastAPI、8501番ポートにStreamlitが立ち上がる
