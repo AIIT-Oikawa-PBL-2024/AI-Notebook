@@ -14,7 +14,7 @@ st.title("Frontend App")
 st.markdown("This is a frontend application that communicates with a backend service.")
 
 
-def submit():
+def submit() -> None:
     if st.button("Submit"):
         try:
             response = requests.get(BACKEND_HOST)
@@ -25,12 +25,12 @@ def submit():
             st.text(e)
 
 
-def wtite_message():
+def wtite_message() -> None:
     message = st.text_input("何か書いて")
     st.write("あなたが書いたメッセージは: ", message)
 
 
-def main():
+def main() -> None:
     submit()
     wtite_message()
 

@@ -9,7 +9,7 @@ load_dotenv()
 mock = {"message": "Hello World"}
 
 
-def test_main():
+def test_main() -> None:
     "Test the main function of the app."
     at = AppTest.from_file("app/main.py").run()
     assert at.title[0].value == "Frontend App"
