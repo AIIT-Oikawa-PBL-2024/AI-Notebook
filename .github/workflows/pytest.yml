@@ -50,6 +50,16 @@ jobs:
       run: |
         poetry install --no-root
         poetry add pytest pytest-cov
+        poetry add ruff
+        poetry add mypy
+    
+    - name: Lint with Ruff
+      run: |
+        poetry run ruff check . --output-format=github
+    
+    - name: Lint with Mypy
+      run: |
+        poetry run mypy . --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
 
     - name: Test with pytest
       run: |        
@@ -100,7 +110,17 @@ jobs:
       run: |
         poetry install --no-root
         poetry add pytest pytest-cov
-
+        poetry add ruff
+        poetry add mypy
+      
+    - name: Lint with Ruff
+      run: |
+        poetry run ruff check . --output-format=github
+      
+    - name: Lint with Mypy
+      run: |
+        poetry run mypy . --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
+  
     - name: Test with pytest
       run: |        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
