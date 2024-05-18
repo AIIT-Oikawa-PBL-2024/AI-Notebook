@@ -122,10 +122,9 @@ https://github.com/github/gitignore/blob/main/Python.gitignore
 コードラビットの設定ファイル
 
 - .vscode/settings.json<br>
-リンター、フォーマッターとしてruffを設定<br>
-`pyproject.tomlにも[tool.ruff]を設定済み`<br>
-⭐️poetryのパッケージにruffを追加したが反映されず、
-私の場合、VSCodeの拡張機能でもruffをインストール
+リンター、フォーマッターとしてruff, mypyを設定<br>
+`pyproject.tomlにも[tool.ruff],[tool.mypy]を設定済み`<br>
+⭐️VSCodeの拡張機能でもruffとmypyをインストール
 
 ## テストの実行
 - Dev Containerでの実行
@@ -137,7 +136,7 @@ https://github.com/github/gitignore/blob/main/Python.gitignore
       `backend`, `frontend`で処理を分けています。
       `coverage-path-prefix`を設定することで、リンクのパスに飛ぶようになりました。
 
-
    - GitHub Actionsの処理について
+      - Ruff, Mypy, Pytestが実行されます。
       参考ページ
       https://github.com/MishaKav/pytest-coverage-comment

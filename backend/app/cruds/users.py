@@ -16,7 +16,7 @@ async def create_user(
     return user
 
 
-async def get_users(db: AsyncSession) -> list[tuple[int, str, str]]:
+async def get_users(db: AsyncSession) -> list[users_schemas.User]:
     result: Result = await db.execute(
         select(
             users_models.User.id,
@@ -24,7 +24,11 @@ async def get_users(db: AsyncSession) -> list[tuple[int, str, str]]:
             users_models.User.email,
         )
     )
-    return result.all()
+    users = result.all()
+    return [
+        users_schemas.User(id=user.id, username=user.username, email=user.email)
+        for user in users
+    ]
 
 
 async def get_user_by_id(db: AsyncSession, user_id: int) -> users_models.User | None:
@@ -32,20 +36,6 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> users_models.User | 
         select(users_models.User).filter(users_models.User.id == user_id)
     )
     return result.scalars().first()
-
-
-async def update_user(
-    db: AsyncSession,
-    user_create: users_schemas.UserCreate,
-    original_user: users_models.User,
-) -> users_models.User:
-    original_user.username = user_create.username
-    original_user.email = user_create.email
-    original_user.password = user_create.password
-    db.add(original_user)
-    await db.commit()
-    await db.refresh(original_user)
-    return original_user
 
 
 async def delete_user(db: AsyncSession, original_user: users_models.User) -> None:

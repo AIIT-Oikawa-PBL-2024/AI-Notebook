@@ -1,8 +1,9 @@
 import os
-from sqlalchemy import create_engine
-from app.models.users import Base
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+
+from app.models.users import Base
 
 load_dotenv()
 
@@ -12,11 +13,13 @@ DB_HOST = os.getenv("DB_HOST", "db")
 DB_PORT = os.getenv("DB_PORT", "3306")
 
 
-DB_URL = (f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/dev-db?charset=utf8")
+DB_URL = (
+    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/dev-db?charset=utf8"
+)
 engine = create_engine(DB_URL, echo=True)
 
 
-def reset_db():
+def reset_db() -> None:
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
