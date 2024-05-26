@@ -70,8 +70,8 @@ jobs:
       with:
           coverage-path-prefix: backend/
           title: Backend Coverage Report
-          pytest-coverage-path: ./backend/pytest-coverage.txt
-          junitxml-path: ./backend/pytest.xml  
+          pytest-coverage-path: backend/pytest-coverage.txt
+          junitxml-path: backend/pytest.xml  
 
   ci-frontend:
     runs-on: ubuntu-latest
@@ -130,7 +130,7 @@ jobs:
       with:
           coverage-path-prefix: frontend/
           title: Frontend Coverage Report
-          pytest-coverage-path: ./frontend/pytest-coverage.txt
-          junitxml-path: ./frontend/pytest.xml   
+          pytest-coverage-path: frontend/pytest-coverage.txt
+          junitxml-path: frontend/pytest.xml   
 
   
