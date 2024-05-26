@@ -12,7 +12,7 @@ uvicorn = {extras = ["standard"], version = "^0.29.0"}
 python-multipart = "^0.0.9"
 aiofiles = "^23.2.1"
 sqlalchemy = "^2.0.29"
-pymysql = "^1.1.0"
+pymysql = "^1.1.1"
 aiomysql = "^0.2.0"
 cryptography = "^42.0.5"
 mysql-connector-python = "^8.4.0"
@@ -48,6 +48,11 @@ select = [
 ]
 ignore = []
 fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"!app/**.py" = ["F", "B", "E", "W", "I"]
+"app/db" = ["F", "B", "E", "W", "I"]
+"__init__.py" = ["F", "B", "E", "W", "I"]
 
 
 [tool.mypy]
