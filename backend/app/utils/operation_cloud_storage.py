@@ -13,16 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 # 環境変数から認証情報を取得
-GOOGLE_APPLICATION_CREDENTIALS_JSON: str | None = os.getenv(
-    "GOOGLE_APPLICATION_CREDENTIALS_JSON"
-)
-
-
-# 認証情報が設定されていない場合はエラーを発生させる
-if GOOGLE_APPLICATION_CREDENTIALS_JSON is None:
-    raise ValueError("認証情報が設定されていません")
-else:
-    credentials = GOOGLE_APPLICATION_CREDENTIALS_JSON
+credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
 
 
 # GCSにファイルをアップロードする関数
@@ -30,7 +21,7 @@ def upload_blob(
     bucket_name: str,
     source_file_name: str,
     destination_blob_name: str,
-    credentials: str = credentials,
+    credentials: str = str(credentials),
 ) -> None:
     """Uploads a file to the bucket."""
     client = storage.Client.from_service_account_json(credentials)
@@ -51,7 +42,7 @@ def upload_blob_from_stream(
     bucket_name: str,
     file_obj: io.BytesIO,
     destination_blob_name: str,
-    credentials: str = credentials,
+    credentials: str = str(credentials),
 ) -> None:
     """Uploads bytes from a stream or other file-like object to a blob."""
 
