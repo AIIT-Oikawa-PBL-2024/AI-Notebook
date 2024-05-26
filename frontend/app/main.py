@@ -1,6 +1,6 @@
 import os
 
-import requests
+import requests  # type: ignore
 import streamlit as st
 from dotenv import load_dotenv
 

@@ -4,13 +4,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
-    paths-ignore:
-      - 'backend/app/db/**'
+    branches: [ "main" ]    
   pull_request:
     branches: [ "main" ]    
-    paths-ignore:
-      - 'backend/app/db/**'
 
 permissions:
   contents: write  
@@ -59,11 +55,11 @@ jobs:
     
     - name: Lint with Ruff
       run: |
-        poetry run ruff check . --output-format=github
+        poetry run ruff check --exclude=./app/db ./app --output-format=github
       
     - name: Lint with Mypy
       run: |
-        poetry run mypy . --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
+        poetry run mypy ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
       
     - name: Test with pytest
       run: |        
@@ -119,11 +115,11 @@ jobs:
       
     - name: Lint with Ruff
       run: |
-        poetry run ruff check . --output-format=github         
+        poetry run ruff check ./app --output-format=github         
       
     - name: Lint with Mypy
       run: |
-        poetry run mypy . --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
+        poetry run mypy ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
       
     - name: Test with pytest
       run: |        
