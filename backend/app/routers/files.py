@@ -19,10 +19,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 # 環境変数から認証情報を取得
-if os.getenv("BUCKET_NAME") is None:
-    raise ValueError("BUCKET_NAME is not set")
-else:
-    BUCKET_NAME: str | None = os.getenv("BUCKET_NAME")
+BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
 
 # ルーターの設定
 router = APIRouter(
