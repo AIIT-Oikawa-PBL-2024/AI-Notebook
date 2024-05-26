@@ -16,6 +16,9 @@ pymysql = "^1.1.0"
 aiomysql = "^0.2.0"
 cryptography = "^42.0.5"
 mysql-connector-python = "^8.4.0"
+google-cloud-storage = "^2.16.0"
+alembic = "^1.13.1"
+sqlalchemy-utils = "^0.41.2"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -50,13 +53,6 @@ fixable = ["ALL"]
 [tool.mypy]
 python_version = "3.11"
 disallow_untyped_defs = true
-
-[[tool.mypy.overrides]]
-# サードパーティの[import-untyped]を無視する
-module = [
-    'requests/*',
-    'psutil',
-]
 ignore_missing_imports = true
 
 

@@ -43,13 +43,6 @@ fixable = ["ALL"]
 [tool.mypy]
 python_version = "3.11"
 disallow_untyped_defs = true
-
-[[tool.mypy.overrides]]
-# サードパーティの[import-untyped]を無視する
-module = [
-    'requests/*',
-    'psutil',
-]
 ignore_missing_imports = true
 
 

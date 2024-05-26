@@ -16,12 +16,14 @@ copilot-practice2
 │   │    └── settings.json
 │   ├── app
 │   │    ├── main.py
-│   │    ├── db.py
+│   │    ├── database.py
 │   │    ├── migrate_db.py
 │   │    ├── cruds
+│   │    ├── db ※マイグレーション（alembic_dev, alembic_test）
 │   │    ├── models
 │   │    ├── routers
-│   │    └── schemas
+│   │    ├── schemas
+│   │    └── utils 
 │   ├── tests
 │   ├── Dockerfile.backend
 │   ├── poetry.lock
@@ -94,13 +96,26 @@ copilot-practice2
    backend, frontendのコンテナ内で操作できる。
 
 - DBの起動確認
-   `$ docker compose exec db mysql dev-db`で起動
-- DBマイグレーション
-   `$ docker compose exec backend poetry run python -m app.migrate_db`
+   - 開発用DB
+      - `$ docker compose exec dev-db mysql dev-db`で起動
+   - テスト用DB
+      - `$ docker compose exec test-db mysql test-db`で起動
+
+- DBマイグレーション(backendのDevContainer内で実行)
+   - 開発用DB
+      - `$ cd app/db/alembic_dev`
+      - `$ alembic revision --autogenerate -m "dev migration"`
+      - `$ alembic upgrade head`
+   - テスト用DB
+      - `$ cd app/db/alembic_test`
+      - `$ alembic revision --autogenerate -m "test migration"`
+      - `$ alembic upgrade head`
+  
 - テーブル作成の確認
-   `$ docker compose exec db mysql dev-db`
-   `mysql> SHOW TABLES;`
-   `mysql> DESCRIBE users;`
+   - `$ docker compose exec dev-db mysql dev-db`
+   - `mysql> SHOW TABLES;`
+   - `mysql> DESCRIBE users;`
+
 - DBマイグレーション実施後は、
    FastAPIのSwagger UIからDBにアクセス可能になる。
    8000番ポートの`/docs`パスで確認
