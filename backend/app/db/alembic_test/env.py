@@ -30,12 +30,12 @@ db_host = os.getenv("TEST_DB_HOST", "test-db")
 db_port = os.getenv("TEST_DB_PORT", "3307")
 db_name = os.getenv("TEST_DB_NAME", "test-db")
 database_url = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-print(f"database_url: {database_url}")
 
 if not database_url:
     raise ValueError("The sqlalchemy.url configuration option must be a string.")
 
 config.set_main_option("sqlalchemy.url", database_url)
+
 
 # オフラインモードのマイグレーション関数
 def run_migrations_offline() -> None:
@@ -53,12 +53,14 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
+
 # オンラインモードのマイグレーション関数
 def do_run_migrations(connection: Connection) -> None:
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
@@ -74,6 +76,7 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         do_run_migrations(connection)
+
 
 if context.is_offline_mode():
     run_migrations_offline()
