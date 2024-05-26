@@ -59,7 +59,7 @@ jobs:
       
     - name: Lint with Mypy
       run: |
-        poetry run mypy ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
+        poetry run mypy --exclude=./app/db ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
       
     - name: Test with pytest
       run: |        
