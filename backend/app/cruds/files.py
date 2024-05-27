@@ -16,6 +16,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 # gcsにあげる時にファイル名が被ってたら拒否
 # 同じファイル名が上がったときに、エラーにするかバケットのファイル削除する？ -> 同じファイルだと上書きだが、警告出す（先にファイル情報をgetして一覧で出しておく）
 # mypyの設定
+# テストコメント
 
 async def post_files(file: UploadFile):
     allowed_extensions = [".png", ".pdf", ".jpeg", ".jpg"]
