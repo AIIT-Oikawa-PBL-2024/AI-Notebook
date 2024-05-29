@@ -45,7 +45,7 @@ async def upload_files(
     for file in files:
         if file.filename and BUCKET_NAME:
             # UploadFileをBytesIOに変換
-            file_bytes = BytesIO(await file.read())                        
+            file_bytes = BytesIO(await file.read())
             try:
                 upload_blob_from_stream(BUCKET_NAME, file_bytes, file.filename)
                 logging.info(f"File {file.filename} uploaded to {BUCKET_NAME}.")
