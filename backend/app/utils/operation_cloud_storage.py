@@ -16,27 +16,6 @@ logging.basicConfig(level=logging.INFO)
 credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
 
 
-# GCSにファイルをアップロードする関数
-def upload_blob(
-    bucket_name: str,
-    source_file_name: str,
-    destination_blob_name: str,
-    credentials: str = str(credentials),
-) -> None:
-    """Uploads a file to the bucket."""
-    client = storage.Client.from_service_account_json(credentials)
-
-    # 作成したバケットの名前を指定します
-    bucket = storage.Bucket(client, bucket_name)
-    blob = bucket.blob(destination_blob_name)
-
-    # ファイルをアップロード(同じファイル名は上書きされます)
-    blob.upload_from_filename(source_file_name)
-
-    # ログ出力
-    logging.info(f"File {source_file_name} uploaded to {destination_blob_name}.")
-
-
 # GCSにストリーミングでアップロードする関数
 def upload_blob_from_stream(
     bucket_name: str,
@@ -46,7 +25,6 @@ def upload_blob_from_stream(
 ) -> None:
     """Uploads bytes from a stream or other file-like object to a blob."""
 
-    file_obj = io.BytesIO()
     client = storage.Client.from_service_account_json(credentials)
     bucket = storage.Bucket(client, bucket_name)
     blob = bucket.blob(destination_blob_name)
@@ -61,3 +39,24 @@ def upload_blob_from_stream(
     logging.info(
         f"Stream data uploaded to {destination_blob_name} in bucket {bucket_name}."
     )
+
+
+# GCSにファイルをアップロードする関数
+# def upload_blob(
+#     bucket_name: str,
+#     source_file_name: str,
+#     destination_blob_name: str,
+#     credentials: str = str(credentials),
+# ) -> None:
+#     """Uploads a file to the bucket."""
+#     client = storage.Client.from_service_account_json(credentials)
+
+#     # 作成したバケットの名前を指定します
+#     bucket = storage.Bucket(client, bucket_name)
+#     blob = bucket.blob(destination_blob_name)
+
+#     # ファイルをアップロード(同じファイル名は上書きされます)
+#     blob.upload_from_filename(source_file_name)
+
+#     # ログ出力
+#     logging.info(f"File {source_file_name} uploaded to {destination_blob_name}.")
