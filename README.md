@@ -119,7 +119,7 @@ copilot-practice2
   - テスト用 DB
     - `$ cd app/db/alembic_test`
     - エラーが出る場合は最新のマイグレーションファイルを削除
-      - (`/backend/app/db/alembic_test/versions/a53b2fedf2e7_test_migration.py`があれば削除)
+      - (`/backend/app/db/alembic_test/versions/a53b2fedf2e7_test_migration.py`があれば削除)f
     - マイグレーションできることを確認
     - `$ alembic revision --autogenerate -m "test migration"`
     - `$ alembic upgrade head`
