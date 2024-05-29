@@ -77,7 +77,9 @@ copilot-practice2
 ## 作成方法
 - `git clone`でリポジトリをダウンロード
 - ルートディレクトリにある`.env.sample`ファイルをコピーして、`.env`ファイルを作成<br>
-   設定は変更せず、passwordはブランクのままにしてください。
+  DB の設定は変更せず、password はブランクのままにしてください。<br>
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON`に GCP サービスアカウントキーのファイルのパスを入力
+  - `BUCKET_NAME`に GCP のバケット名を入力
 - `$ docker compose build --no-cache`でDockerイメージをビルド
 - パッケージ管理はpoetryを使用<br>
 　backendとfrontendのそれぞれの定義ファイルからインストール<br>
@@ -101,15 +103,22 @@ copilot-practice2
    - テスト用DB
       - `$ docker compose exec test-db mysql test-db`で起動
 
-- DBマイグレーション(backendのDevContainer内で実行)
-   - 開発用DB
-      - `$ cd app/db/alembic_dev`
-      - `$ alembic revision --autogenerate -m "dev migration"`
-      - `$ alembic upgrade head`
-   - テスト用DB
-      - `$ cd app/db/alembic_test`
-      - `$ alembic revision --autogenerate -m "test migration"`
-      - `$ alembic upgrade head`
+- DB マイグレーション(backend の DevContainer 内で実行)
+  - 開発用 DB
+    - `$ cd app/db/alembic_dev`
+    - エラーが出る場合は最新のマイグレーションファイルを削除
+      - (`/backend/app/db/alembic_dev/versions/828f9c90de2f_dev_migration.py`があれば削除)
+    - `$ alembic upgrade head`
+    - マイグレーションできることを確認
+    - `$ alembic revision --autogenerate -m "dev migration`
+    - `$ alembic upgrade head`
+  - テスト用 DB
+    - `$ cd app/db/alembic_test`
+    - エラーが出る場合は最新のマイグレーションファイルを削除
+      - (`/backend/app/db/alembic_test/versions/a53b2fedf2e7_test_migration.py`があれば削除)
+    - マイグレーションできることを確認
+    - `$ alembic revision --autogenerate -m "test migration"`
+    - `$ alembic upgrade head`
   
 - テーブル作成の確認
    - `$ docker compose exec dev-db mysql dev-db`

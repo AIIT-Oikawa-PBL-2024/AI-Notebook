@@ -30,7 +30,7 @@ def upload_blob(
     bucket = storage.Bucket(client, bucket_name)
     blob = bucket.blob(destination_blob_name)
 
-    # ファイルをアップロード(同じファイル名は上書きされます)
+    # ファイルをアップロード(同じ名前は上書きされる)
     blob.upload_from_filename(source_file_name)
 
     # ログ出力
@@ -46,7 +46,6 @@ def upload_blob_from_stream(
 ) -> None:
     """Uploads bytes from a stream or other file-like object to a blob."""
 
-    file_obj = io.BytesIO()
     client = storage.Client.from_service_account_json(credentials)
     bucket = storage.Bucket(client, bucket_name)
     blob = bucket.blob(destination_blob_name)
