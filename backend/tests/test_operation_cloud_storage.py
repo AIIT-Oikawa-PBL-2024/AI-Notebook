@@ -1,10 +1,11 @@
+import io
 from typing import Generator
 from unittest import mock
 
 import pytest
 from google.resumable_media.requests.upload import MultipartUpload
 
-from app.utils.operation_cloud_storage import upload_blob
+from app.utils.operation_cloud_storage import upload_blob, upload_blob_from_stream
 
 
 # GCSクライエントのモックを作成

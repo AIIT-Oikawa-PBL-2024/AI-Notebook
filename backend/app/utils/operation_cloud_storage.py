@@ -42,21 +42,21 @@ def upload_blob_from_stream(
 
 
 # GCSにファイルをアップロードする関数
-# def upload_blob(
-#     bucket_name: str,
-#     source_file_name: str,
-#     destination_blob_name: str,
-#     credentials: str = str(credentials),
-# ) -> None:
-#     """Uploads a file to the bucket."""
-#     client = storage.Client.from_service_account_json(credentials)
+def upload_blob(
+    bucket_name: str,
+    source_file_name: str,
+    destination_blob_name: str,
+    credentials: str = str(credentials),
+) -> None:
+    """Uploads a file to the bucket."""
+    client = storage.Client.from_service_account_json(credentials)
 
-#     # 作成したバケットの名前を指定します
-#     bucket = storage.Bucket(client, bucket_name)
-#     blob = bucket.blob(destination_blob_name)
+    # 作成したバケットの名前を指定します
+    bucket = storage.Bucket(client, bucket_name)
+    blob = bucket.blob(destination_blob_name)
 
-#     # ファイルをアップロード(同じファイル名は上書きされます)
-#     blob.upload_from_filename(source_file_name)
+    # ファイルをアップロード(同じファイル名は上書きされます)
+    blob.upload_from_filename(source_file_name)
 
-#     # ログ出力
-#     logging.info(f"File {source_file_name} uploaded to {destination_blob_name}.")
+    # ログ出力
+    logging.info(f"File {source_file_name} uploaded to {destination_blob_name}.")
