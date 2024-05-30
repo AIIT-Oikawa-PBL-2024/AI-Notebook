@@ -96,7 +96,14 @@ jobs:
         poetry add pytest pytest-cov
         poetry add ruff
         poetry add mypy
-    
+
+    - name: Set up Google Cloud credentials
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      run: |
+        echo "${GOOGLE_APPLICATION_CREDENTIALS_JSON}" > $HOME/gcloud-key.json
+        export GOOGLE_APPLICATION_CREDENTIALS_JSON=$HOME/gcloud-key.json
+          
     - name: Lint with Ruff
       run: |
         poetry run ruff check --exclude=./app/db ./app --output-format=github
@@ -104,8 +111,11 @@ jobs:
     - name: Lint with Mypy
       run: |
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-      
+     
     - name: Test with pytest
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: $HOME/gcloud-key.json
+        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
       run: |
         cp ./tests/conftest_ci.py ./tests/conftest.py        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
