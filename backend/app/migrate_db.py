@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 from app.models.users import Base
+from app.models.files import Base
 
 load_dotenv()
 

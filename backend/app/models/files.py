@@ -1,5 +1,7 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+
 from app.db import Base
+
 
 # filesテーブルを定義
 class File(Base):
@@ -11,3 +13,5 @@ class File(Base):
     file_size = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False)
+
+

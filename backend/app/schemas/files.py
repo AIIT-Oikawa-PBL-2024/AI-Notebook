@@ -1,11 +1,14 @@
 from pydantic import BaseModel
 
+
 class FileBase(BaseModel):
     file_name: str
     file_path: str
 
+
 class FileCreate(FileBase):
     pass
+
 
 class File(FileBase):
     id: int

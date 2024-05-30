@@ -1,56 +1,76 @@
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-
+import asyncio
+import io
+import logging
 import os
 import app.models.files as file_models
 import app.schemas.files as files_schemas
-
 from google.cloud import storage
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from google.oauth2 import service_account
+from fastapi import FastAPI, File, UploadFile, HTTPException, Response
+from typing import List
+from dotenv import load_dotenv
 
-# 複数ファイルをリストで受け取って条件似合わないものがあればスルー
-# ユーザは複数ファイルアップロード、Streamlitで1つずつ送る？
-# 後々動画が入ってくることも考慮すべき
-# クライアント側には一般的なエラー伝える
-# gcsにあげる時にファイル名が被ってたら拒否
-# 同じファイル名が上がったときに、エラーにするかバケットのファイル削除する？ -> 同じファイルだと上書きだが、警告出す（先にファイル情報をgetして一覧で出しておく）
-# mypyの設定
-# テストコメント
+# 環境変数を読み込む
+load_dotenv()
 
-async def post_files(file: UploadFile):
+# 環境変数から認証情報取得
+credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+credentials = service_account.Credentials.from_service_account_file(credentials_path)
+
+async def post_files(files: List[UploadFile], db: AsyncSession) -> dict:
     allowed_extensions = [".png", ".pdf", ".jpeg", ".jpg"]
-    file_extensions = os.path.splitext(file.filename)[1].lower()
-# リストのファイルを確認して成功失敗を教える、失敗したファイルを教えてあげる
-
-    # if file_extensions not in allowed_extensions:
-    #     raise HTTPException(status_code=400, detail="無効なファイル拡張子です") 
-
+    success_files = []  # アップロード成功ファイル
+    failed_files = []  # アップロード失敗ファイル
+    
+    #  オブジェクトアップロード処理
     try:
-        client = storage.Client() # Google Cloud Storageのクライアントを作成
-        bucket = client.bucket(os.environ["GCS_BUCKET_NAME"])  # バケットを取得->環境変数にバケット名入れる
-        file_name = file.filename  # ファイル名取得 -> バイナリとして取らないとダメなので、filename使えない？
-        blob = bucket.blob(file_name)  # バケットにBlobを作成
-        blob.upload_from_file(file.file)  # ファイルをアップロード
-        return {"message": "ファイルのアップロードに成功しました -> 成功と失敗したファイルを教える"}
+        bucket_name = os.getenv("GCS_BUCKET_NAME")
+        client = storage.Client(credentials=credentials)
+        bucket = client.bucket(bucket_name)
+        upload_tasks = []
+        for file in files:
+            file_extension = os.path.splitext(file.filename)[1].lower()
+            if file_extension not in allowed_extensions:
+                failed_files.append({"filename": file.filename, "reason": "拡張子が許可されていません"})
+                continue #拡張子が許可されている場合は下記の処理に続く
 
+            file_content = await file.read()
+            file_obj = io.BytesIO(file_content)
+            destination_blob_name = file.filename
+            blob = bucket.blob(destination_blob_name)
+            file_obj.seek(0)
+
+            try:
+                upload_result = await blob.upload_from_file(file_obj)
+                upload_tasks.append((file, upload_result))
+            except Exception as e:
+                failed_files.append({"filename": file.filename, "reason": str(e)})
+
+        if not upload_tasks:
+            return {
+                "message": "ファイルアップロードが完了しました。",
+                "success_files": success_files,
+                "failed_files": failed_files,
+            }
+
+        for file, result in upload_tasks:
+            if isinstance(result, Exception):
+                failed_files.append({"filename": file.filename, "reason": str(result)})
+            else:
+                success_files.append(file.filename)
+                logging.info(f"Stream data uploaded to {file.filename} in bucket {bucket_name}.")
+                db_file = file_models.File(file_name=file.filename)
+                db.add(db_file)
+                await db.commit()
+                await db.refresh(db_file)
+
+        return {
+            "message": "ファイルアップロードが完了しました。",
+            "success_files": success_files,
+            "failed_files": failed_files,
+        }
     except Exception as e:
-        # エラーが発生した場合は、HTTPExceptionを発生させる
         raise HTTPException(status_code=500, detail=str(e))
-
-async def post_filename_to_db(db: AsyncSession, file: UploadFile):
-    # ファイル名をデータベースに保存
-    db_file = file_models.File(file_name=file.filename)
-    db.add(db_file)
-    await db.commit()
-    await db.refresh(db_file)
-    return db_file
-
-async def create_file(db: AsyncSession, file: UploadFile):
-    # ファイルをGoogle Cloud Storageにアップロード
-    await post_files(file)
-
-    # アップロードしたファイルの情報をデータベースに保存
-    db_file = await post_filename_to_db(db, file)
-
-    return db_file
