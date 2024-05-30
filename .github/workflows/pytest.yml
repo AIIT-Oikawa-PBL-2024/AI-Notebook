@@ -125,10 +125,6 @@ jobs:
           title: Backend Coverage Report
           pytest-coverage-path: backend/pytest-coverage.txt
           junitxml-path: backend/pytest.xml
-      
-    - name: delete GOOGLE_APPLICATION_CREDENTIALS_JSON
-      run: rm $GOOGLE_APPLICATION_CREDENTIALS_JSON
-      if: ${{ always() }}
 
   ci-frontend:
     runs-on: ubuntu-latest
