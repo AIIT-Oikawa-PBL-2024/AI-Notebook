@@ -14,6 +14,10 @@ permissions:
 
 jobs:
   ci-backend:
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -25,7 +29,7 @@ jobs:
       db:
         image: mysql:8.0
         ports:
-          - 3306:3306
+          - 3307:3306
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
           MYSQL_DATABASE: "test-db"
@@ -96,14 +100,7 @@ jobs:
         poetry add pytest pytest-cov
         poetry add ruff
         poetry add mypy
-
-    - name: Set up Google Cloud credentials
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
-      run: |
-        echo "${GOOGLE_APPLICATION_CREDENTIALS_JSON}" > $HOME/gcloud-key.json
-        export GOOGLE_APPLICATION_CREDENTIALS_JSON=$HOME/gcloud-key.json
-          
+        
     - name: Lint with Ruff
       run: |
         poetry run ruff check --exclude=./app/db ./app --output-format=github
@@ -111,11 +108,11 @@ jobs:
     - name: Lint with Mypy
       run: |
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-     
-    - name: Test with pytest
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: $HOME/gcloud-key.json
-        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+    
+    - name: make GOOGLE_APPLICATION_CREDENTIALS_JSON
+      run: echo $GCLOUD_SERVICE_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS_JSON      
+
+    - name: Test with pytest      
       run: |
         cp ./tests/conftest_ci.py ./tests/conftest.py        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
@@ -126,7 +123,11 @@ jobs:
           coverage-path-prefix: backend/
           title: Backend Coverage Report
           pytest-coverage-path: backend/pytest-coverage.txt
-          junitxml-path: backend/pytest.xml  
+          junitxml-path: backend/pytest.xml
+      
+    - name: delete GOOGLE_APPLICATION_CREDENTIALS_JSON
+      run: rm $GOOGLE_APPLICATION_CREDENTIALS_JSON
+      if: ${{ always() }}
 
   ci-frontend:
     runs-on: ubuntu-latest
