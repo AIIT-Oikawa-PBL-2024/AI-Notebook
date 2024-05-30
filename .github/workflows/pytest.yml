@@ -13,11 +13,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  ci-backend:
-    env:
-      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
-      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-      GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+  ci-backend:    
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -29,7 +25,7 @@ jobs:
       db:
         image: mysql:8.0
         ports:
-          - 3307:3306
+          - 3306:3306
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
           MYSQL_DATABASE: "test-db"
@@ -109,10 +105,15 @@ jobs:
       run: |
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
     
-    - name: make GOOGLE_APPLICATION_CREDENTIALS_JSON
-      run: echo $GCLOUD_SERVICE_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS_JSON      
-
-    - name: Test with pytest      
+    - name: Set Up GOOGLE_APPLICATION_CREDENTIALS_JSON
+      env:
+        GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      run: echo $GCLOUD_SERVICE_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS_JSON
+   
+    - name: Test with pytest
+      env:
+        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}    
       run: |
         cp ./tests/conftest_ci.py ./tests/conftest.py        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
