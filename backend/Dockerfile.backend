@@ -11,9 +11,6 @@ RUN pip install poetry
 
 COPY pyproject.toml* poetry.lock* /backend/
 
-# Google Cloudモジュール
-RUN pip install google-cloud-storage 
-
 RUN poetry config virtualenvs.in-project true && \
     poetry install --no-root
 
