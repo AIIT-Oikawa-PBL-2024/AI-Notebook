@@ -40,6 +40,11 @@ jobs:
       run:
         working-directory: ./backend
 
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+
     steps:
     - uses: actions/checkout@v4
 
@@ -105,19 +110,27 @@ jobs:
       run: |
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
     
-    - name: Set Up GOOGLE_APPLICATION_CREDENTIALS_JSON
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: 'latest'
+  
+    - name: Authenticate to Google Cloud
+      run: |
+        echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > ${HOME}/gcloud.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud.json
+        gcloud config set project $GCP_PROJECT_ID
       env:
-        GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
-      run: echo $GCLOUD_SERVICE_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS_JSON
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${HOME}/gcloud.json
    
-    - name: Test with pytest
-      env:
-        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}    
+    - name: Test with pytest         
       run: |
         cp ./tests/conftest_ci.py ./tests/conftest.py        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
       continue-on-error: false
+      env:
+        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${HOME}/gcloud.json
         
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
