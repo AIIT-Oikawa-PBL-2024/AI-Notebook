@@ -42,7 +42,7 @@ jobs:
 
     env:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
       BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
 
     steps:
@@ -117,11 +117,11 @@ jobs:
   
     - name: Authenticate to Google Cloud
       run: |
-        echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > ${HOME}/gcloud.json
+        echo "$GCP_SERVICE_ACCOUNT_KEY" > ${HOME}/gcloud.json
         gcloud auth activate-service-account --key-file=${HOME}/gcloud.json
         gcloud config set project $GCP_PROJECT_ID
       env:
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${HOME}/gcloud.json
+        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
    
     - name: Test with pytest         
       run: |
@@ -130,7 +130,7 @@ jobs:
       continue-on-error: false
       env:
         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${HOME}/gcloud.json
+        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
         
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
@@ -139,6 +139,13 @@ jobs:
           title: Backend Coverage Report
           pytest-coverage-path: backend/pytest-coverage.txt
           junitxml-path: backend/pytest.xml
+    
+    - name: Upload test results to Google Cloud Storage
+      run: |
+        echo "Uploading test results to Google Cloud Storage..."
+        gsutil cp pytest-coverage.txt gs://$BUCKET_NAME/
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
 
   ci-frontend:
     runs-on: ubuntu-latest

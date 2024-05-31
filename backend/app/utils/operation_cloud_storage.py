@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 # 環境変数から認証情報を取得
-credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 
 # GCSにストリーミングでアップロードする関数
