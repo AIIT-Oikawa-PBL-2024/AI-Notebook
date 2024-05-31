@@ -1,4 +1,4 @@
-# AI-NoteBook-template
+# AI-NoteBook-template!!!
 フロントエンドはStreamlit、バックエンドはFastAPIを利用
 ```
 copilot-practice2
