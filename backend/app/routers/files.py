@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
-from app.utils.operation_cloud_storage import upload_blob_from_stream
 
 # 環境変数を読み込む
 load_dotenv()
@@ -34,7 +33,7 @@ JST = timezone(timedelta(hours=9))
 db_dependency = Depends(get_db)
 
 
-# 複数ファイルのアップロード
+# 複数ファイルのDB登録のみ
 @router.post("/upload", response_model=list[files_schemas.File])
 async def upload_files(
     files: list[UploadFile],
@@ -43,16 +42,16 @@ async def upload_files(
     uploaded_files: list = []
 
     for file in files:
-        if file.filename and BUCKET_NAME:
+        if file.filename:
             # UploadFileをBytesIOに変換
             file_bytes = BytesIO(await file.read())
-            try:
-                upload_blob_from_stream(BUCKET_NAME, file_bytes, file.filename)
-                logging.info(f"File {file.filename} uploaded to {BUCKET_NAME}.")
-            except Exception as e:
-                raise HTTPException(
-                    status_code=500, detail="ファイルをアップロードできませんでした"
-                ) from e
+            # try:
+            #     upload_blob_from_stream(BUCKET_NAME, file_bytes, file.filename)
+            #     logging.info(f"File {file.filename} uploaded to {BUCKET_NAME}.")
+            # except Exception as e:
+            #     raise HTTPException(
+            #         status_code=500, detail="ファイルをアップロードできませんでした"
+            #     ) from e
 
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)

@@ -106,31 +106,31 @@ async def test_get_file_by_id(session: AsyncSession) -> None:
 
 
 # ファイル削除のテスト
-# @pytest.mark.asyncio
-# async def test_delete_file(session: AsyncSession) -> None:
-#     user_id = await get_user_id(session)
+@pytest.mark.asyncio
+async def test_delete_file(session: AsyncSession) -> None:
+    user_id = await get_user_id(session)
 
-#     async with AsyncClient(
-#         transport=ASGITransport(app),  # type: ignore
-#         base_url="http://test",
-#     ) as client:
-#         file_content = b"test file content"
-#         files = [
-#             ("files", ("test_file.pdf", file_content, "application/pdf")),
-#         ]
-#         upload_response = await client.post(
-#             f"/files/upload?user_id={user_id}", files=files
-#         )
-#         print(upload_response.text)  # デバッグ用出力
-#         assert upload_response.status_code == 200
-#         upload_data = upload_response.json()
-#         file_id = upload_data[0]["id"]
+    async with AsyncClient(
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://test",
+    ) as client:
+        file_content = b"test file content"
+        files = [
+            ("files", ("test_file.pdf", file_content, "application/pdf")),
+        ]
+        upload_response = await client.post(
+            f"/files/upload?user_id={user_id}", files=files
+        )
+        print(upload_response.text)  # デバッグ用出力
+        assert upload_response.status_code == 200
+        upload_data = upload_response.json()
+        file_id = upload_data[0]["id"]
 
-#         response = await client.delete(f"/files/{file_id}")
-#         print(response.text)  # デバッグ用出力
-#         assert response.status_code == 200
-#         data = response.json()
-#         assert data["detail"] == "ファイルが削除されました"
+        response = await client.delete(f"/files/{file_id}")
+        print(response.text)  # デバッグ用出力
+        assert response.status_code == 200
+        data = response.json()
+        assert data["detail"] == "ファイルが削除されました"
 
 
 # 存在しないファイルIDによるファイル取得のテスト
