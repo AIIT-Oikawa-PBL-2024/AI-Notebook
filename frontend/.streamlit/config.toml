@@ -1,0 +1,5 @@
+[server]
+maxUploadSize = 200
+showSidebarNavigation = false
+[theme]
+sidebarEnabled = false
