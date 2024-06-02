@@ -14,6 +14,6 @@ async def upload_files(files: List[UploadFile] = None) -> dict:
     upload_result = await post_files(files)
     
     if "success" not in upload_result or not upload_result["success"]:
-        raise HTTPException(status_code=500, detail="ファイルのアップロードに失敗しました")
+        raise HTTPException(status_code=500, detail="Upload failed")
     
-    return upload_result
+    return {"success": upload_result.get("success", False)}

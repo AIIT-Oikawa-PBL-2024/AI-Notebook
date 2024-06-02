@@ -59,8 +59,10 @@ async def test_upload_files_success():
     file_paths = ["tests/5_アジャイルⅡ.pdf", "tests/AI-powered Code Review with LLM.pdf"]
     
     # UploadFileオブジェクトの作成
-    upload_files = [UploadFile(filename=os.path.basename(path), file=open(path, "rb")) for path in file_paths]
-    
+    upload_files = [
+        UploadFile(filename=os.path.basename(path), file=open(path, "rb"))
+        for path in file_paths
+        ]    
     # upload_files関数の呼び出し
     result = await files_crud.upload_files(upload_files)
     
