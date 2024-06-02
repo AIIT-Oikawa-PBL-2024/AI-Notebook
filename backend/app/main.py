@@ -5,6 +5,7 @@ from .routers import files, users
 
 app = FastAPI()
 app.include_router(users.router)
+app.include_router(files.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,8 +13,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(files.router)
-
 
 @app.get("/")
 async def read_root() -> dict[str, str]:
