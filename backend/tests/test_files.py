@@ -1,10 +1,10 @@
 import os
-from fastapi.testclient import TestClient
-from fastapi import UploadFile
-from dotenv import load_dotenv
-from app.main import app  # FastAPIアプリケーションのインスタンス
-from app.cruds import files as files_crud
 import pytest
+from dotenv import load_dotenv
+from fastapi import UploadFile
+from fastapi.testclient import TestClient
+from app.cruds import files as files_crud
+from app.main import app  # FastAPIアプリケーションのインスタンス
 
 load_dotenv()  # 環境変数の読み込み
 
@@ -15,8 +15,10 @@ def test_post_files_success():
     file_paths = ["tests/5_アジャイルⅡ.pdf", "tests/AI-powered Code Review with LLM.pdf"]
     
     # UploadFileオブジェクトの作成
-    upload_files = [UploadFile(filename=os.path.basename(path), file=open(path, "rb")) for path in file_paths]
-    
+    upload_files = [
+        UploadFile(filename=os.path.basename(path), file=open(path, "rb"))
+        for path in file_paths
+        ]  
     # リクエストの送信
     response = client.post("/files/", files=[("files", file) for file in upload_files])
     
@@ -35,8 +37,11 @@ def test_post_files_invalid_extension():
     file_paths = ["tests/test001.txt", "tests/test002.txt"]
     
     # UploadFileオブジェクトの作成
-    upload_files = [UploadFile(filename=os.path.basename(path), file=open(path, "rb")) for path in file_paths]
-    
+    upload_files = [
+        UploadFile(filename=os.path.basename(path), file=open(path, "rb"))
+        for path in file_paths
+        ]
+        
     # リクエストの送信
     response = client.post("/files/", files=[("files", file) for file in upload_files])
     

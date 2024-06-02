@@ -1,14 +1,15 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException,  File, UploadFile
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, File, UploadFile
 from app.cruds.files import post_files
+from typing import List
 
 router = APIRouter(prefix="/files")
 
 
 # 公式ドキュメント参照
 @router.post("/upload", response_model=dict)
-async def upload_files(files: List[UploadFile] = File(...)) -> dict:
+async def upload_files(files: List[UploadFile] = None) -> dict:
+    if files is None:
+        files = File(...)
     # ファイルをGoogle Cloud Storageにアップロード
     upload_result = await post_files(files)
     
