@@ -7,6 +7,9 @@ reviews:
   poem: false
   review_status: true
   collapse_walkthrough: false
+  path_filters:
+    - "!.gitignore"
+    - "!backend/app/db/alembic_*"
   auto_review:
     enabled: true
     ignore_title_keywords:
