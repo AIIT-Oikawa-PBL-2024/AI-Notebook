@@ -40,17 +40,22 @@ ignore = []
 fixable = ["ALL"]
 
 
+[tool.ruff.lint.per-file-ignores]
+"!app/**.py" = ["F", "B", "E", "W", "I"]
+"__init__.py" = ["F", "B", "E", "W", "I"]
+
+
 [tool.mypy]
 python_version = "3.11"
 disallow_untyped_defs = true
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 # サードパーティの[import-untyped]を無視する
 module = [
     'requests/*',
-    'psutil',
+    'httpx/*',    
 ]
-ignore_missing_imports = true
 
 
 [build-system]

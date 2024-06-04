@@ -16,6 +16,10 @@ pymysql = "^1.1.1"
 aiomysql = "^0.2.0"
 cryptography = "^42.0.5"
 mysql-connector-python = "^8.4.0"
+google-cloud-storage = "^2.16.0"
+alembic = "^1.13.1"
+sqlalchemy-utils = "^0.41.2"
+python-dotenv = "^1.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -46,17 +50,15 @@ select = [
 ignore = []
 fixable = ["ALL"]
 
+[tool.ruff.lint.per-file-ignores]
+"!app/**.py" = ["F", "B", "E", "W", "I"]
+"app/db" = ["F", "B", "E", "W", "I"]
+"__init__.py" = ["F", "B", "E", "W", "I"]
+
 
 [tool.mypy]
 python_version = "3.11"
 disallow_untyped_defs = true
-
-[[tool.mypy.overrides]]
-# サードパーティの[import-untyped]を無視する
-module = [
-    'requests/*',
-    'psutil',
-]
 ignore_missing_imports = true
 
 
