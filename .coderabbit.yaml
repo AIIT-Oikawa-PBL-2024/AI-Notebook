@@ -10,6 +10,11 @@ reviews:
   path_filters:
     - "!.gitignore"
     - "!backend/app/db/alembic_*"
+  path_instructions:
+    - path: "**/*.py"
+      instructions:
+        "Review the Python code for conformity with Ruff linter and formatter.\
+         Do not review the import path."
   auto_review:
     enabled: true
     ignore_title_keywords:
