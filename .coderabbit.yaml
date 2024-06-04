@@ -13,5 +13,9 @@ reviews:
       - "WIP"
       - "DO NOT MERGE"
     drafts: false
+  tools:
+    # デフォルトでONだが効いてるか不明なのであえて明示化
+    ruff:
+      enabled: true
 chat:
   auto_reply: true
