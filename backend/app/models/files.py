@@ -13,3 +13,4 @@ class File(Base):
     file_size = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime, nullable=False)
+    
