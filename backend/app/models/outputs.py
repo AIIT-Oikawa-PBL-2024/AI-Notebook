@@ -12,7 +12,6 @@ class Output(Base):
     user_id = Column(
         Integer, ForeignKey("users.id"), nullable=False
     )  # 外部キー制約を追加
-    # Varcharの最大長にするためLengthは未指定
     output = Column(TEXT, nullable=False)
     created_at = Column(DateTime, nullable=False)
 
