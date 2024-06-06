@@ -1,4 +1,5 @@
 import os
+import io
 import pytest
 from dotenv import load_dotenv
 from fastapi import UploadFile
@@ -10,64 +11,46 @@ load_dotenv()  # 環境変数の読み込み
 
 client = TestClient(app)
 
-def test_post_files_success():
-    # テストに使用するファイルのパス
-    file_paths = ["tests/5_アジャイルⅡ.pdf", "tests/AI-powered Code Review with LLM.pdf"]
-    
-    # UploadFileオブジェクトの作成
-    upload_files = [
-        UploadFile(filename=os.path.basename(path), file=open(path, "rb"))
-        for path in file_paths
-        ]  
-    # リクエストの送信
-    response = client.post("/files/", files=[("files", file) for file in upload_files])
-    
+def test_upload_files():
+    # アップロードするファイルのパス
+    file_paths = ["tests/5_アジャイルⅡ.pdf", "tests/AI-powered Code Review with LLM.pdf"]
+
+    # ファイルを開いてリクエストデータを作成
+    files = []
+    for file_path in file_paths:
+        with open(file_path, "rb") as file:
+            file_content = file.read()
+            file_name = os.path.basename(file_path)
+            file_obj = io.BytesIO(file_content)
+            files.append(("files", (file_name, file_obj)))
+
+    # ファイルアップロードのリクエストを送信
+    response = client.post("/files/upload", files=files)
+
     # レスポンスのステータスコードの検証
     assert response.status_code == 200
-    
-    # レスポンスの内容の検証
-    response_data = response.json()
-    assert "success" in response_data
-    assert response_data["success"] == True
-    assert "success_files" in response_data
-    assert len(response_data["success_files"]) == len(file_paths)
 
-def test_post_files_invalid_extension():
+    # レスポンスの内容の検証
+    assert response.json() == {"success": True}
+
+def test_upload_files_with_invalid_extension():
     # 無効な拡張子のファイルのパス
-    file_paths = ["tests/test001.txt", "tests/test002.txt"]
-    
-    # UploadFileオブジェクトの作成
-    upload_files = [
-        UploadFile(filename=os.path.basename(path), file=open(path, "rb"))
-        for path in file_paths
-        ]
-        
-    # リクエストの送信
-    response = client.post("/files/", files=[("files", file) for file in upload_files])
-    
+    invalid_file_paths = ["tests/test001.txt", "tests/test002.txt"]
+
+    # 無効な拡張子のファイルを開いてリクエストデータを作成
+    invalid_files = []
+    for file_path in invalid_file_paths:
+        with open(file_path, "rb") as file:
+            file_content = file.read()
+            file_name = os.path.basename(file_path)
+            file_obj = io.BytesIO(file_content)
+            invalid_files.append(("files", (file_name, file_obj)))
+
+    # ファイルアップロードのリクエストを送信
+    response = client.post("/files/upload", files=invalid_files)
+
     # レスポンスのステータスコードの検証
     assert response.status_code == 400
-    
-    # レスポンスの内容の検証
-    response_data = response.json()
-    assert "detail" in response_data
-    assert "拡張子がアップロード対象外のファイルです" in response_data["detail"]
 
-@pytest.mark.asyncio
-async def test_upload_files_success():
-    # テストに使用するファイルのパス
-    file_paths = ["tests/5_アジャイルⅡ.pdf", "tests/AI-powered Code Review with LLM.pdf"]
-    
-    # UploadFileオブジェクトの作成
-    upload_files = [
-        UploadFile(filename=os.path.basename(path), file=open(path, "rb"))
-        for path in file_paths
-        ]    
-    # upload_files関数の呼び出し
-    result = await files_crud.upload_files(upload_files)
-    
-    # 結果の検証
-    assert "success" in result
-    assert result["success"] == True
-    assert "success_files" in result
-    assert len(result["success_files"]) == len(file_paths)
+    # レスポンスの内容の検証
+    assert "拡張子がアップロード対象外のファイルです" in response.json()["detail"]

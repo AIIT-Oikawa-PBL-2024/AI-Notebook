@@ -6,7 +6,7 @@ from typing import List
 from fastapi import UploadFile, HTTPException
 from google.cloud import storage
 from google.oauth2 import service_account
-from google.api_core.exceptions import exceptions
+from google.api_core import exceptions
 
 # 環境変数を読み込む
 load_dotenv()
@@ -49,23 +49,23 @@ async def upload_files(ext_correct_files: List[UploadFile]) -> dict:
         destination_blob_name = file.filename
         blob = bucket.blob(destination_blob_name)
         file_obj.seek(0)
-    try:
-        # アップロードの実行
-        blob.upload_from_file(file_obj)
+        try:
+            # アップロードの実行
+            blob.upload_from_file(file_obj)
 
-        # アップロードの結果をチェック
-        if blob.exists():
-            success_message = f"ファイル {file.filename} のアップロードが成功しました"
-            success_files.append({"message": success_message, "filename": file.filename})
-        else:
-            error_message = f"ファイル {file.filename} のアップロードに失敗しました"
-            failed_files.append(error_message)
+            # アップロードの結果をチェック
+            if blob.exists():
+                success_message = f"ファイル {file.filename} のアップロードが成功しました"
+                success_files.append({"message": success_message, "filename": file.filename})
+            else:
+                error_message = f"ファイル {file.filename} のアップロードに失敗しました"
+                failed_files.append(error_message)
 
-    except exceptions.GoogleCloudError as e:
+        except exceptions.GoogleCloudError as e:
             error_message = f"ファイル {file.filename} のアップロード中にエラーが発生しました: {str(e)}"
             failed_files.append(error_message)
             
-    except Exception as e:
+        except Exception as e:
             error_message = f"ファイル {file.filename} のアップロード中に予期しないエラーが発生しました: {str(e)}"
             failed_files.append(error_message)
     
