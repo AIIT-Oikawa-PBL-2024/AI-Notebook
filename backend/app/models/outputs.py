@@ -6,7 +6,7 @@ from app.database import Base
 
 # filesテーブルを定義
 class File(Base):
-    __tablename__ = "output"
+    __tablename__ = "outputs"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     user_id = Column(
