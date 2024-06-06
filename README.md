@@ -125,12 +125,21 @@ copilot-practice2
   FastAPI の Swagger UI から DB にアクセス可能になる。
   8000 番ポートの`/docs`パスで確認
 
+
+- Google VertexAIのローカル環境での利用方法
+  - GCPでサービスアカウントキーの作成
+  - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納<br>
+    - **重要**　**ファイル名がグレーアウトされていて、GitHubに上がらないことを確認**
+  - backendのコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
+
+
 - パッケージを追加する場合
   - Dev Container を起動してから`$ poetry add <パッケージ>`
   - 開発環境のみのパッケージは`$ poetry add -D <パッケージ>`
     ※ローカル環境から操作したい場合
   - バックエンド `$ docker compose exec backend poetry add <パッケージ>`
   - フロントエンド `$ docker compose exec frontend poetry add <パッケージ>`
+
 
 ## 設定ファイル
 
