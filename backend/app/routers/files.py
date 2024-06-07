@@ -18,7 +18,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 # 環境変数から認証情報を取得
-BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
+BUCKET_NAME = str(os.getenv("BUCKET_NAME"))
 
 # ルーターの設定
 router = APIRouter(

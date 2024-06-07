@@ -12,6 +12,15 @@ def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("REGION", "your_region")
 
 
+# テストデータ
+MODEL_NAME = "gemini-1.5-pro-001"
+GENERATION_CONFIG = {
+    "temperature": 0.1,
+    "max_output_tokens": 8192,
+    "response_mime_type": "application/json",
+}
+
+
 # GenerativeModelクラスをモック
 @patch("app.utils.gemini_request.GenerativeModel", autospec=True)
 def test_generate_content(mock_GenerativeModel: Mock, mock_env_vars: None) -> None:
@@ -21,25 +30,15 @@ def test_generate_content(mock_GenerativeModel: Mock, mock_env_vars: None) -> No
     # モックの設定
     mock_model = mock_GenerativeModel.return_value
     mock_response = mock_model.generate_content.return_value
-    mock_response.text = "mocked response text"
+    mock_response.text = {"response": "mocked response text"}
 
     # テストデータ
-    pdf_file_uri = "gs://ai-notebook-test001/5_アジャイルⅡ.pdf"
-    prompt = """
-    あなたは、わかりやすく丁寧に教えることで評判の大学教授です。
-    ソフトウェア工学についてのスライド資料と解説です。
-    この資料と解説に基づいて、わかりやすく、親しみやすい解説がついていて、誰もが読みたくなるような整理ノートを作成して下さい。
-    ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、強調表示などのスタイルを作成して、スライド資料の図を複数挿入できるようにスライドのページと配置を指定してください。
-    また、コラムや用語解説を複数つけて、興味を持てるようにしてください。
-    最後に選択式と穴埋め式の練習問題を付けてください。
-    問題の解答は、最後に別枠で記載してください。
-    出力のファイル形式は、マークダウンのファイルで出力してください。
-    """
+    files = ["1_ソフトウェア工学の誕生.pdf", "5_アジャイルⅡ.pdf"]
 
     # テスト対象関数の実行
-    result = generate_content(pdf_file_uri, prompt)
+    result = generate_content(files)
 
     # アサーション（検証）
-    mock_GenerativeModel.assert_called_once_with(model_name="gemini-1.5-pro-001")
+    mock_GenerativeModel.assert_called_once_with(model_name=MODEL_NAME)
     mock_model.generate_content.assert_called_once()
-    assert result == "mocked response text"
+    assert result == {"response": "mocked response text"}
