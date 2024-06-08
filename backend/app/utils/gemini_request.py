@@ -53,16 +53,16 @@ def generate_content(
             pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
             pdf_files.append(pdf_file)
     except NotFound as e:
-        logging.error(f"File not found: {e}")
+        logging.error(f"指定されたファイルが見つかりません: {e}")
         raise
     except InvalidArgument as e:
-        logging.error(f"Invalid file format: {e}")
+        logging.error(f"ファイル形式が無効です: {e}")
         raise
     except GoogleAPIError as e:
-        logging.error(f"Google API error: {e}")
+        logging.error(f"Google APIからのエラーが発生しました: {e}")
         raise
     except Exception as e:
-        logging.error(f"Unexpected error loading PDF files: {e}")
+        logging.error(f"PDFファイルの読み込み中に予期せぬエラーが発生しました: {e}")
         raise
 
     try:
@@ -80,10 +80,10 @@ def generate_content(
         logging.error(f"Type error in model generation: {e}")
         raise
     except GoogleAPIError as e:
-        logging.error(f"Google API error: {e}")
+        logging.error(f"Google APIからのエラーが発生しました: {e}")
         raise
     except Exception as e:
-        logging.error(f"Unexpected error generating content: {e}")
+        logging.error(f"コンテンツ生成中に予期せぬエラーが発生しました: {e}")
         raise
 
     logging.info(f"Response: {response.text}")
