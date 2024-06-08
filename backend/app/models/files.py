@@ -16,4 +16,4 @@ class File(Base):
     )  # 外部キー制約を追加
     created_at = Column(DateTime, nullable=False)
 
-    user = relationship("User", back_populates="outputs")
+    user = relationship("User", back_populates="files")
