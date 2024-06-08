@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, HTTPException, UploadOutput
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.outputs as outputs_cruds
@@ -35,7 +35,7 @@ db_dependency = Depends(get_db)
 # 学習帳のDB登録
 @router.post("/upload", response_model=outputs_schemas.Output)
 async def upload_outputs(
-    outputs: UploadOutput,
+    outputs: outputs_schemas.Output,
     db: AsyncSession = db_dependency,
 ) -> outputs_schemas.Output:
     uploaded_output: outputs_schemas.Output
