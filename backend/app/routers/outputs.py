@@ -31,8 +31,7 @@ async def request_content(files: list[str]) -> str:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
             status_code=404,
-            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。"
-            + "ファイル名を再確認してください。",
+            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。ファイル名を再確認してください。",
         ) from e
     except InvalidArgument as e:
         logging.error(f"Invalid argument: {e}")
