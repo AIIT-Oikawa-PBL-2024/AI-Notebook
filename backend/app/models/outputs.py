@@ -15,4 +15,4 @@ class Output(Base):
     output = Column(TEXT, nullable=False)
     created_at = Column(DateTime, nullable=False)
 
-    user = relationship("User", back_populates="files")
+    user = relationship("User", back_populates="outputs")
