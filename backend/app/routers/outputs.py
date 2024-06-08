@@ -8,7 +8,6 @@ from app.utils.gemini_request import generate_content
 # ロギング設定
 logging.basicConfig(level=logging.INFO)
 
-
 # ルーターの設定
 router = APIRouter(
     prefix="/outputs",
@@ -27,12 +26,13 @@ async def request_content(files: list[str]) -> str:
 
     try:
         # ファイル名のリストを元に、コンテンツを生成
-        content = generate_content(file_names)
+        content = await generate_content(file_names)
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
             status_code=404,
-            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。ファイル名を再確認してください。",
+            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。"
+            + "ファイル名を再確認してください。",
         ) from e
     except InvalidArgument as e:
         logging.error(f"Invalid argument: {e}")
@@ -44,13 +44,15 @@ async def request_content(files: list[str]) -> str:
         logging.error(f"Google API error: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Google APIからエラーが返されました。システム管理者に連絡してください。",
+            detail="Google APIからエラーが返されました。"
+            + "システム管理者に連絡してください。",
         ) from e
     except Exception as e:
         logging.error(f"Error generating content: {e}")
         raise HTTPException(
             status_code=500,
-            detail="コンテンツの生成中に予期せぬエラーが発生しました。システム管理者に連絡してください。",
+            detail="コンテンツの生成中に予期せぬエラーが発生しました。"
+            + "システム管理者に連絡してください。",
         ) from e
 
     return content
