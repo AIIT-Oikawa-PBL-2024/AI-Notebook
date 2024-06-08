@@ -32,25 +32,25 @@ async def request_content(files: list[str]) -> str:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
             status_code=404,
-            detail="ファイルが見つかりません。ファイル名を確認してください。",
+            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。ファイル名を再確認してください。",
         ) from e
     except InvalidArgument as e:
         logging.error(f"Invalid argument: {e}")
         raise HTTPException(
             status_code=400,
-            detail="ファイル名の形式が正しくありません。ファイル名を確認してください。",
+            detail="ファイル名の形式が無効です。有効なファイル名を指定してください。",
         ) from e
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
         raise HTTPException(
             status_code=500,
-            detail="Google APIに関するエラーが発生しました。管理者に確認してください。",
+            detail="Google APIからエラーが返されました。システム管理者に連絡してください。",
         ) from e
     except Exception as e:
         logging.error(f"Error generating content: {e}")
         raise HTTPException(
             status_code=500,
-            detail="コンテンツ生成中にエラーが発生しました。管理者に確認してください。",
+            detail="コンテンツの生成中に予期せぬエラーが発生しました。システム管理者に連絡してください。",
         ) from e
 
     return content
