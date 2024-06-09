@@ -1,76 +1,60 @@
-import io
-import os
-import logging
-from dotenv import load_dotenv
-from typing import List
-from fastapi import UploadFile, HTTPException
-from google.cloud import storage
-from google.oauth2 import service_account
-from google.api_core import exceptions
+from sqlalchemy import select
+from sqlalchemy.engine import Result
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# 環境変数を読み込む
-load_dotenv()
+import app.models.files as files_models
+import app.schemas.files as files_schemas
 
-# 環境変数から認証情報取得
-service_account_credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-credentials = service_account.Credentials.from_service_account_file(service_account_credentials_path)
 
-# ファイルを読み込む関数
-async def post_files(files: List[UploadFile]) -> dict:
-    allowed_extensions = [".png", ".pdf", ".jpeg", ".jpg"]
-    ext_correct_files, ext_error_files = [],[]
+# 新しいファイルを作成する関数
+async def create_file(
+    db: AsyncSession, file_create: files_schemas.FileCreate
+) -> files_models.File:
+    # ファイルのインスタンスを作成
+    file = files_models.File(**file_create.model_dump())
+    db.add(file)  # ファイルをデータベースに追加
+    await db.commit()  # 変更をコミット
+    await db.refresh(file)  # ファイルの情報をリフレッシュ
+    return file
 
-    for file in files:
-        file_extension = os.path.splitext(file.filename)[1].lower()
-        if file_extension not in allowed_extensions:
-            ext_error_files.append(file.filename)
-        else:
-            ext_correct_files.append(file)
 
-    if ext_error_files:
-        raise HTTPException(status_code=400, detail=f"拡張子がアップロード対象外のファイルです。{', '.join(ext_error_files)}")
-    # ファイルのアップロード処理
-    upload_result = await upload_files(ext_correct_files)
+# 全ファイルを取得する関数
+async def get_files(db: AsyncSession) -> list[files_schemas.File]:
+    # ファイル情報を選択
+    result: Result = await db.execute(
+        select(
+            files_models.File.id,
+            files_models.File.file_name,
+            files_models.File.file_size,
+            files_models.File.user_id,
+            files_models.File.created_at,
+        )
+    )
+    files = result.all()  # 結果を取得
+    # ファイル情報をスキーマに変換して返す
+    return [
+        files_schemas.File(
+            id=file.id,
+            file_name=file.file_name,
+            file_size=file.file_size,
+            user_id=file.user_id,
+            created_at=file.created_at,
+        )
+        for file in files
+    ]
 
-    if "success" not in upload_result or not upload_result["success"]:
-        raise HTTPException(status_code=500, detail="ファイルのアップロードに失敗しました")
 
-    return upload_result
+# ファイルIDから特定のファイルを取得する関数
+async def get_file_by_id(db: AsyncSession, file_id: int) -> files_models.File | None:
+    # 指定されたファイルIDのファイル情報を選択
+    result: Result = await db.execute(
+        select(files_models.File).filter(files_models.File.id == file_id)
+    )
+    return result.scalars().first()  # 結果の最初のファイルを返す
 
-async def upload_files(ext_correct_files: List[UploadFile]) -> dict:
-    success_files, failed_files = [], []  # アップロードに失敗したファイル
 
-    for file in ext_correct_files:
-        bucket_name = os.getenv("GCS_BUCKET_NAME")
-        client = storage.Client(credentials=credentials)
-        bucket = client.bucket(bucket_name)
-        file_content = await file.read()
-        file_obj = io.BytesIO(file_content)
-        destination_blob_name = file.filename
-        blob = bucket.blob(destination_blob_name)
-        file_obj.seek(0)
-        try:
-            # アップロードの実行
-            blob.upload_from_file(file_obj)
-
-            # アップロードの結果をチェック
-            if blob.exists():
-                success_message = f"ファイル {file.filename} のアップロードが成功しました"
-                success_files.append({"message": success_message, "filename": file.filename})
-            else:
-                error_message = f"ファイル {file.filename} のアップロードに失敗しました"
-                failed_files.append(error_message)
-
-        except exceptions.GoogleCloudError as e:
-            error_message = f"ファイル {file.filename} のアップロード中にエラーが発生しました: {str(e)}"
-            failed_files.append(error_message)
-            
-        except Exception as e:
-            error_message = f"ファイル {file.filename} のアップロード中に予期しないエラーが発生しました: {str(e)}"
-            failed_files.append(error_message)
-    
-    if failed_files:
-        error_details = "\n".join(failed_files)
-        return {"success": False, "success_files": success_files, "failed_files": error_details}
-
-    return {"success": True, "success_files": success_files}
+# ファイルIDから特定のファイルを削除する関数
+async def delete_file(db: AsyncSession, original_file: files_models.File) -> None:
+    await db.delete(original_file)  # ファイルを削除
+    await db.commit()  # 変更をコミット
+    return

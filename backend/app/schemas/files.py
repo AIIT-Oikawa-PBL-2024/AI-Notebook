@@ -1,20 +1,20 @@
-from pydantic import BaseModel
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
 
 
 class FileBase(BaseModel):
     file_name: str
-    file_path: str
+    file_size: int
 
 
 class FileCreate(FileBase):
-    pass
-
-
-class File(FileBase):
-    id: int
-    file_size: int
     user_id: int
-    created_at: str
+    created_at: datetime
 
-    class Config:
-        orm_mode = True
+
+# ファイル作成時のレスポンス
+class File(FileCreate):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)

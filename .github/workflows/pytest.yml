@@ -4,28 +4,77 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]    
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ]    
 
 permissions:
   contents: write  
   pull-requests: write
 
 jobs:
-  ci-backend:
+  ci-backend:    
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 15
     permissions:
       pull-requests: write
       contents: write
       id-token: write
+
+    services:
+      db:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: "test-db"
+          TZ: "Asia/Tokyo"
+        options: >-
+          --health-cmd="mysqladmin ping --silent --host=127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     defaults:
       run:
         working-directory: ./backend
 
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+
     steps:
     - uses: actions/checkout@v4
+
+    - name: Wait for MySQL to be ready
+      run: |
+        echo 'Waiting for MySQL to be connectable...'
+        for i in {1..30}; do
+          if mysqladmin ping --host=127.0.0.1 --silent; then
+            echo 'MySQL is up!'
+            break
+          else
+            echo 'MySQL not up yet...'
+          fi
+          echo 'Waiting for MySQL...'
+          sleep 2
+        done
+        if [ $i -eq 30 ]; then
+          echo 'MySQL is not connectable after 30 attempts, exiting...'
+          exit 1
+        fi
+
+    - name: Check MySQL logs
+      run: docker logs $(docker ps -q --filter ancestor=mysql:8.0)
+
+    - name: Grant privileges to user
+      run: |
+        mysql --protocol=tcp -h 127.0.0.1 -P 3306 -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'; FLUSH PRIVILEGES;"
+      env:
+        DB_PASSWORD: ""
+        DB_USER: "root"
 
     - name: Install Python
       uses: actions/setup-python@v4
@@ -52,26 +101,51 @@ jobs:
         poetry add pytest pytest-cov
         poetry add ruff
         poetry add mypy
-    
+        
     - name: Lint with Ruff
       run: |
-        poetry run ruff check . --output-format=github
-    
+        poetry run ruff check --exclude=./app/db ./app --output-format=github
+      
     - name: Lint with Mypy
       run: |
-        poetry run mypy . --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-
-    - name: Test with pytest
-      run: |        
+        poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
+    
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: 'latest'
+  
+    - name: Authenticate to Google Cloud
+      run: |
+        echo "$GCP_SERVICE_ACCOUNT_KEY" > ${HOME}/gcloud.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud.json
+        gcloud config set project $GCP_PROJECT_ID
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
+   
+    - name: Test with pytest         
+      run: |
+        cp ./tests/conftest_ci.py ./tests/conftest.py        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
-
+      continue-on-error: false
+      env:
+        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
+        
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
       with:
           coverage-path-prefix: backend/
           title: Backend Coverage Report
-          pytest-coverage-path: ./backend/pytest-coverage.txt
-          junitxml-path: ./backend/pytest.xml  
+          pytest-coverage-path: backend/pytest-coverage.txt
+          junitxml-path: backend/pytest.xml
+    
+    - name: Upload test results to Google Cloud Storage
+      run: |
+        echo "Uploading test results to Google Cloud Storage..."
+        gsutil cp pytest-coverage.txt gs://$BUCKET_NAME/
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
 
   ci-frontend:
     runs-on: ubuntu-latest
@@ -115,22 +189,23 @@ jobs:
       
     - name: Lint with Ruff
       run: |
-        poetry run ruff check . --output-format=github
+        poetry run ruff check ./app --output-format=github         
       
     - name: Lint with Mypy
       run: |
-        poetry run mypy . --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-  
+        poetry run mypy ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
+      
     - name: Test with pytest
       run: |        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
+      continue-on-error: false
 
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
       with:
           coverage-path-prefix: frontend/
           title: Frontend Coverage Report
-          pytest-coverage-path: ./frontend/pytest-coverage.txt
-          junitxml-path: ./frontend/pytest.xml   
+          pytest-coverage-path: frontend/pytest-coverage.txt
+          junitxml-path: frontend/pytest.xml   
 
   

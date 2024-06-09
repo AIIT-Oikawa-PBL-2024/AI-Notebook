@@ -30,8 +30,8 @@ services:
       - ./backend:/backend
     networks:
       - app-network    
-  
-  db:
+
+  dev-db:
     image: mysql:8.0
     platform: linux/x86_64
     environment:
@@ -39,14 +39,29 @@ services:
       MYSQL_DATABASE: 'dev-db'
       TZ: 'Asia/Tokyo'
     volumes:
-      - mysql-data:/var/lib/mysql    
+      - dev-mysql-data:/var/lib/mysql    
     ports:
       - 3306:3306
     networks:
       - app-network
-   
+  
+  test-db:
+    image: mysql:8.0
+    platform: linux/x86_64
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'test-db'
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - test-mysql-data:/var/lib/mysql    
+    ports:
+      - 3307:3306
+    networks:
+      - app-network
+
 volumes:
-  mysql-data:
+  dev-mysql-data:
+  test-mysql-data:
 
 networks:
   app-network:
