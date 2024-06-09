@@ -19,6 +19,7 @@ def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("REGION", "your_region")
 
 
+# 正常にコンテンツが生成される場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs.generate_content", new_callable=AsyncMock)
 async def test_request_content_success(
@@ -38,6 +39,7 @@ async def test_request_content_success(
     mock_generate_content.assert_called_once_with(["file1.pdf", "file2.pdf"])
 
 
+# 指定されたファイルが見つからない場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs.generate_content", new_callable=AsyncMock)
 async def test_request_content_file_not_found(
@@ -58,6 +60,7 @@ async def test_request_content_file_not_found(
     }
 
 
+# 無効なファイル形式が指定された場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs.generate_content", new_callable=AsyncMock)
 async def test_request_content_invalid_argument(
@@ -77,6 +80,7 @@ async def test_request_content_invalid_argument(
     }
 
 
+# Google APIエラーが発生した場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs.generate_content", new_callable=AsyncMock)
 async def test_request_content_google_api_error(
@@ -97,6 +101,7 @@ async def test_request_content_google_api_error(
     }
 
 
+# 予期せぬエラーが発生した場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs.generate_content", new_callable=AsyncMock)
 async def test_request_content_unexpected_error(

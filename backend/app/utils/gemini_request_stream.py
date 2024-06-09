@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 import os
 from typing import AsyncGenerator
@@ -107,23 +106,23 @@ async def generate_content_stream(
         raise
 
 
-# テスト用のコード
-async def main() -> None:
-    response: AsyncGenerator = generate_content_stream(["5_アジャイルⅡ.pdf"])
-    async for content in response:
-        # まず辞書形式に変換
-        content_dict = content.to_dict()
+# # テスト用のコード
+# async def main() -> None:
+#     response: AsyncGenerator = generate_content_stream(["5_アジャイルⅡ.pdf"])
+#     async for content in response:
+#         # まず辞書形式に変換
+#         content_dict = content.to_dict()
 
-        # 辞書をJSON文字列に変換
-        json_string = json.dumps(content_dict)
+#         # 辞書をJSON文字列に変換
+#         json_string = json.dumps(content_dict)
 
-        # JSON文字列をパース
-        data = json.loads(json_string)
+#         # JSON文字列をパース
+#         data = json.loads(json_string)
 
-        # textの値を出力
-        text_value = data["candidates"][0]["content"]["parts"][0]["text"]
-        print(text_value)
+#         # textの値を出力
+#         text_value = data["candidates"][0]["content"]["parts"][0]["text"]
+#         print(text_value)
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# if __name__ == "__main__":
+#     asyncio.run(main())
