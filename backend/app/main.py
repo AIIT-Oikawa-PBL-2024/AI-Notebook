@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import files, users, outputs
+from app.routers import files, outputs, users
 
 # FastAPIのインスタンスを作成
 app = FastAPI()
