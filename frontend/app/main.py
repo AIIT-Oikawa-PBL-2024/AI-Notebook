@@ -9,10 +9,8 @@
 ##ファイルサイズは‘.streamlit/config.toml’で変更（デフォルト200MB）
 
 import os
-import asyncio
-from time import time
-import httpx
-import requests
+
+import requests  # type: ignore
 import streamlit as st
 from dotenv import load_dotenv
 from PIL import Image
@@ -22,7 +20,7 @@ load_dotenv()
 
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 
-IMG_PATH = 'imgs'
+IMG_PATH = "imgs"
 
 with st.sidebar:
     st.page_link("main.py", label="ホーム", icon="🏠")
@@ -32,16 +30,22 @@ with st.sidebar:
     st.page_link("pages/output_test.py", label="AIサポートテスト", icon="4️⃣")
     st.page_link("pages/flyer.py", label="PBL フライヤー")
 
+
 def upload_files() -> None:
-    st.markdown('# AIサポート学習帳　ファイルアップロード')
-    files = st.file_uploader('講義テキストの画像をアップロードしてください.', accept_multiple_files=True, type=['png', 'pdf', 'jpeg', 'jpg'])
-    
-    
+    st.markdown("# AIサポート学習帳　ファイルアップロード")
+    files = st.file_uploader(
+        "講義テキストの画像をアップロードしてください.",
+        accept_multiple_files=True,
+        type=["png", "pdf", "jpeg", "jpg"],
+    )
+
     if files:
         for file in files:
-            st.markdown(f'{file.name} をアップロードしました.')
-            with open(os.path.join(IMG_PATH, file.name), 'wb') as f:
+            st.markdown(f"{file.name} をアップロードしました.")
+            with open(os.path.join(IMG_PATH, file.name), "wb") as f:
                 f.write(file.getbuffer())
+
+
 def submit() -> None:
     if st.button("Submit"):
         try:
@@ -52,12 +56,14 @@ def submit() -> None:
             st.text("An error occurred.")
             st.text(e)
 
+
 def main() -> None:
     submit()
     upload_files()
 
-    img = Image.open('AIサポート学習帳.jpg')
+    img = Image.open("AIサポート学習帳.jpg")
     st.image(img, use_column_width=True)
 
-if __name__ == '__main__':
-        main()
+
+if __name__ == "__main__":
+    main()
