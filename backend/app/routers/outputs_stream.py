@@ -87,7 +87,7 @@ async def request_content(files: list[str]) -> StreamingResponse:
             ) from e
         finally:
             # コンテンツを結合して1つの文字列にする
-            final_content = "\n".join(accumulated_content)
+            final_content = "".join(accumulated_content)
             # DBに登録するための処理を追加する
             # ここではログに出力するだけ
             logging.info(f"Final content for DB: {final_content}")
