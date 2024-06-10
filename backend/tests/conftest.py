@@ -23,7 +23,7 @@ TEST_DB_PORT = os.getenv("TEST_DB_PORT", "3306")
 TEST_DB_NAME = os.getenv("TEST_DB_NAME", "test-db")
 
 # テスト用データベースのURL
-TEST_DB_URL = f"mysql+aiomysql://{TEST_DB_USER}:{TEST_DB_PASSWORD}@{TEST_DB_HOST}:{TEST_DB_PORT}/{TEST_DB_NAME}?charset=utf8"
+TEST_DB_URL = f"mysql+aiomysql://{TEST_DB_USER}:{TEST_DB_PASSWORD}@{TEST_DB_HOST}:{TEST_DB_PORT}/{TEST_DB_NAME}?charset=utf8mb4"
 
 # エンジンとセッションを作成
 engine = create_async_engine(TEST_DB_URL, echo=True)

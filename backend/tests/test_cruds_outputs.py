@@ -24,13 +24,13 @@ async def session(
 @pytest.mark.asyncio
 async def test_create_output(session: AsyncSession, test_user_id: int) -> None:
     output_create = outputs_schemas.OutputCreate(
-        output="テストマークダウン絵文字",
+        output="テストマークダウン🚀",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
     output = await outputs_cruds.create_output(session, output_create)
     assert output.id is not None
-    assert output.output == "テストマークダウン絵文字"
+    assert output.output == "テストマークダウン🚀"
     assert output.user_id == test_user_id
 
 
@@ -38,7 +38,7 @@ async def test_create_output(session: AsyncSession, test_user_id: int) -> None:
 @pytest.mark.asyncio
 async def test_get_outputs(session: AsyncSession, test_user_id: int) -> None:
     output_create = outputs_schemas.OutputCreate(
-        output="テストマークダウン絵文字",
+        output="テストマークダウン🚀",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
@@ -46,7 +46,7 @@ async def test_get_outputs(session: AsyncSession, test_user_id: int) -> None:
 
     outputs = await outputs_cruds.get_outputs(session)
     assert len(outputs) > 0
-    assert outputs[0].output == "テストマークダウン絵文字"
+    assert outputs[0].output == "テストマークダウン🚀"
     assert outputs[0].user_id == test_user_id
 
 
@@ -54,7 +54,7 @@ async def test_get_outputs(session: AsyncSession, test_user_id: int) -> None:
 @pytest.mark.asyncio
 async def test_get_output_by_id(session: AsyncSession, test_user_id: int) -> None:
     output_create = outputs_schemas.OutputCreate(
-        output="テストマークダウン絵文字",
+        output="テストマークダウン🚀",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
@@ -79,7 +79,7 @@ async def test_get_output_by_id_not_found(session: AsyncSession) -> None:
 @pytest.mark.asyncio
 async def test_delete_output(session: AsyncSession, test_user_id: int) -> None:
     output_create = outputs_schemas.OutputCreate(
-        output="テストマークダウン絵文字",
+        output="テストマークダウン🚀",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
