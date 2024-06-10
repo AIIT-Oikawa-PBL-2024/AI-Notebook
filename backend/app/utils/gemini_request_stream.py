@@ -48,10 +48,10 @@ async def generate_content_stream(
         - #instruction: 複数のpdfファイルを読み解いて、親しみやすい解説がついていて、
             誰もが読みたくなるような、わかりやすい整理ノートを日本語で作成して下さい。
         - #style: ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、
-            強調表示などのスタイルを工夫してください。
+            強調表示などのスタイルを追加してください。
         - #condition1: 絵文字を使って、視覚的にもわかりやすくしてください。
         - #condition2: 途中に興味深いコラムを設けてください。
-        - #condition3: 最後に用語解説の一覧を箇条書きで表示してください。
+        - #condition3: 最後に用語解説の一覧を箇条書き形式で表示してください。
         - #format: タイトルを付けて、8000文字程度のMarkdownで出力してください。
     """
 
@@ -122,7 +122,7 @@ async def main() -> None:
 
         # textの値を出力
         text_value = data["candidates"][0]["content"]["parts"][0]["text"]
-        print(text_value)
+        print(text_value, end="")
 
 
 if __name__ == "__main__":
