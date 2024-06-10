@@ -6,7 +6,12 @@ from typing import AsyncGenerator
 
 import vertexai
 from dotenv import load_dotenv
-from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
+from google.api_core.exceptions import (
+    GoogleAPIError,
+    InternalServerError,
+    NotFound,
+)
+from google.cloud import storage
 from vertexai.generative_models import (
     GenerationConfig,
     GenerationResponse,
@@ -33,6 +38,14 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 logging.basicConfig(level=logging.INFO)
 
 
+# Google Cloud Storageでファイルが存在するかチェック
+def check_file_exists(bucket_name: str, file_name: str) -> bool:
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(file_name)
+    return blob.exists()
+
+
 # 複数のPDFファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
@@ -57,16 +70,23 @@ async def generate_content_stream(
 
     try:
         for file_name in files:
-            # PDFファイルのURI
-            pdf_file_uri = f"gs://{bucket_name}/{file_name}"
-            # PDFファイルのパートを作成
-            pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
-            pdf_files.append(pdf_file)
-    except NotFound as e:
-        logging.error(f"File not found: {e}")
-        raise
-    except InvalidArgument as e:
-        logging.error(f"Invalid file format: {e}")
+            # ファイルがGCSに存在するかチェック
+            if check_file_exists(bucket_name, file_name):
+                # PDFファイルのURI
+                pdf_file_uri = f"gs://{bucket_name}/{file_name}"
+                # PDFファイルのパートを作成
+                pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
+                pdf_files.append(pdf_file)
+            else:
+                logging.error(
+                    f"File {file_name} does not exist in the bucket {bucket_name}."
+                )
+                raise NotFound(
+                    f"File {file_name} does not exist in the bucket {bucket_name}."
+                )
+
+    except InternalServerError as e:
+        logging.error(f"Internal server error: {e}")
         raise
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
@@ -99,6 +119,9 @@ async def generate_content_stream(
     except TypeError as e:
         logging.error(f"Type error in model generation: {e}")
         raise
+    except InternalServerError as e:
+        logging.error(f"Internal server error: {e}")
+        raise
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
         raise
@@ -109,7 +132,7 @@ async def generate_content_stream(
 
 # テスト用のコード
 async def main() -> None:
-    response: AsyncGenerator = generate_content_stream(["5_アジャイルⅡ.pdf"])
+    response: AsyncGenerator = generate_content_stream(["55_アジャイルⅡ.pdf"])
     async for content in response:
         # まず辞書形式に変換
         content_dict = content.to_dict()

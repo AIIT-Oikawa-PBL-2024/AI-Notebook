@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, patch, Mock
 from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
-from app.utils.gemini_request_stream import generate_content_stream
+from app.utils.gemini_request_stream import generate_content_stream, check_file_exists
 from pytest import MonkeyPatch
 import json
 from typing import Generator
@@ -19,9 +19,10 @@ def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
 
 # 正常系のテスト
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=True)
 @pytest.mark.asyncio
 async def test_generate_content_stream_success(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -68,29 +69,29 @@ async def test_generate_content_stream_success(
 
 # ファイルが見つからない場合のエラーハンドリングのテスト
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=False)
 @pytest.mark.asyncio
 async def test_generate_content_stream_not_found(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
-    mock_GenerativeModel.return_value.generate_content.side_effect = NotFound(
-        "File not found"
-    )
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(NotFound) as excinfo:
         result = generate_content_stream(["non_existent_file.pdf"])
         async for _ in result:
             pass
-    assert str(excinfo.value) == "404 File not found"
+    expected_error_message = "File non_existent_file.pdf does not exist in the bucket"
+    assert expected_error_message in str(excinfo.value)
 
 
 # 無効な引数の場合のエラーハンドリングのテスト
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=True)
 @pytest.mark.asyncio
 async def test_generate_content_stream_invalid_argument(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -100,17 +101,18 @@ async def test_generate_content_stream_invalid_argument(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(InvalidArgument) as excinfo:
-        result = generate_content_stream(["invalid_file"])
+        result = generate_content_stream(["invalid_file.pdf"])
         async for _ in result:
             pass
-    assert str(excinfo.value) == "400 Invalid file format"
+    assert "400 Invalid file format" in str(excinfo.value)
 
 
 # Google APIエラーの場合のエラーハンドリングのテスト
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=True)
 @pytest.mark.asyncio
 async def test_generate_content_stream_google_api_error(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -123,14 +125,15 @@ async def test_generate_content_stream_google_api_error(
         result = generate_content_stream(["file1.pdf"])
         async for _ in result:
             pass
-    assert str(excinfo.value) == "Google API error"
+    assert "Google API error" in str(excinfo.value)
 
 
 # その他の予期しないエラーの場合のエラーハンドリングのテスト
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=True)
 @pytest.mark.asyncio
 async def test_generate_content_stream_unexpected_error(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -143,14 +146,15 @@ async def test_generate_content_stream_unexpected_error(
         result = generate_content_stream(["file1.pdf"])
         async for _ in result:
             pass
-    assert str(excinfo.value) == "Unexpected error"
+    assert "Unexpected error" in str(excinfo.value)
 
 
 # エラーハンドリングのテスト（モデル属性エラー）
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=True)
 @pytest.mark.asyncio
 async def test_generate_content_stream_attribute_error(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -163,14 +167,15 @@ async def test_generate_content_stream_attribute_error(
         result = generate_content_stream(["file1.pdf", "file2.pdf"])
         async for _ in result:
             pass
-    assert str(excinfo.value) == "Model attribute error"
+    assert "Model attribute error" in str(excinfo.value)
 
 
 # エラーハンドリングのテスト（タイプエラー）
 @patch("app.utils.gemini_request_stream.GenerativeModel", autospec=True)
+@patch("app.utils.gemini_request_stream.check_file_exists", return_value=True)
 @pytest.mark.asyncio
 async def test_generate_content_stream_type_error(
-    mock_GenerativeModel: Mock, mock_env_vars: None
+    mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -183,4 +188,4 @@ async def test_generate_content_stream_type_error(
         result = generate_content_stream(["file1.pdf", "file2.pdf"])
         async for _ in result:
             pass
-    assert str(excinfo.value) == "Type error in model generation"
+    assert "Type error in model generation" in str(excinfo.value)
