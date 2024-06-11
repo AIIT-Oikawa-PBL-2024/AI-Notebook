@@ -84,6 +84,40 @@ copilot-practice2
   - `GOOGLE_APPLICATION_CREDENTIALS`に GCP サービスアカウントキーのファイルのパスを入力
   - `BUCKET_NAME`に GCP のバケット名を入力
 - `$ docker compose build --no-cache`で Docker イメージをビルド
++ `$ docker compose build --no-cache`で Docker イメージをビルド
+
+- `$ cd backend`
++ `$ cd backend`
+
+- `$ docker compose run --entrypoint "poetry install --no-root" backend`
++ `$ docker compose run --entrypoint "poetry install --no-root" backend`
+
+- `$ cd ../frontend`
++ `$ cd ../frontend`
+
+- `$ docker compose run --entrypoint "poetry install --no-root" frontend`
++ `$ docker compose run --entrypoint "poetry install --no-root" frontend`
+
+- `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
++ `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
+
+- .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
++ .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
+
+- `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
++ `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
+
+- `PROJECT_ID=<PROJECT_ID>`
++ `PROJECT_ID=<PROJECT_ID>`
+
+- `REGION="asia-northeast1"`
++ `REGION="asia-northeast1"`
+
+- `BUCKET_NAME=<BUCKET_NAME>`
++ `BUCKET_NAME=<BUCKET_NAME>`
+
+- backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
++ backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
 - パッケージ管理は poetry を使用<br>
   　 backend と frontend のそれぞれの定義ファイルからインストール<br>
   `$ cd backend`
