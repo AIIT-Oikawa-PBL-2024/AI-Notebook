@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 
 
-# Ouputテーブルを定義
+# Ouputテーブルのモデルを定義
 class Output(Base):
     __tablename__ = "outputs"
 
