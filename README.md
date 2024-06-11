@@ -87,9 +87,11 @@ copilot-practice2
 - パッケージ管理は poetry を使用<br>
   　 backend と frontend のそれぞれの定義ファイルからインストール<br>
   `$ cd backend`
-  `$ docker compose run --entrypoint "poetry install --no-root" backend`<br>
+  `$ docker compose run --entrypoint "poetry install --no-root" backend`
+
   `$ cd ../frontend`
-  `$ docker compose run --entrypoint "poetry install --no-root" frontend`<br>
+  `$ docker compose run --entrypoint "poetry install --no-root" frontend`
+
 - `pyproject.toml`ファイルをもとに`.venv`ディレクトリにパッケージがインストールされる。
 
 - ルートディレクトリから`$ docker compose up`でコンテナを立ち上げ
@@ -132,10 +134,14 @@ copilot-practice2
   - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納<br>
     - **重要**　**ファイル名がグレーアウトされていて、GitHub に上がらないことを確認**
   - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加<br>
-    `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`<br>
-    `PROJECT_ID=<PROJECT_ID>`<br>
-    `REGION="asia-northeast1"`<br>
-    `BUCKET_NAME=<BUCKET_NAME>`<br>
+    `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
+
+    `PROJECT_ID=<PROJECT_ID>`
+
+    `REGION="asia-northeast1"`
+
+    `BUCKET_NAME=<BUCKET_NAME>`
+
   - Docker イメージのリビルド `$ docker compose build --no-cache`
   - backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
     - 以下の表示が出るが PROJECT_ID は設定しない<br>
@@ -173,7 +179,8 @@ copilot-practice2
 - GitHub Actions の CI 実行
 
   - 実行ファイル
-    `.github/workflows/pytest.yml`<br>
+    `.github/workflows/pytest.yml`
+    
     `backend`, `frontend`で処理を分けています。
     `coverage-path-prefix`を設定することで、リンクのパスに飛ぶようになりました。
 

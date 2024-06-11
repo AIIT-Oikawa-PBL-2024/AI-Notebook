@@ -132,7 +132,7 @@ async def generate_content_stream(
 
 # テスト用のコード
 async def main() -> None:
-    response: AsyncGenerator = generate_content_stream(["55_アジャイルⅡ.pdf"])
+    response: AsyncGenerator = generate_content_stream(["5_アジャイルⅡ.pdf"])
     async for content in response:
         # まず辞書形式に変換
         content_dict = content.to_dict()
