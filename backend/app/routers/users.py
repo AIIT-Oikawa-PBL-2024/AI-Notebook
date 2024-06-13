@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -21,8 +19,8 @@ router = APIRouter(
 
 
 # ユーザーの一覧を取得するエンドポイント
-@router.get("/", response_model=List[users_schemas.User])
-async def list_users(db: AsyncSession = db_dependency) -> List[users_schemas.User]:
+@router.get("/", response_model=list[users_schemas.User])
+async def list_users(db: AsyncSession = db_dependency) -> list[users_schemas.User]:
     return await users_cruds.get_users(db)
 
 
