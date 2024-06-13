@@ -1,34 +1,27 @@
-from typing import Optional
+import asyncio
+import io
+from typing import AsyncIterator, List
 
 import httpx
 import streamlit as st  # type: ignore
 
 
-def get_output_raw_data() -> Optional[str]:
-    # TODO: アウトプットデータの仕様確認後進める
-    request_url = "https://localhost:8000/outputs/request"
+# Geminiからの出力レスポンスはストリームデータで受け取る
+async def generate_gemini_processed_markdown_stream(
+    filenames: List[str],
+) -> AsyncIterator[str]:
+    request_url = "http://127.0.0.1:8001/outputs/request"  # Test Mock server
+    # request_url = "https://localhost:8000/outputs/request" # Local FastAPI server
+
     headers = {"accept": "application/json", "Content-Type": "application/json"}
 
-    try:
-        response = httpx.get(request_url, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-        return data
-    except httpx.HTTPStatusError as hs:
-        st.write(f"リクエストが失敗しました: {hs}")
-    except Exception as e:
-        st.write(f"予期せぬエラーが発生しました: {e}")
-
-    return None
-
-
-def convert_output_to_markdown() -> None:
-    # TODO: 同上
-    pass
-
-
-def show_output_markdown(markdown_text: str = "**テストです**") -> None:
-    st.markdown(markdown_text)
+    async with httpx.AsyncClient() as client:
+        async with client.stream(
+            "POST", request_url, headers=headers, json={"filenames": filenames}
+        ) as response:
+            response.raise_for_status()
+            async for line in response.aiter_lines():
+                yield line
 
 
 if __name__ == "__main__":
