@@ -1,64 +1,56 @@
+import os
 import io
-from typing import Generator
-from unittest import mock
-
 import pytest
-from google.resumable_media.requests.upload import MultipartUpload
+from dotenv import load_dotenv
+from fastapi import UploadFile
+from fastapi.testclient import TestClient
+from app.utils.operation_cloud_storage import post_files
+from app.main import app  # FastAPIアプリケーションのインスタンス
 
-from app.utils.operation_cloud_storage import upload_blob, upload_blob_from_stream
+load_dotenv()  # 環境変数の読み込み
 
+client = TestClient(app)
 
-# GCSクライエントのモックを作成
-@pytest.fixture
-def mock_storage_client() -> Generator[mock.Mock, None, None]:
-    with mock.patch("google.cloud.storage.Client") as MockClient:
-        yield MockClient
+def test_upload_files():
+    # アップロードするファイルのパス
+    file_paths = ["tests/5_アジャイルⅡ.pdf", "tests/AI-powered Code Review with LLM.pdf"]
 
+    # ファイルを開いてリクエストデータを作成
+    files = []
+    for file_path in file_paths:
+        with open(file_path, "rb") as file:
+            file_content = file.read()
+            file_name = os.path.basename(file_path)
+            file_obj = io.BytesIO(file_content)
+            files.append(("files", (file_name, file_obj)))
 
-# GCSバケットのモックを作成
-@pytest.fixture
-def mock_bucket(mock_storage_client: mock.Mock) -> Generator[mock.Mock, None, None]:
-    mock_bucket = mock_storage_client().bucket()
-    yield mock_bucket
+    # ファイルアップロードのリクエストを送信
+    response = client.post("/files/upload", files=files)
 
+    # レスポンスのステータスコードの検証
+    assert response.status_code == 200
 
-# アップロード処理のテスト
-def test_upload_blob(mock_bucket: mock.Mock) -> None:
-    # テストの準備
-    bucket_name = "test_bucket"
-    source_file_name = "test_file.pdf"
-    destination_blob_name = "test_file.pdf"
-    credentials = "mock_credentials.json"
-    file_content = b"data" * 6
+    # レスポンスの内容の検証
+    assert response.json() == {"success": True}
 
-    # モックの設定
-    mock_blob = mock_bucket.blob(destination_blob_name)
-    mock_blob.upload_from_filename.return_value = None
+def test_upload_files_with_invalid_extension():
+    # 無効な拡張子のファイルのパス
+    invalid_file_paths = ["tests/test001.txt", "tests/test002.txt"]
 
-    # HTTPリクエストのモックレスポンスを設定
-    with mock.patch.object(
-        MultipartUpload,
-        "_prepare_request",
-        return_value=(
-            "POST",
-            "http://mock.url",
-            file_content,
-            {"Content-Type": "application/pdf"},
-        ),
-    ):
-        with mock.patch.object(
-            MultipartUpload,
-            "_process_response",
-            return_value=mock.Mock(status_code=200),
-        ):
-            with mock.patch(
-                "builtins.open", mock.mock_open(read_data=file_content)
-            ) as mock_file:
-                # テスト実行
-                print("Before upload_blob call")
-                upload_blob(
-                    bucket_name, source_file_name, destination_blob_name, credentials
-                )
-                print("After upload_blob call")
-                # ファイルを開くことを確認
-                mock_file.assert_any_call(source_file_name, "rb")
+    # 無効な拡張子のファイルを開いてリクエストデータを作成
+    invalid_files = []
+    for file_path in invalid_file_paths:
+        with open(file_path, "rb") as file:
+            file_content = file.read()
+            file_name = os.path.basename(file_path)
+            file_obj = io.BytesIO(file_content)
+            invalid_files.append(("files", (file_name, file_obj)))
+
+    # ファイルアップロードのリクエストを送信
+    response = client.post("/files/upload", files=invalid_files)
+
+    # レスポンスのステータスコードの検証
+    assert response.status_code == 400
+
+    # レスポンスの内容の検証
+    assert "拡張子がアップロード対象外のファイルです" in response.json()["detail"]

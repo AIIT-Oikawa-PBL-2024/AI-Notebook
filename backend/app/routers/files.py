@@ -37,9 +37,13 @@ JST = timezone(timedelta(hours=9))
 # 依存関係
 db_dependency = Depends(get_db)
 
-# GCSへのファイルアップロード
-@router.post("/gcs_upload", response_model=dict)
-async def upload_files(files: List[UploadFile] = None) -> dict:
+# GCSへのファイルアップロードとファイル名をDBに登録
+@router.post("/upload", response_model=dict) 
+async def upload_files(
+    files: list[UploadFile],
+    db: AsyncSession = db_dependency,
+) -> dict:
+
     if files is None:
         files = File(...)
     # ファイルをGoogle Cloud Storageにアップロード
@@ -48,28 +52,10 @@ async def upload_files(files: List[UploadFile] = None) -> dict:
     if "success" not in upload_result or not upload_result["success"]:
         raise HTTPException(status_code=500, detail="Upload failed")
     
-    return {"success": upload_result.get("success", False)}
-
-
-# 複数ファイルのDB登録のみ
-@router.post("/upload", response_model=list[files_schemas.File])
-async def upload_files(
-    files: list[UploadFile],
-    db: AsyncSession = db_dependency,
-) -> list[files_schemas.File]:
-    uploaded_files: list = []
-
     for file in files:
         if file.filename:
             # UploadFileをBytesIOに変換
             file_bytes = BytesIO(await file.read())
-            # try:
-            #     upload_blob_from_stream(BUCKET_NAME, file_bytes, file.filename)
-            #     logging.info(f"File {file.filename} uploaded to {BUCKET_NAME}.")
-            # except Exception as e:
-            #     raise HTTPException(
-            #         status_code=500, detail="ファイルをアップロードできませんでした"
-            #     ) from e
 
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
@@ -79,15 +65,13 @@ async def upload_files(
                 file_size=len(file_bytes.getvalue()),
                 user_id=1,  # ユーザIDは仮で1を設定
                 created_at=now_japan,  # 日本時間の現在日時を設定
-            )
+                )
 
             # ファイル情報を保存
-            uploaded_file = await files_cruds.create_file(db, file_create)
-            uploaded_files.append(uploaded_file)
+            await files_cruds.create_file(db, file_create)
             logging.info(f"File {file.filename} saved to database.")
 
-    return uploaded_files
-
+    return {"success": upload_result.get("success", False)}
 
 # ファイルの一覧取得
 @router.get("/", response_model=list[files_schemas.File])
