@@ -3,7 +3,7 @@ from typing import AsyncIterator, List, Optional
 
 import httpx
 import streamlit as st  # type: ignore
-from streamlit.uploaded_file_manager import UploadedFile
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 
 # Geminiからの出力レスポンスはストリームデータで受け取る
