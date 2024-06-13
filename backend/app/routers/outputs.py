@@ -4,13 +4,12 @@ from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
+from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.outputs as outputs_cruds
 import app.schemas.outputs as outputs_schemas
 from app.database import get_db
-
-from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 from app.utils.gemini_request import generate_content
 
 # 環境変数を読み込む
@@ -87,9 +86,13 @@ async def delete_output(output_id: int, db: AsyncSession = db_dependency) -> dic
     await outputs_cruds.delete_output(db, output)
     return {"detail": "学習帳が削除されました"}
 
+
 # 複数のファイル名のリストを入力して、出力を生成するエンドポイント
 @router.post("/request", response_model=str)
-async def request_content(files: list[str]) -> str:
+async def request_content(
+    files: list[str],
+    db: AsyncSession = db_dependency,
+) -> str:
     # ロギング
     logging.info(f"Requesting content generation for files: {files}")
 
@@ -99,6 +102,24 @@ async def request_content(files: list[str]) -> str:
     try:
         # ファイル名のリストを元に、コンテンツを生成
         content = await generate_content(file_names)
+
+        # DBに登録するための処理
+        # if content:
+
+        # 日本時間の現在日時を取得
+        now_japan = datetime.now(JST)
+
+        output_create = outputs_schemas.OutputCreate(
+            output=content,
+            user_id=1,  # ユーザIDは仮で1を設定
+            created_at=now_japan,  # 日本時間の現在日時を設定
+        )
+
+        # 学習帳を保存
+        output = await outputs_cruds.create_output(db, output_create)
+        await db.commit()
+        logging.info(f"Output {output} saved to database.")
+
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
@@ -128,4 +149,3 @@ async def request_content(files: list[str]) -> str:
         ) from e
 
     return content
-
