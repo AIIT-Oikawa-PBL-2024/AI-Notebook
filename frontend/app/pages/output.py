@@ -24,5 +24,16 @@ async def generate_gemini_processed_markdown_stream(
                 yield line
 
 
+async def display_gemini_processed_markdown(filenames: List[str]) -> None:
+    markdown_output = ""
+    placeholder = st.empty()
+    try:
+        async for line in generate_gemini_processed_markdown_stream(filenames):
+            markdown_output += line
+            placeholder.text(markdown_output)
+    # バックエンドの実装次第で他の例外も追加必要かもしれない
+    except Exception as e:
+        st.write(f"予期せぬエラーが発生しました。エラー： {e}")
+
 if __name__ == "__main__":
     show_output_markdown()
