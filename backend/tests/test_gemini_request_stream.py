@@ -52,8 +52,8 @@ async def test_generate_content_stream_success(
         )
     )
 
-    # テスト対象関数の実行
-    result = generate_content_stream(["file1.pdf", "file2.pdf"])
+    # テスト対象関数の実行(pdfファイル、pngファイルを指定)
+    result = generate_content_stream(["file1.pdf", "file2.png"])
 
     accumulated_content = []
     async for content in result:
@@ -101,10 +101,10 @@ async def test_generate_content_stream_invalid_argument(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(InvalidArgument) as excinfo:
-        result = generate_content_stream(["invalid_file.pdf"])
+        result = generate_content_stream(["invalid_file.txt"])
         async for _ in result:
             pass
-    assert "400 Invalid file format" in str(excinfo.value)
+    assert "Invalid file format" in str(excinfo.value)
 
 
 # Google APIエラーの場合のエラーハンドリングのテスト
@@ -164,7 +164,7 @@ async def test_generate_content_stream_attribute_error(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(AttributeError) as excinfo:
-        result = generate_content_stream(["file1.pdf", "file2.pdf"])
+        result = generate_content_stream(["file1.pdf", "file2.png"])
         async for _ in result:
             pass
     assert "Model attribute error" in str(excinfo.value)
@@ -185,7 +185,7 @@ async def test_generate_content_stream_type_error(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(TypeError) as excinfo:
-        result = generate_content_stream(["file1.pdf", "file2.pdf"])
+        result = generate_content_stream(["file1.pdf", "file2.png"])
         async for _ in result:
             pass
     assert "Type error in model generation" in str(excinfo.value)
