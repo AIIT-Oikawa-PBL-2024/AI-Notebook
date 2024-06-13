@@ -10,7 +10,7 @@ app = FastAPI()
 
 async def mock_stream() -> str:
     for i in range(10):
-        yield f"line {i}\n"
+        yield f"## line {i}\n"
         await asyncio.sleep(1)
 
 
