@@ -1,9 +1,9 @@
 import asyncio
-import io
-from typing import AsyncIterator, List
+from typing import AsyncIterator, List, Optional
 
 import httpx
 import streamlit as st  # type: ignore
+from streamlit.uploaded_file_manager import UploadedFile
 
 
 # Geminiからの出力レスポンスはストリームデータで受け取る
@@ -36,16 +36,18 @@ async def display_gemini_processed_markdown(filenames: List[str]) -> None:
         st.write(f"予期せぬエラーが発生しました。エラー： {e}")
 
 
-def upload_files() -> List[io.BytesIO]:
+def upload_files() -> Optional[List[UploadedFile]]:
     uploaded_files = st.file_uploader(
         "ファイルをアップロードしてください。", type=["pdf"], accept_multiple_files=True
     )
+
     return uploaded_files
 
 
 if __name__ == "__main__":
     uploaded_files = upload_files()
-    uploaded_filenames = [file.name for file in uploaded_files]
+    if uploaded_files:
+        uploaded_filenames = [file.name for file in uploaded_files]
 
     if st.button("作成開始"):
         if uploaded_filenames:
