@@ -52,7 +52,7 @@ async def test_upload_outputs(session: AsyncSession) -> None:
     user_id = await get_user_id(session)
 
     outputs = {
-        "output": "テストマークダウン絵文字",
+        "output": "テストマークダウン🚀",
         "user_id": user_id,
         "created_at": "2024-06-08T06:38:33.149Z",
         "id": 0
@@ -68,7 +68,7 @@ async def test_upload_outputs(session: AsyncSession) -> None:
         data = response.json()
         print(data)  # デバッグ用出力
         assert len(data) == 4
-        assert data["output"] == "テストマークダウン絵文字"
+        assert data["output"] == "テストマークダウン🚀"
 
 
 # 学習帳一覧取得のテスト
@@ -81,7 +81,7 @@ async def test_get_outputs(session: AsyncSession) -> None:
         base_url="http://test",
     ) as client:
         outputs = {
-            "output": "テストマークダウン絵文字",
+            "output": "テストマークダウン🚀",
             "user_id": user_id,
             "created_at": "2024-06-08T06:38:33.149Z",
             "id": 0
@@ -106,7 +106,7 @@ async def test_get_output_by_id(session: AsyncSession) -> None:
         base_url="http://test",
     ) as client:
         outputs = {
-            "output": "テストマークダウン絵文字",
+            "output": "テストマークダウン🚀",
             "user_id": user_id,
             "created_at": "2024-06-08T06:38:33.149Z",
             "id": 0
@@ -124,7 +124,7 @@ async def test_get_output_by_id(session: AsyncSession) -> None:
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == output_id
-        assert data["output"] == "テストマークダウン絵文字"
+        assert data["output"] == "テストマークダウン🚀"
 
 
 # 学習帳削除のテスト
@@ -137,7 +137,7 @@ async def test_delete_output(session: AsyncSession) -> None:
         base_url="http://test",
     ) as client:
         outputs = {
-            "output": "テストマークダウン絵文字",
+            "output": "テストマークダウン🚀",
             "user_id": user_id,
             "created_at": "2024-06-08T06:38:33.149Z",
             "id": 0
