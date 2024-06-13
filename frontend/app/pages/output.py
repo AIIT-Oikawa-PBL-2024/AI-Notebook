@@ -35,5 +35,20 @@ async def display_gemini_processed_markdown(filenames: List[str]) -> None:
     except Exception as e:
         st.write(f"予期せぬエラーが発生しました。エラー： {e}")
 
+
+def upload_files() -> List[io.BytesIO]:
+    uploaded_files = st.file_uploader(
+        "ファイルをアップロードしてください。", type=["pdf"], accept_multiple_files=True
+    )
+    return uploaded_files
+
+
 if __name__ == "__main__":
-    show_output_markdown()
+    uploaded_files = upload_files()
+    uploaded_filenames = [file.name for file in uploaded_files]
+
+    if st.button("作成開始"):
+        if uploaded_filenames:
+            asyncio.run(display_gemini_processed_markdown(uploaded_filenames))
+        else:
+            st.error("ファイルをアップロードしてください。")
