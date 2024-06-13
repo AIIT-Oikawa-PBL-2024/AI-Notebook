@@ -16,6 +16,11 @@ pymysql = "^1.1.1"
 aiomysql = "^0.2.0"
 cryptography = "^42.0.5"
 mysql-connector-python = "^8.4.0"
+google-cloud-storage = "^2.16.0"
+alembic = "^1.13.1"
+sqlalchemy-utils = "^0.41.2"
+python-dotenv = "^1.0.1"
+google-cloud-aiplatform = "^1.53.0"
 
 
 [tool.poetry.group.dev.dependencies]
