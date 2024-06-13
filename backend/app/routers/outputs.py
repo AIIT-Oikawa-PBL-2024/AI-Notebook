@@ -104,21 +104,20 @@ async def request_content(
         content = await generate_content(file_names)
 
         # DBに登録するための処理
-        # if content:
+        if content:
+            # 日本時間の現在日時を取得
+            now_japan = datetime.now(JST)
 
-        # 日本時間の現在日時を取得
-        now_japan = datetime.now(JST)
+            output_create = outputs_schemas.OutputCreate(
+                output=content,
+                user_id=1,  # ユーザIDは仮で1を設定
+                created_at=now_japan,  # 日本時間の現在日時を設定
+            )
 
-        output_create = outputs_schemas.OutputCreate(
-            output=content,
-            user_id=1,  # ユーザIDは仮で1を設定
-            created_at=now_japan,  # 日本時間の現在日時を設定
-        )
-
-        # 学習帳を保存
-        output = await outputs_cruds.create_output(db, output_create)
-        await db.commit()
-        logging.info(f"Output {output} saved to database.")
+            # 学習帳を保存
+            await outputs_cruds.create_output(db, output_create)
+            await db.commit()
+            logging.info("Output markdown saved to database.")
 
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")

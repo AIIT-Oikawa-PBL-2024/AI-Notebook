@@ -1,17 +1,17 @@
 import json
 import logging
-from typing import AsyncGenerator
 from datetime import datetime, timedelta, timezone
+from typing import AsyncGenerator
 
-from fastapi import APIRouter,Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.utils.gemini_request_stream import generate_content_stream
 import app.cruds.outputs as outputs_cruds
 import app.schemas.outputs as outputs_schemas
 from app.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
+from app.utils.gemini_request_stream import generate_content_stream
 
 # ロギング設定
 logging.basicConfig(level=logging.INFO)
@@ -28,9 +28,13 @@ JST = timezone(timedelta(hours=9))
 # 依存関係
 db_dependency = Depends(get_db)
 
+
 # 複数のファイル名のリストを入力して、出力を生成するエンドポイント
 @router.post("/request_stream", response_model=str)
-async def request_content(files: list[str],db: AsyncSession = db_dependency,) -> StreamingResponse:
+async def request_content(
+    files: list[str],
+    db: AsyncSession = db_dependency,
+) -> StreamingResponse:
     # ロギング
     logging.info(f"Requesting content generation for files: {files}")
 
@@ -111,7 +115,8 @@ async def request_content(files: list[str],db: AsyncSession = db_dependency,) ->
                 )
 
                 # 学習帳を保存
-                output = await outputs_cruds.create_output(db, output_create)
+                await outputs_cruds.create_output(db, output_create)
+                await db.commit()
                 logging.info("Output markdown saved to database.")
 
             # ここではログに出力するだけ
