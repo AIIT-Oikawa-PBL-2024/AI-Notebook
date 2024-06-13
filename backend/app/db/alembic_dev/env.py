@@ -8,6 +8,7 @@ from sqlalchemy.engine import Connection
 
 from app.database import Base
 from app.models.files import File  # noqa: F401
+from app.models.outputs import Output  # noqa: F401
 from app.models.users import User  # noqa: F401
 
 # .envファイルを読み込む
