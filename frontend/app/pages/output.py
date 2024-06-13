@@ -46,11 +46,10 @@ def upload_files() -> Optional[List[UploadedFile]]:
 
 if __name__ == "__main__":
     uploaded_files = upload_files()
-    if uploaded_files:
-        uploaded_filenames = [file.name for file in uploaded_files]
 
     if st.button("作成開始"):
-        if uploaded_filenames:
+        if uploaded_files:
+            uploaded_filenames = [file.name for file in uploaded_files]
             asyncio.run(display_gemini_processed_markdown(uploaded_filenames))
         else:
             st.error("ファイルをアップロードしてください。")
