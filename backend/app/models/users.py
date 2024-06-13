@@ -14,3 +14,4 @@ class User(Base):
     password = Column(String(256), nullable=False)
 
     files = relationship("File", back_populates="user", cascade="delete")
+    outputs = relationship("Output", back_populates="user", cascade="delete")

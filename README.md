@@ -147,9 +147,9 @@ copilot-practice2
     - `$ alembic upgrade head`
     - [エラーが出る場合はドキュメント確認](https://alembic.sqlalchemy.org/en/latest/tutorial.html#running-our-first-migration)
   - テスト用 DB
-    - `$ cd ../alembic_test`
-    - `$ alembic upgrade head`
-    - [エラーが出る場合はドキュメント確認](https://alembic.sqlalchemy.org/en/latest/tutorial.html#running-our-first-migration)
+    テスト用 DBについてはalembicコマンドは実行しない
+    理由はテストコードの中で毎回テーブルを作成して、削除しているため、alembicコマンドと併用すると不整合が起きるため
+  
 - テーブル作成の確認
 
   - `$ docker compose exec dev-db mysql dev-db`

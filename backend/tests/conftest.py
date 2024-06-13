@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.database import Base, get_db
 from app.main import app
 from app.models.files import File
+from app.models.outputs import Output
 from app.models.users import User
 
 # .envファイルから環境変数を読み込む
@@ -47,6 +48,9 @@ async def setup_and_teardown_database() -> AsyncGenerator[AsyncSession, None]:
 
     async with TestingSessionLocal() as session:
         await session.execute(delete(File))
+        await session.commit()
+
+        await session.execute(delete(Output))
         await session.commit()
 
         await session.execute(delete(User).where(User.email == "test@example.com"))
