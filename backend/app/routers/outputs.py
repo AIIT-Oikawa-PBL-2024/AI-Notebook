@@ -4,13 +4,12 @@ from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
+from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.outputs as outputs_cruds
 import app.schemas.outputs as outputs_schemas
 from app.database import get_db
-
-from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 from app.utils.gemini_request import generate_content
 
 # 環境変数を読み込む
@@ -87,6 +86,7 @@ async def delete_output(output_id: int, db: AsyncSession = db_dependency) -> dic
     await outputs_cruds.delete_output(db, output)
     return {"detail": "学習帳が削除されました"}
 
+
 # 複数のファイル名のリストを入力して、出力を生成するエンドポイント
 @router.post("/request", response_model=str)
 async def request_content(files: list[str]) -> str:
@@ -128,4 +128,3 @@ async def request_content(files: list[str]) -> str:
         ) from e
 
     return content
-
