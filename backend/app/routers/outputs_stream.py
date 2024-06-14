@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from typing import AsyncGenerator
@@ -78,6 +79,8 @@ async def request_content(files: list[str]) -> StreamingResponse:
                 logging.info(f"Streaming content: {text_value}")
                 accumulated_content.append(text_value)
                 yield text_value
+                await asyncio.sleep(0.05)
+
         except Exception as e:
             logging.error(f"Error while streaming content: {e}")
             raise HTTPException(
@@ -93,4 +96,4 @@ async def request_content(files: list[str]) -> StreamingResponse:
             logging.info(f"Final content for DB: {final_content}")
 
     # ストリーミングレスポンスを返す
-    return StreamingResponse(content_streamer(), media_type="text/plain")
+    return StreamingResponse(content_streamer(), media_type="text/event-stream")
