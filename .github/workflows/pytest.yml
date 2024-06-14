@@ -125,6 +125,7 @@ jobs:
    
     - name: Test with pytest         
       run: |
+        set -euo pipefail
         cp ./tests/conftest_ci.py ./tests/conftest.py        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
       continue-on-error: false
@@ -196,7 +197,8 @@ jobs:
         poetry run mypy ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
       
     - name: Test with pytest
-      run: |        
+      run: |
+        set -euo pipefail        
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
       continue-on-error: false
 
