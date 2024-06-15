@@ -1,0 +1,70 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - 8501:8501
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_HOST=http://backend:8000
+    volumes:
+      - ./frontend:/frontend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/backend
+    networks:
+      - app-network    
+
+  dev-db:
+    image: mysql:8.0
+    platform: linux/x86_64
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'dev-db'
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - dev-mysql-data:/var/lib/mysql    
+    ports:
+      - 3306:3306
+    networks:
+      - app-network
+  
+  test-db:
+    image: mysql:8.0
+    platform: linux/x86_64
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'test-db'
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - test-mysql-data:/var/lib/mysql    
+    ports:
+      - 3307:3306
+    networks:
+      - app-network
+
+volumes:
+  dev-mysql-data:
+  test-mysql-data:
+
+networks:
+  app-network:
+    driver: bridge
