@@ -122,7 +122,7 @@ async def request_content(
                 await db.commit()
                 logging.info("Output markdown saved to database.")
 
-            # ここではログに出力するだけ
+            # ログに出力
             logging.info(f"Final content for DB: {final_content}")
 
     # ストリーミングレスポンスを返す
