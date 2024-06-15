@@ -94,10 +94,10 @@ copilot-practice2
 - `$ docker compose run --entrypoint "poetry install --no-root" frontend`
 - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
 - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
-- `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
-- `PROJECT_ID=<PROJECT_ID>`
-- `REGION="asia-northeast1"`
-- `BUCKET_NAME=<BUCKET_NAME>`
+  - `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
+  - `PROJECT_ID=<PROJECT_ID>`
+  - `REGION="asia-northeast1"`
+  - `BUCKET_NAME=<BUCKET_NAME>`
 - backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
 - パッケージ管理は poetry を使用
 

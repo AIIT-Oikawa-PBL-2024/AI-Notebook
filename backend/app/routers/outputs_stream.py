@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from datetime import datetime, timedelta, timezone
@@ -30,7 +31,7 @@ db_dependency = Depends(get_db)
 
 
 # 複数のファイル名のリストを入力して、出力を生成するエンドポイント
-@router.post("/request_stream", response_model=str)
+@router.post("/request_stream")
 async def request_content(
     files: list[str],
     db: AsyncSession = db_dependency,
@@ -92,6 +93,8 @@ async def request_content(
                 logging.info(f"Streaming content: {text_value}")
                 accumulated_content.append(text_value)
                 yield text_value
+                await asyncio.sleep(0.05)
+
         except Exception as e:
             logging.error(f"Error while streaming content: {e}")
             raise HTTPException(
@@ -119,8 +122,8 @@ async def request_content(
                 await db.commit()
                 logging.info("Output markdown saved to database.")
 
-            # ここではログに出力するだけ
+            # ログに出力
             logging.info(f"Final content for DB: {final_content}")
 
     # ストリーミングレスポンスを返す
-    return StreamingResponse(content_streamer(), media_type="text/plain")
+    return StreamingResponse(content_streamer(), media_type="text/event-stream")

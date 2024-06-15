@@ -6,7 +6,13 @@ from typing import AsyncGenerator
 
 import vertexai
 from dotenv import load_dotenv
-from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
+from google.api_core.exceptions import (
+    GoogleAPIError,
+    InternalServerError,
+    InvalidArgument,
+    NotFound,
+)
+from google.cloud import storage
 from vertexai.generative_models import (
     GenerationConfig,
     GenerationResponse,
@@ -33,7 +39,15 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 logging.basicConfig(level=logging.INFO)
 
 
-# 複数のPDFファイルを入力してコンテンツを生成
+# Google Cloud Storageでファイルが存在するかチェック
+def check_file_exists(bucket_name: str, file_name: str) -> bool:
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(file_name)
+    return blob.exists()
+
+
+# 複数のPDF, imageファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
     model_name: str = MODEL_NAME,
@@ -41,14 +55,16 @@ async def generate_content_stream(
     bucket_name: str = BUCKET_NAME,
 ) -> AsyncGenerator[GenerationResponse, None]:
     pdf_files: list[Part] = []
+    image_files: list[Part] = []
     # プロンプト（指示文）
     prompt = """
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
         - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。
-        - #instruction: 複数のpdfファイルを読み解いて、親しみやすい解説がついていて、
+        - #instruction: 複数のpdf, imageファイルを読み解いて、親しみやすい解説がついて、
             誰もが読みたくなるような、わかりやすい整理ノートを日本語で作成して下さい。
+            imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。
         - #style: ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、
-            強調表示などのスタイルを追加してください。
+            強調表示などのスタイルを追加してください。表形式は避けてください。
         - #condition1: 絵文字を使って、視覚的にもわかりやすくしてください。
         - #condition2: 途中に興味深いコラムを設けてください。
         - #condition3: 最後に用語解説の一覧を箇条書き形式で表示してください。
@@ -57,22 +73,52 @@ async def generate_content_stream(
 
     try:
         for file_name in files:
-            # PDFファイルのURI
-            pdf_file_uri = f"gs://{bucket_name}/{file_name}"
-            # PDFファイルのパートを作成
-            pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
-            pdf_files.append(pdf_file)
-    except NotFound as e:
-        logging.error(f"File not found: {e}")
-        raise
-    except InvalidArgument as e:
-        logging.error(f"Invalid file format: {e}")
+            # ファイルがGCSに存在するかチェック
+            if check_file_exists(bucket_name, file_name):
+                if file_name.endswith(".pdf"):
+                    # PDFファイルのURI
+                    pdf_file_uri = f"gs://{bucket_name}/{file_name}"
+                    # PDFファイルのパートを作成
+                    pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
+                    pdf_files.append(pdf_file)
+                elif file_name.endswith(".jpg") or file_name.endswith(".jpeg"):
+                    # imageファイルのURI
+                    image_file_uri = f"gs://{bucket_name}/{file_name}"
+                    # imageファイルのパートを作成
+                    image_file = Part.from_uri(image_file_uri, mime_type="image/jpeg")
+                    image_files.append(image_file)
+                elif file_name.endswith(".png"):
+                    # imageファイルのURI
+                    image_file_uri = f"gs://{bucket_name}/{file_name}"
+                    # imageファイルのパートを作成
+                    image_file = Part.from_uri(image_file_uri, mime_type="image/png")
+                    image_files.append(image_file)
+                else:
+                    logging.error(
+                        f"Invalid file format: {file_name}. "
+                        + "Only PDF and image files are supported."
+                    )
+                    raise InvalidArgument(
+                        f"Invalid file format: {file_name}. "
+                        + "Only PDF and image files are supported."
+                    )
+            else:
+                logging.error(
+                    f"File {file_name} does not exist in the bucket {bucket_name}."
+                )
+                raise NotFound(
+                    f"File {file_name} does not exist in the bucket {bucket_name}."
+                )
+        logging.info(f"Files: {pdf_files + image_files} are read.")
+
+    except InternalServerError as e:
+        logging.error(f"Internal server error: {e}")
         raise
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
         raise
     except Exception as e:
-        logging.error(f"Unexpected error while reading PDF files: {e}")
+        logging.error(f"Unexpected error while reading files: {e}")
         raise
 
     try:
@@ -80,7 +126,7 @@ async def generate_content_stream(
         model = GenerativeModel(model_name=model_name)
 
         # コンテンツリストを作成
-        contents = pdf_files + [prompt]
+        contents = pdf_files + image_files + [prompt]
 
         # 同期関数を非同期にラップする
         sync_response = await asyncio.to_thread(
@@ -99,6 +145,9 @@ async def generate_content_stream(
     except TypeError as e:
         logging.error(f"Type error in model generation: {e}")
         raise
+    except InternalServerError as e:
+        logging.error(f"Internal server error: {e}")
+        raise
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
         raise
@@ -109,7 +158,9 @@ async def generate_content_stream(
 
 # テスト用のコード
 async def main() -> None:
-    response: AsyncGenerator = generate_content_stream(["5_アジャイルⅡ.pdf"])
+    response: AsyncGenerator = generate_content_stream(
+        ["kougi_sample.png", "kougi_sample2.png"]
+    )
     async for content in response:
         # まず辞書形式に変換
         content_dict = content.to_dict()
