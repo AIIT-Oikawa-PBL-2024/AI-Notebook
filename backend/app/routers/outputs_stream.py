@@ -31,7 +31,7 @@ db_dependency = Depends(get_db)
 
 
 # 複数のファイル名のリストを入力して、出力を生成するエンドポイント
-@router.post("/request_stream", response_model=str)
+@router.post("/request_stream")
 async def request_content(
     files: list[str],
     db: AsyncSession = db_dependency,
