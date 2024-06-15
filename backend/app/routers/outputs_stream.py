@@ -1,12 +1,17 @@
 import asyncio
 import json
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import AsyncGenerator
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
+from sqlalchemy.ext.asyncio import AsyncSession
 
+import app.cruds.outputs as outputs_cruds
+import app.schemas.outputs as outputs_schemas
+from app.database import get_db
 from app.utils.gemini_request_stream import generate_content_stream
 
 # ロギング設定
@@ -18,10 +23,19 @@ router = APIRouter(
     tags=["outputs"],
 )
 
+# 日本時間のタイムゾーン
+JST = timezone(timedelta(hours=9))
+
+# 依存関係
+db_dependency = Depends(get_db)
+
 
 # 複数のファイル名のリストを入力して、出力を生成するエンドポイント
-@router.post("/request_stream")
-async def request_content(files: list[str]) -> StreamingResponse:
+@router.post("/request_stream", response_model=str)
+async def request_content(
+    files: list[str],
+    db: AsyncSession = db_dependency,
+) -> StreamingResponse:
     # ロギング
     logging.info(f"Requesting content generation for files: {files}")
 
@@ -91,7 +105,23 @@ async def request_content(files: list[str]) -> StreamingResponse:
         finally:
             # コンテンツを結合して1つの文字列にする
             final_content = "".join(accumulated_content)
-            # DBに登録するための処理を追加する
+
+            # DBに登録するための処理
+            if final_content:
+                # 日本時間の現在日時を取得
+                now_japan = datetime.now(JST)
+
+                output_create = outputs_schemas.OutputCreate(
+                    output=final_content,
+                    user_id=1,  # ユーザIDは仮で1を設定
+                    created_at=now_japan,  # 日本時間の現在日時を設定
+                )
+
+                # 学習帳を保存
+                await outputs_cruds.create_output(db, output_create)
+                await db.commit()
+                logging.info("Output markdown saved to database.")
+
             # ここではログに出力するだけ
             logging.info(f"Final content for DB: {final_content}")
 
