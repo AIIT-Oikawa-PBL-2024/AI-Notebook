@@ -4,15 +4,13 @@ from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
-
 from app.utils.operation_cloud_storage import post_files
-from typing import List
 
 router = APIRouter(prefix="/files")
 
@@ -37,8 +35,9 @@ JST = timezone(timedelta(hours=9))
 # 依存関係
 db_dependency = Depends(get_db)
 
+
 # GCSへのファイルアップロードとファイル名をDBに登録
-@router.post("/upload", response_model=dict) 
+@router.post("/upload", response_model=dict)
 async def upload_files(
     files: list[UploadFile],
     db: AsyncSession = db_dependency,
@@ -65,17 +64,18 @@ async def upload_files(
                 file_size=len(file_bytes.getvalue()),
                 user_id=1,  # ユーザIDは仮で1を設定
                 created_at=now_japan,  # 日本時間の現在日時を設定
-                )
+            )
 
             # ファイル情報を保存
             uploaded_file = await files_cruds.create_file(db, file_create)
             logging.info(f"File {file.filename} saved to database.")
             response_data["files"].append(
                 {"id": uploaded_file.id, "file_name": uploaded_file.file_name}
-                )
+            )
 
     response_data["success"] = upload_result.get("success", False)
     return response_data
+
 
 # ファイルの一覧取得
 @router.get("/", response_model=list[files_schemas.File])

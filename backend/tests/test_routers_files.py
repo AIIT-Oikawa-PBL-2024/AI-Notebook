@@ -51,11 +51,9 @@ async def test_upload_files(session: AsyncSession) -> None:
         response = await client.post(f"/files/upload?user_id={user_id}", files=files)
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
-        # data = response.json()
-        # assert len(data) == 1
-        # assert data[0]["file_name"] == "test_file.pdf"
         data = response.json()
         assert data["success"] is True
+
 
 # ファイル一覧取得のテスト
 @pytest.mark.asyncio
@@ -70,9 +68,8 @@ async def test_get_files(session: AsyncSession) -> None:
         files = [
             ("files", ("test_file.pdf", file_content, "application/pdf")),
         ]
-        # await client.post(f"/files/upload?user_id={user_id}", files=files)
         await client.post("/files/upload", files=files)
-        
+
         response = await client.get("/files/")
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
@@ -108,7 +105,11 @@ async def test_get_file_by_id(session: AsyncSession) -> None:
         elif isinstance(upload_data, dict):
             if "id" in upload_data:
                 file_id = upload_data["id"]
-            elif "files" in upload_data and len(upload_data["files"]) > 0 and "id" in upload_data["files"][0]:
+            elif (
+                "files" in upload_data
+                and len(upload_data["files"]) > 0
+                and "id" in upload_data["files"][0]
+            ):
                 file_id = upload_data["files"][0]["id"]
             else:
                 raise KeyError("Key 'id' not found in upload data")
@@ -121,6 +122,7 @@ async def test_get_file_by_id(session: AsyncSession) -> None:
         data = response.json()
         assert data["id"] == file_id
         assert data["file_name"] == "test_file.pdf"
+
 
 # ファイル削除のテスト
 @pytest.mark.asyncio
@@ -147,7 +149,11 @@ async def test_delete_file(session: AsyncSession) -> None:
         if isinstance(upload_data, list):
             file_id = upload_data[0]["id"]
         elif isinstance(upload_data, dict):
-            if "files" in upload_data and len(upload_data["files"]) > 0 and "id" in upload_data["files"][0]:
+            if (
+                "files" in upload_data
+                and len(upload_data["files"]) > 0
+                and "id" in upload_data["files"][0]
+            ):
                 file_id = upload_data["files"][0]["id"]
             else:
                 raise KeyError("Key 'id' not found in upload data")

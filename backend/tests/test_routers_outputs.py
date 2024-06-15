@@ -20,13 +20,15 @@ load_dotenv()
 app = FastAPI()
 app.include_router(router)
 
+
 # 環境変数を設定するフィクスチャ
 @pytest.fixture
 def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
     # 環境変数を設定
     monkeypatch.setenv("PROJECT_ID", "your_project_id")
     monkeypatch.setenv("REGION", "your_region")
-    
+
+
 # sessionフィクスチャを提供するフィクスチャを定義
 @pytest.fixture
 async def session(
@@ -55,7 +57,7 @@ async def test_upload_outputs(session: AsyncSession) -> None:
         "output": "テストマークダウン🚀",
         "user_id": user_id,
         "created_at": "2024-06-08T06:38:33.149Z",
-        "id": 0
+        "id": 0,
     }
 
     async with AsyncClient(
@@ -84,7 +86,7 @@ async def test_get_outputs(session: AsyncSession) -> None:
             "output": "テストマークダウン🚀",
             "user_id": user_id,
             "created_at": "2024-06-08T06:38:33.149Z",
-            "id": 0
+            "id": 0,
         }
         await client.post(f"/outputs/upload?user_id={user_id}", json=outputs)
 
@@ -109,7 +111,7 @@ async def test_get_output_by_id(session: AsyncSession) -> None:
             "output": "テストマークダウン🚀",
             "user_id": user_id,
             "created_at": "2024-06-08T06:38:33.149Z",
-            "id": 0
+            "id": 0,
         }
         upload_response = await client.post(
             f"/outputs/upload?user_id={user_id}", json=outputs
@@ -140,7 +142,7 @@ async def test_delete_output(session: AsyncSession) -> None:
             "output": "テストマークダウン🚀",
             "user_id": user_id,
             "created_at": "2024-06-08T06:38:33.149Z",
-            "id": 0
+            "id": 0,
         }
 
         upload_response = await client.post(
@@ -184,7 +186,8 @@ async def test_delete_output_not_found(session: AsyncSession) -> None:
         assert response.status_code == 404
         data = response.json()
         assert data["detail"] == "学習帳が見つかりません"
-        
+
+
 # 正常にコンテンツが生成される場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs.generate_content", new_callable=AsyncMock)
