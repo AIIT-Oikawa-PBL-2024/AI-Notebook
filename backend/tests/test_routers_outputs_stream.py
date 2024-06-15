@@ -6,11 +6,10 @@ from pytest import MonkeyPatch
 from app.routers.outputs_stream import router
 from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
-# FastAPIアプリケーションにルーターを追加
-app = FastAPI()
-app.include_router(router)
+from app.main import app
 
 
 # 環境変数を設定するフィクスチャ
@@ -19,6 +18,15 @@ def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
     # 環境変数を設定
     monkeypatch.setenv("PROJECT_ID", "your_project_id")
     monkeypatch.setenv("REGION", "your_region")
+
+
+# sessionフィクスチャを提供するフィクスチャを定義
+@pytest.fixture
+async def session(
+    setup_and_teardown_database: AsyncGenerator[AsyncSession, None],
+) -> AsyncGenerator[AsyncSession, None]:
+    async with setup_and_teardown_database as session:  # type: ignore
+        yield session
 
 
 # モックのコンテンツ
@@ -33,7 +41,7 @@ class MockContent:
 @pytest.mark.asyncio
 @patch("app.routers.outputs_stream.generate_content_stream")
 async def test_request_content_stream_success(
-    mock_generate_content_stream: Mock, mock_env_vars: None
+    mock_generate_content_stream: Mock, mock_env_vars: None, session: AsyncSession
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
@@ -153,6 +161,7 @@ async def test_request_content_stream_final_content_logging(
     mock_generate_content_stream: Mock,
     mock_env_vars: None,
     caplog: pytest.LogCaptureFixture,
+    session: AsyncSession,
 ) -> None:
     # フィクスチャを適用
     mock_env_vars
