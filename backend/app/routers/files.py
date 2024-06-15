@@ -48,10 +48,10 @@ async def upload_files(
         files = File(...)
     # ファイルをGoogle Cloud Storageにアップロード
     upload_result = await post_files(files)
-    
+
     if "success" not in upload_result or not upload_result["success"]:
         raise HTTPException(status_code=500, detail="Upload failed")
-    
+
     for file in files:
         if file.filename:
             # UploadFileをBytesIOに変換
@@ -66,11 +66,13 @@ async def upload_files(
                 user_id=1,  # ユーザIDは仮で1を設定
                 created_at=now_japan,  # 日本時間の現在日時を設定
                 )
-            
+
             # ファイル情報を保存
             uploaded_file = await files_cruds.create_file(db, file_create)
             logging.info(f"File {file.filename} saved to database.")
-            response_data["files"].append({"id": uploaded_file.id, "file_name": uploaded_file.file_name})
+            response_data["files"].append(
+                {"id": uploaded_file.id, "file_name": uploaded_file.file_name}
+                )
 
     response_data["success"] = upload_result.get("success", False)
     return response_data

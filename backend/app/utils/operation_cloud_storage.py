@@ -1,6 +1,5 @@
 import io
 import os
-import logging
 from dotenv import load_dotenv
 from typing import List
 from fastapi import UploadFile, HTTPException
@@ -28,7 +27,9 @@ async def post_files(files: List[UploadFile]) -> dict:
             ext_correct_files.append(file)
 
     if ext_error_files:
-        raise HTTPException(status_code=400, detail=f"拡張子がアップロード対象外のファイルです。{', '.join(ext_error_files)}")
+        raise HTTPException(
+            status_code=400, detail=f"アップロード対象外の拡張子です。{', '.join(ext_error_files)}"
+            )
     # ファイルのアップロード処理
     upload_result = await upload_files(ext_correct_files)
 
@@ -56,7 +57,9 @@ async def upload_files(ext_correct_files: List[UploadFile]) -> dict:
             # アップロードの結果をチェック
             if blob.exists():
                 success_message = f"ファイル {file.filename} のアップロードが成功しました"
-                success_files.append({"message": success_message, "filename": file.filename})
+                success_files.append(
+                    {"message": success_message, "filename": file.filename}
+                    )
             else:
                 error_message = f"ファイル {file.filename} のアップロードに失敗しました"
                 failed_files.append(error_message)
@@ -65,11 +68,11 @@ async def upload_files(ext_correct_files: List[UploadFile]) -> dict:
         except google_exceptions.GoogleCloudError as e:
             error_message = f"ファイル {file.filename} のアップロード中にエラーが発生しました: {str(e)}"
             failed_files.append(error_message)
-            
+
         except Exception as e:
             error_message = f"ファイル {file.filename} のアップロード中に予期しないエラーが発生しました: {str(e)}"
             failed_files.append(error_message)
-    
+
     if failed_files:
         error_details = "\n".join(failed_files)
         return {"success": False, "success_files": success_files, "failed_files": error_details}
