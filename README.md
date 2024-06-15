@@ -73,57 +73,44 @@ copilot-practice2
 
 ### Docker Compose
 
-- `docker-compose.yml`: フロントエンド、バックエンド、DB のコンテナのサービス、公開するポートを定義する。<br>
+- `docker-compose.yml`: フロントエンド、バックエンド、DB のコンテナのサービス、公開するポートを定義する。
+
   ※DB には MySQL を利用する。
 
 ## 作成方法
 
 - `git clone`でリポジトリをダウンロード
-- ルートディレクトリにある`.env.sample`ファイルをコピーして、`.env`ファイルを作成<br>
-  DB の設定は変更せず、password はブランクのままにしてください。<br>
+- ルートディレクトリにある`.env.sample`ファイルをコピーして、`.env`ファイルを作成
+
+  DB の設定は変更せず、password はブランクのままにしてください。
+
   - `GOOGLE_APPLICATION_CREDENTIALS`に GCP サービスアカウントキーのファイルのパスを入力
   - `BUCKET_NAME`に GCP のバケット名を入力
+
 - `$ docker compose build --no-cache`で Docker イメージをビルド
-+ `$ docker compose build --no-cache`で Docker イメージをビルド
-
 - `$ cd backend`
-+ `$ cd backend`
-
 - `$ docker compose run --entrypoint "poetry install --no-root" backend`
-+ `$ docker compose run --entrypoint "poetry install --no-root" backend`
-
 - `$ cd ../frontend`
-+ `$ cd ../frontend`
-
 - `$ docker compose run --entrypoint "poetry install --no-root" frontend`
-+ `$ docker compose run --entrypoint "poetry install --no-root" frontend`
-
 - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
-+ `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
-
 - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
-+ .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
-
 - `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
-+ `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
-
 - `PROJECT_ID=<PROJECT_ID>`
-+ `PROJECT_ID=<PROJECT_ID>`
-
 - `REGION="asia-northeast1"`
-+ `REGION="asia-northeast1"`
-
 - `BUCKET_NAME=<BUCKET_NAME>`
-+ `BUCKET_NAME=<BUCKET_NAME>`
-
 - backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
-+ backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
-- パッケージ管理は poetry を使用<br>
-  　 backend と frontend のそれぞれの定義ファイルからインストール<br>
+- パッケージ管理は poetry を使用
+
+  　 backend と frontend のそれぞれの定義ファイルからインストール
+
   `$ cd backend`
-  `$ docker compose run --entrypoint "poetry install --no-root" backend`<br>
+
+  `$ docker compose run --entrypoint "poetry install --no-root" backend`
+
   `$ cd ../frontend`
-  `$ docker compose run --entrypoint "poetry install --no-root" frontend`<br>
+
+  `$ docker compose run --entrypoint "poetry install --no-root" frontend`
+
 - `pyproject.toml`ファイルをもとに`.venv`ディレクトリにパッケージがインストールされる。
 
 - ルートディレクトリから`$ docker compose up`でコンテナを立ち上げ
@@ -132,6 +119,7 @@ copilot-practice2
 - ブラウザから動作確認 8000 番ポートに FastAPI、8501 番ポートに Streamlit が立ち上がる
 
 - Dev Container の起動確認 VSCode 左下の「><」マークから「コンテナで再度開く」を選択
+
   backend, frontend のコンテナ内で操作できる。
 
 - DB の起動確認
@@ -147,7 +135,9 @@ copilot-practice2
     - `$ alembic upgrade head`
     - [エラーが出る場合はドキュメント確認](https://alembic.sqlalchemy.org/en/latest/tutorial.html#running-our-first-migration)
   - テスト用 DB
+
     テスト用 DBについてはalembicコマンドは実行しない
+
     理由はテストコードの中で毎回テーブルを作成して、削除しているため、alembicコマンドと併用すると不整合が起きるため
   
 - テーブル作成の確認
@@ -157,61 +147,65 @@ copilot-practice2
   - `mysql> DESCRIBE users;`
 
 - DB マイグレーション実施後は、
+  
   FastAPI の Swagger UI から DB にアクセス可能になる。
+  
   8000 番ポートの`/docs`パスで確認
 
 - Google VertexAI のローカル環境での利用方法
 
   - GCP でサービスアカウントキーの作成
-  - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納<br>
+  - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
     - **重要**　**ファイル名がグレーアウトされていて、GitHub に上がらないことを確認**
-  - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加<br>
-    `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`<br>
-    `PROJECT_ID=<PROJECT_ID>`<br>
-    `REGION="asia-northeast1"`<br>
-    `BUCKET_NAME=<BUCKET_NAME>`<br>
+  
+  - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
+    - `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
+    - `PROJECT_ID=<PROJECT_ID>`
+    - `REGION="asia-northeast1"`
+    - `BUCKET_NAME=<BUCKET_NAME>`
   - Docker イメージのリビルド `$ docker compose build --no-cache`
   - backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
-    - 以下の表示が出るが PROJECT_ID は設定しない<br>
-      `Your current project is [None].  You can change this setting by running:`
-      `$ gcloud config set project PROJECT_ID`
+    - 以下の表示が出るが PROJECT_ID は設定しない
+      - `Your current project is [None].  You can change this setting by running:`
+      - `$ gcloud config set project PROJECT_ID`
+
   - backend のコンテナ内で`sudo poetry install --no-root` ※google 関連パッケージを sudo 権限でインストール
   - `python app/utils/gemini_request_stream.py`で gemini から出力されれば OK
 
 - パッケージを追加する場合
   - Dev Container を起動してから`$ poetry add <パッケージ>`
   - 開発環境のみのパッケージは`$ poetry add -D <パッケージ>`
-    ※ローカル環境から操作したい場合
-  - バックエンド `$ docker compose exec backend poetry add <パッケージ>`
-  - フロントエンド `$ docker compose exec frontend poetry add <パッケージ>`
+
+  - ローカル環境から操作したい場合
+    - バックエンド `$ docker compose exec backend poetry add <パッケージ>`
+    - フロントエンド `$ docker compose exec frontend poetry add <パッケージ>`
 
 ## 設定ファイル
 
-- .gitignore ファイル<br>
-  以下のファイルをコピーして、カスタマイズ<br>
-  https://github.com/github/gitignore/blob/main/Python.gitignore
+- .gitignore ファイル
+  - 以下のファイルをコピーして、カスタマイズ
+  - https://github.com/github/gitignore/blob/main/Python.gitignore
 
-- .coderabbit.yaml ファイル<br>
-  コードラビットの設定ファイル
+- .coderabbit.yaml ファイル
+  - コードラビットの設定ファイル
 
-- .vscode/settings.json<br>
-  リンター、フォーマッターとして ruff, mypy を設定<br>
-  `pyproject.tomlにも[tool.ruff],[tool.mypy]を設定済み`<br>
-  ⭐️VSCode の拡張機能でも ruff と mypy をインストール
+- .vscode/settings.json
+  - リンター、フォーマッターとして ruff, mypy を設定
+  - `pyproject.tomlにも[tool.ruff],[tool.mypy]を設定済み`
+  - ⭐️VSCode の拡張機能でも ruff と mypy をインストール
 
 ## テストの実行
 
 - Dev Container での実行
-  `pytest tests/ --cov=app`
+  - `pytest tests/ --cov=app`
 
 - GitHub Actions の CI 実行
-
   - 実行ファイル
-    `.github/workflows/pytest.yml`<br>
-    `backend`, `frontend`で処理を分けています。
-    `coverage-path-prefix`を設定することで、リンクのパスに飛ぶようになりました。
+    - `.github/workflows/pytest.yml`
+      - `backend`, `frontend`で処理を分けています。
+      - `coverage-path-prefix`を設定することで、リンクのパスに飛ぶようになりました。
 
   - GitHub Actions の処理について
     - Ruff, Mypy, Pytest が実行されます。
-      参考ページ
-      https://github.com/MishaKav/pytest-coverage-comment
+  - 参考ページ
+    - https://github.com/MishaKav/pytest-coverage-comment
