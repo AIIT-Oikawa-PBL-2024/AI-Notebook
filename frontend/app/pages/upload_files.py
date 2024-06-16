@@ -18,7 +18,8 @@ def is_valid_file(file):
     file_ext = os.path.splitext(file.name)[1][1:].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
         st.error(
-            f"Cannot upload {file.name}. Only PDF, JPG, JPEG, and PNG files are allowed."
+            f"Cannot upload {file.name}. Only PDF, JPG, JPEG, and PNG"
+            "files are allowed."
         )
         return False
 
@@ -70,7 +71,8 @@ def main():
                     st.error(f"An error occurred during the request: {e}")
         else:
             st.warning(
-                "No valid files to submit. Please upload PDF, JPG, JPEG, or PNG files (max 200 MB each)."
+                "No valid files to submit. Please upload PDF, JPG, JPEG, or PNG files"
+                "(max 200 MB each)."
             )
 
 
