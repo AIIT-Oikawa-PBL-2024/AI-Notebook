@@ -37,7 +37,11 @@ def is_valid_file(file):
 def main():
     st.title("ファイルアップロード")
 
-    uploaded_files = st.file_uploader("", accept_multiple_files=True)
+    uploaded_files = st.file_uploader(
+        "",
+        accept_multiple_files=True,
+        label_visibility="collapsed"
+    )
 
     if uploaded_files:
         valid_files = []
@@ -46,8 +50,8 @@ def main():
         for file in uploaded_files:
             if file.name in file_names:
                 st.warning(
-                    f" {file.name}ファイルは既にアップロードされています。重複した"
-                    "ファイルは登録されません。他のファイルをアップロードしてください。"
+                    f" {file.name}ファイルは既にアップロードされています。"
+                    "他のファイルをアップロードしてください。"
                 )
                 continue
 
@@ -55,7 +59,8 @@ def main():
                 valid_files.append(file)
                 file_names.add(file.name)
                 st.success(
-                    f"Valid file: {file.name} (Size: {file.size / 1024 / 1024:.2f} MB)"
+                    f" {file.name}は正常にアップロードされました。 (Size: " +
+                    f"{file.size / 1024 / 1024:.2f} MB)"
                 )
 
         if valid_files:
