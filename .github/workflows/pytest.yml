@@ -119,7 +119,10 @@ jobs:
         service_account: "ai-notebook-test001@oikawapbl2024.iam.gserviceaccount.com"
         create_credentials_file: "true"
         export_environment_variables: "true"
-
+    
+    - name: Set up GOOGLE_APPLICATION_CREDENTIALS environment variable
+      run: echo "GOOGLE_APPLICATION_CREDENTIALS=${{ steps.auth.outputs.credentials_file_path }}" >> $GITHUB_ENV
+  
     - name: Test with pytest         
       run: |
         set -euo pipefail
@@ -130,6 +133,7 @@ jobs:
         PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
         REGION: ${{ secrets.REGION }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
                  
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
