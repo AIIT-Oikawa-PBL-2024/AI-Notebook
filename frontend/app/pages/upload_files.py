@@ -69,13 +69,15 @@ def main():
                             st.success("ファイルは正常に登録されました。")
                         else:
                             st.error(
-                                f"ファイルは登録できませんでした。 Status code: {response.status_code}"
+                                f"ファイルは登録できませんでした。 Status code: "
+                                "{response.status_code}"
                             )
                 except httpx.RequestError as e:
                     st.error(f" {e}リクエストでエラーが発生しました。")
         else:
             st.warning(
-                "ファイルが登録されませんでした。 有効なファイルをアップロードしてください。"
+                "ファイルが登録されませんでした。"
+                "有効なファイルをアップロードしてください。"
             )
 
 
