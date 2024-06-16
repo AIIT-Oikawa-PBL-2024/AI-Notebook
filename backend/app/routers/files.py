@@ -1,7 +1,5 @@
 import logging
-import os
 from datetime import datetime, timedelta, timezone
-from io import BytesIO
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
@@ -10,15 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
+from app.utils.operate_cloud_storage import post_files
 
 # 環境変数を読み込む
 load_dotenv()
 
 # ロギング設定
 logging.basicConfig(level=logging.INFO)
-
-# 環境変数から認証情報を取得
-BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
 
 # ルーターの設定
 router = APIRouter(
@@ -33,42 +29,46 @@ JST = timezone(timedelta(hours=9))
 db_dependency = Depends(get_db)
 
 
-# 複数ファイルのDB登録のみ
-@router.post("/upload", response_model=list[files_schemas.File])
+# GCSへのファイルアップロードとファイル名をDBに登録
+@router.post("/upload", response_model=dict)
 async def upload_files(
     files: list[UploadFile],
     db: AsyncSession = db_dependency,
-) -> list[files_schemas.File]:
-    uploaded_files: list = []
+) -> dict:
+    response_data = {}
+
+    # ファイルをGoogle Cloud Storageにアップロード
+    upload_result = await post_files(files)
+
+    if "success" not in upload_result or not upload_result["success"]:
+        raise HTTPException(status_code=500, detail="Upload failed")
 
     for file in files:
-        if file.filename:
-            # UploadFileをBytesIOに変換
-            file_bytes = BytesIO(await file.read())
-            # try:
-            #     upload_blob_from_stream(BUCKET_NAME, file_bytes, file.filename)
-            #     logging.info(f"File {file.filename} uploaded to {BUCKET_NAME}.")
-            # except Exception as e:
-            #     raise HTTPException(
-            #         status_code=500, detail="ファイルをアップロードできませんでした"
-            #     ) from e
-
+        if file.filename and file.size:
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
 
             file_create = files_schemas.FileCreate(
                 file_name=file.filename,
-                file_size=len(file_bytes.getvalue()),
+                file_size=file.size,
                 user_id=1,  # ユーザIDは仮で1を設定
                 created_at=now_japan,  # 日本時間の現在日時を設定
             )
 
             # ファイル情報を保存
-            uploaded_file = await files_cruds.create_file(db, file_create)
-            uploaded_files.append(uploaded_file)
-            logging.info(f"File {file.filename} saved to database.")
+            try:
+                regist_file = await files_cruds.create_file(db, file_create)
+                logging.info(f"File {regist_file.file_name} saved to database.")
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"{regist_file.file_name} データベース登録に失敗しました",
+                ) from e
 
-    return uploaded_files
+    response_data["success"] = upload_result.get("success", False)
+    response_data["success_files"] = upload_result.get("success_files", [])
+    response_data["failed_files"] = upload_result.get("failed_files", [])
+    return response_data
 
 
 # ファイルの一覧取得
