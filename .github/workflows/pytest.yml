@@ -117,6 +117,8 @@ jobs:
       with:
         workload_identity_provider: "projects/429194103408/locations/global/workloadIdentityPools/ai-notebook-test/providers/github"
         service_account: "ai-notebook-test001@oikawapbl2024.iam.gserviceaccount.com"
+        create_credentials_file: "true"
+        export_environment_variables: "true"
 
     - name: Test with pytest         
       run: |
@@ -128,7 +130,7 @@ jobs:
         PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
         REGION: ${{ secrets.REGION }}
-                
+                 
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
       with:
