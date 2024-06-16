@@ -44,6 +44,7 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
       BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      REGION: ${{ secrets.REGION }}
 
     steps:
     - uses: actions/checkout@v4
@@ -120,7 +121,7 @@ jobs:
         echo "$GCP_SERVICE_ACCOUNT_KEY" > ${HOME}/gcloud.json
         gcloud auth activate-service-account --key-file=${HOME}/gcloud.json
         gcloud config set project $GCP_PROJECT_ID
-      env:
+      env:        
         GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
    
     - name: Test with pytest         
@@ -210,4 +211,5 @@ jobs:
           pytest-coverage-path: frontend/pytest-coverage.txt
           junitxml-path: frontend/pytest.xml   
 
+  
   
