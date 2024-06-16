@@ -63,13 +63,15 @@ def main():
                 try:
                     with httpx.Client() as client:
                         files = {f.name: f.getvalue() for f in valid_files}
-                        response = client.post("http://www.test.com", files=files)
+                        response = client.post(
+                            "http://127.0.0.1:8000/files/upload", files=files
+                        )
 
                         if response.status_code == 200:
                             st.success("ファイルは正常に登録されました。")
                         else:
                             st.error(
-                                f"ファイルは登録できませんでした。 Status code: "
+                                "ファイルは登録できませんでした。 Status code: "
                                 "{response.status_code}"
                             )
                 except httpx.RequestError as e:
