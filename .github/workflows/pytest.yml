@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write  
   pull-requests: write
+  id-token: write
 
 jobs:
   ci-backend:    
@@ -41,9 +42,9 @@ jobs:
         working-directory: ./backend
 
     env:
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}         
       BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      REGION: ${{ secrets.REGION }}
 
     steps:
     - uses: actions/checkout@v4
@@ -109,20 +110,15 @@ jobs:
     - name: Lint with Mypy
       run: |
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-    
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+           
+    - id: "auth"
+      name: "Authenticate to Google Cloud"
+      uses: "google-github-actions/auth@v1"
       with:
-        version: 'latest'
-  
-    - name: Authenticate to Google Cloud
-      run: |
-        echo "$GCP_SERVICE_ACCOUNT_KEY" > ${HOME}/gcloud.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud.json
-        gcloud config set project $GCP_PROJECT_ID
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
-   
+        workload_identity_provider: "projects/429194103408/locations/global/workloadIdentityPools/ai-notebook-test/providers/github"
+        service_account: "ai-notebook-test001@oikawapbl2024.iam.gserviceaccount.com"
+        create_credentials_file: true
+
     - name: Test with pytest         
       run: |
         set -euo pipefail
@@ -130,9 +126,11 @@ jobs:
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
       continue-on-error: false
       env:
+        PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
-        
+        REGION: ${{ secrets.REGION }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/credentials.json
+                
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
       with:
@@ -141,13 +139,6 @@ jobs:
           pytest-coverage-path: backend/pytest-coverage.txt
           junitxml-path: backend/pytest.xml
     
-    - name: Upload test results to Google Cloud Storage
-      run: |
-        echo "Uploading test results to Google Cloud Storage..."
-        gsutil cp pytest-coverage.txt gs://$BUCKET_NAME/
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
-
   ci-frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 8
