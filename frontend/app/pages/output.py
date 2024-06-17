@@ -1,55 +1,57 @@
 import asyncio
-from typing import AsyncIterator, List, Optional
+import logging
+from typing import List
 
 import httpx
-import streamlit as st  # type: ignore
-from streamlit.runtime.uploaded_file_manager import UploadedFile
+import streamlit as st
+
+logging.basicConfig(level=logging.INFO)
+
+BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
 
 
-# Geminiからの出力レスポンスはストリームデータで受け取る
-async def generate_gemini_processed_markdown_stream(
-    filenames: List[str],
-) -> AsyncIterator[str]:
-    request_url = "http://127.0.0.1:8001/outputs/request"  # Test Mock server
-    # request_url = "https://localhost:8000/outputs/request" # Local FastAPI server
-
-    headers = {"accept": "application/json", "Content-Type": "application/json"}
-
-    async with httpx.AsyncClient() as client:
-        async with client.stream(
-            "POST", request_url, headers=headers, json={"filenames": filenames}
-        ) as response:
-            response.raise_for_status()
-            async for line in response.aiter_lines():
-                yield line
-
-
-async def display_gemini_processed_markdown(filenames: List[str]) -> None:
-    markdown_output = ""
-    placeholder = st.empty()
+async def fetch_gemini_stream_data(filenames: List[str]) -> None:
+    CLIENT_TIMEOUT_SEC = 100.0
+    headers = {"accept": "text/event-stream"}
     try:
-        async for line in generate_gemini_processed_markdown_stream(filenames):
-            markdown_output += line + "\n"
-            placeholder.markdown(markdown_output)
-    # バックエンドの実装次第で他の例外も追加必要かもしれない
+        async with httpx.AsyncClient(timeout=CLIENT_TIMEOUT_SEC) as client:
+            async with client.stream(
+                "POST", BACKEND_DEV_API_URL, headers=headers, json=filenames
+            ) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk.decode("utf-8")
+    except httpx.HTTPStatusError as e:
+        logging.error(f"エラーが発生しました: {e}")
+        st.error(f"エラーが発生しました: {e}")
+    except httpx.RemoteProtocolError as e:
+        logging.error(f"通信中にエラーが発生しました: {e}")
+        return
+    except httpx.RequestError as e:
+        logging.error(f"リクエストエラーが発生しました: {e}")
+        st.error(f"リクエストエラーが発生しました: {e}")
+    except httpx.TimeoutException as e:
+        logging.error(f"タイムアウトしました: {e}")
+        st.error(f"タイムアウトしました: {e}")
     except Exception as e:
-        st.write(f"予期せぬエラーが発生しました。エラー： {e}")
+        logging.error(f"問題が発生しました: {e}")
+        st.error(f"問題が発生しました: {e}")
 
 
-def upload_files() -> Optional[List[UploadedFile]]:
-    uploaded_files = st.file_uploader(
-        "ファイルをアップロードしてください。", type=["pdf"], accept_multiple_files=True
-    )
+async def create_pdf_to_markdown_summary(filenames: List[str]) -> None:
+    output = st.empty()
 
-    return uploaded_files
+    stream_content = ""
+    async for line in fetch_gemini_stream_data(filenames):
+        stream_content += line
+        output.markdown(stream_content)
+    # await fetch_gemini_stream_data(filenames)
 
 
 if __name__ == "__main__":
-    uploaded_files = upload_files()
+    # TODO: 別ページでアップロードされたファイル一覧からファイル名を取得する
+    # uploaded_filenames = [file.name for file in uploaded_files]
 
-    if st.button("作成開始"):
-        if uploaded_files:
-            uploaded_filenames = [file.name for file in uploaded_files]
-            asyncio.run(display_gemini_processed_markdown(uploaded_filenames))
-        else:
-            st.error("ファイルをアップロードしてください。")
+    temp_uploaded_filenames = ["5_アジャイルⅡ.pdf"]
+
+    if st.button("要約する"):
+        asyncio.run(create_pdf_to_markdown_summary(temp_uploaded_filenames))
