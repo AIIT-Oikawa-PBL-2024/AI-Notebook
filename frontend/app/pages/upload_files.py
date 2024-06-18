@@ -4,15 +4,10 @@ from typing import Any  # Add this line
 import httpx
 import streamlit as st
 
-# Read links from an external file
-with open("links.txt", "r") as f:
-    links = f.readlines()
-
-# Display links in the sidebar
+# ./PBLフライヤー1Q.jpg　を表示する
 with st.sidebar:
-    for link in links:
-        link_parts = link.strip().split(",")
-        st.page_link(link_parts[0], label=link_parts[1], icon=link_parts[2])
+    st.page_link("main.py", label="ホーム", icon="🏠")
+    st.page_link("pages/upload_files.py", label="ファイルアップロード", icon="1️⃣")
 
 # Constants
 ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
@@ -35,7 +30,37 @@ def is_valid_file(file: Any) -> bool:
             f"{file.name}をアップロードできませんでした。200 MB以下のファイルを"
             "アップロードしてください。"
         )
-        valid_files = []  # Define valid_files as an empty list before using it
+        return False
+
+    return True
+
+
+def main() -> None:
+    st.title("ファイルアップロード")
+
+    uploaded_files = st.file_uploader(
+        "", accept_multiple_files=True, label_visibility="collapsed"
+    )
+
+    if uploaded_files:
+        valid_files = []
+        file_names = set()
+
+        for file in uploaded_files:
+            if file.name in file_names:
+                st.warning(
+                    f" {file.name}ファイルは既にアップロードされています。"
+                    "他のファイルをアップロードしてください。"
+                )
+                continue
+
+            if is_valid_file(file):
+                valid_files.append(file)
+                file_names.add(file.name)
+                st.success(
+                    f" {file.name}は正常にアップロードされました。 (Size: "
+                    + f"{file.size / 1024 / 1024:.2f} MB)"
+                )
 
         if valid_files:
             if st.button("登録"):
@@ -60,15 +85,6 @@ def is_valid_file(file: Any) -> bool:
                 "ファイルが登録されませんでした。"
                 "有効なファイルをアップロードしてください。"
             )
-            st.warning(
-                "ファイルが登録されませんでした。"
-                "有効なファイルをアップロードしてください。"
-            )
-
-
-def main():
-    # Your code here
-    pass
 
 
 if __name__ == "__main__":
