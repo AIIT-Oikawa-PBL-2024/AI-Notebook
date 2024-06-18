@@ -1,6 +1,7 @@
 import os
+from typing import Any  # Add this line
 
-import httpx  # Add this line
+import httpx
 import streamlit as st
 
 # ./PBLフライヤー1Q.jpg　を表示する
@@ -13,7 +14,7 @@ ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
 MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB in bytes
 
 
-def is_valid_file(file):
+def is_valid_file(file: Any) -> bool:
     # Check file extension
     file_ext = os.path.splitext(file.name)[1][1:].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
@@ -34,13 +35,11 @@ def is_valid_file(file):
     return True
 
 
-def main():
+def main() -> None:
     st.title("ファイルアップロード")
 
     uploaded_files = st.file_uploader(
-        "",
-        accept_multiple_files=True,
-        label_visibility="collapsed"
+        "", accept_multiple_files=True, label_visibility="collapsed"
     )
 
     if uploaded_files:
@@ -59,8 +58,8 @@ def main():
                 valid_files.append(file)
                 file_names.add(file.name)
                 st.success(
-                    f" {file.name}は正常にアップロードされました。 (Size: " +
-                    f"{file.size / 1024 / 1024:.2f} MB)"
+                    f" {file.name}は正常にアップロードされました。 (Size: "
+                    + f"{file.size / 1024 / 1024:.2f} MB)"
                 )
 
         if valid_files:

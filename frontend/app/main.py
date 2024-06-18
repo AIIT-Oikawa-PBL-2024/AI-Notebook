@@ -1,7 +1,16 @@
 import streamlit as st
 
-# ./PBLフライヤー1Q.jpg　を表示する
-st.image("./PBLフライヤー1Q.jpg")
+# Load configuration from a settings file
+image_path = "./PBLフライヤー1Q.jpg"
+sidebar_links = [
+    {"path": "main.py", "label": "ホーム", "icon": "🏠"},
+    {"path": "pages/upload_files.py", "label": "ファイルアップロード", "icon": "1️⃣"},
+]
+
+# Display the image
+st.image(image_path)
+
+# Add sidebar links
 with st.sidebar:
-    st.page_link("main.py", label="ホーム", icon="🏠")
-    st.page_link("pages/upload_files.py", label="ファイルアップロード", icon="1️⃣")
+    for link in sidebar_links:
+        st.page_link(link["path"], label=link["label"], icon=link["icon"])
