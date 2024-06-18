@@ -45,6 +45,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
       BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
       REGION: ${{ secrets.REGION }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
     steps:
     - uses: actions/checkout@v4
@@ -110,7 +111,7 @@ jobs:
     - name: Lint with Mypy
       run: |
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-    
+  
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
@@ -118,21 +119,34 @@ jobs:
   
     - name: Authenticate to Google Cloud
       run: |
-        echo "$GCP_SERVICE_ACCOUNT_KEY" > ${HOME}/gcloud.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud.json
+        echo $GCP_SERVICE_ACCOUNT_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
         gcloud config set project $GCP_PROJECT_ID
       env:        
-        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
-   
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+    - name: Create a dummy file
+      run: |
+        echo "This is a dummy file for testing." > dummy-file.txt
+
+    - name: Upload dummy file to Google Cloud Storage
+      run: |
+        echo "Uploading dummy file to Google Cloud Storage..."
+        gsutil cp dummy-file.txt gs://$BUCKET_NAME/
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
     - name: Test with pytest         
       run: |
         set -euo pipefail
-        cp ./tests/conftest_ci.py ./tests/conftest.py        
+        cp ./tests/conftest_ci.py ./tests/conftest.py
+        echo $GCP_SERVICE_ACCOUNT_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
         poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
       continue-on-error: false
       env:
         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
@@ -141,13 +155,6 @@ jobs:
           title: Backend Coverage Report
           pytest-coverage-path: backend/pytest-coverage.txt
           junitxml-path: backend/pytest.xml
-    
-    - name: Upload test results to Google Cloud Storage
-      run: |
-        echo "Uploading test results to Google Cloud Storage..."
-        gsutil cp pytest-coverage.txt gs://$BUCKET_NAME/
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud.json
 
   ci-frontend:
     runs-on: ubuntu-latest
@@ -210,6 +217,4 @@ jobs:
           title: Frontend Coverage Report
           pytest-coverage-path: frontend/pytest-coverage.txt
           junitxml-path: frontend/pytest.xml   
-
-  
-  
+ 
