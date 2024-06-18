@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import List
+from typing import AsyncGenerator, List
 
 import httpx
 import streamlit as st
@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
 
 
-async def fetch_gemini_stream_data(filenames: List[str]) -> None:
+async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, None]:
     CLIENT_TIMEOUT_SEC = 100.0
     headers = {"accept": "text/event-stream"}
     try:
