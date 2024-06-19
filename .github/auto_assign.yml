@@ -1,4 +1,5 @@
 # Set to true to add reviewers to pull requests
+# Set to false for now, since Auto assign by GitHub is enabled
 addReviewers: false
 
 # Set to true to add assignees to pull requests, set to author for the PR creator
@@ -12,6 +13,9 @@ reviewers:
 # A number of reviewers added to the pull request
 # Set 0 to add all the reviewers (default: 0)
 numberOfReviewers: 0
+
+# Enable even in Draft PR
+runOnDraft: true
 
 # A list of assignees, overrides reviewers if set
 # assignees:
@@ -29,3 +33,4 @@ numberOfReviewers: 0
 # A list of users to be skipped by both the add reviewers and add assignees processes
 # skipUsers:
 #   - dependabot[bot]
+
