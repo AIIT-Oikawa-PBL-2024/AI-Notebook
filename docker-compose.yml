@@ -41,6 +41,7 @@ services:
       TZ: 'Asia/Tokyo'
     volumes:
       - dev-mysql-data:/var/lib/mysql    
+      - ./backend/my.cnf:/etc/mysql/conf.d/my.cnf
     ports:
       - 3306:3306
     networks:
@@ -55,7 +56,8 @@ services:
       MYSQL_DATABASE: 'test-db'
       TZ: 'Asia/Tokyo'
     volumes:
-      - test-mysql-data:/var/lib/mysql    
+      - test-mysql-data:/var/lib/mysql
+      - ./backend/my.cnf:/etc/mysql/conf.d/my.cnf
     ports:
       - 3307:3306
     networks:
