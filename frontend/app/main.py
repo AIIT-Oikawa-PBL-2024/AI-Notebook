@@ -17,8 +17,3 @@ with st.sidebar:
 
 # Display the image
 st.image(image_path)
-
-# Add sidebar links
-with st.sidebar:
-    for link in sidebar_links:
-        st.page_link(link["path"], label=link["label"], icon=link["icon"])
