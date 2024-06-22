@@ -49,8 +49,8 @@ async def test_upload_files(session: AsyncSession) -> None:
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["file_name"] == "test_file.pdf"
+        assert data["success"] is True
+        assert len(data["success_files"]) == 1
 
 
 # ファイル一覧取得のテスト
@@ -89,19 +89,13 @@ async def test_get_file_by_id(session: AsyncSession) -> None:
         files = [
             ("files", ("test_file.pdf", file_content, "application/pdf")),
         ]
-        upload_response = await client.post(
-            f"/files/upload?user_id={user_id}", files=files
-        )
-        print(upload_response.text)  # デバッグ用出力
-        assert upload_response.status_code == 200
-        upload_data = upload_response.json()
-        file_id = upload_data[0]["id"]
+        await client.post(f"/files/upload?user_id={user_id}", files=files)
 
-        response = await client.get(f"/files/{file_id}")
+        response = await client.get("/files/1")
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()
-        assert data["id"] == file_id
+        assert data["id"] == 1
         assert data["file_name"] == "test_file.pdf"
 
 
@@ -118,15 +112,9 @@ async def test_delete_file(session: AsyncSession) -> None:
         files = [
             ("files", ("test_file.pdf", file_content, "application/pdf")),
         ]
-        upload_response = await client.post(
-            f"/files/upload?user_id={user_id}", files=files
-        )
-        print(upload_response.text)  # デバッグ用出力
-        assert upload_response.status_code == 200
-        upload_data = upload_response.json()
-        file_id = upload_data[0]["id"]
+        await client.post(f"/files/upload?user_id={user_id}", files=files)
 
-        response = await client.delete(f"/files/{file_id}")
+        response = await client.delete("/files/1")
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()

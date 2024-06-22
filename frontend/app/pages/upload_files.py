@@ -34,10 +34,10 @@ def is_valid_file(file: Any) -> bool:
 
     return True
 
-
 def main() -> None:
     st.title("ファイルアップロード")
-
+    # 学習帳名の入力
+    note_name = st.text_input("学習帳名を入力してください")
     uploaded_files = st.file_uploader(
         "", accept_multiple_files=True, label_visibility="collapsed"
     )
@@ -63,7 +63,7 @@ def main() -> None:
                 )
 
         if valid_files:
-            if st.button("登録"):
+            if st.button("アップロード"):
                 try:
                     with httpx.Client() as client:
                         files = {f.name: f.getvalue() for f in valid_files}
@@ -80,11 +80,27 @@ def main() -> None:
                             )
                 except httpx.RequestError as e:
                     st.error(f" {e}リクエストでエラーが発生しました。")
-        else:
-            st.warning(
+            elif st.button("学習帳出力"):
+                try:
+                    with httpx.Client() as client:
+                        files = {f.name: f.getvalue() for f in valid_files}
+                        response = client.post(
+                            "http://127.0.0.1:8000/files/upload", files=files
+                        )
+
+                        if response.status_code == 200:
+                            st.success("ファイルは正常に登録されました。")
+                        else:
+                            st.error(
+                                f"ファイルは登録できませんでした。 Status code: {response.status_code}"
+                            )
+                except httpx.RequestError as e:
+                    st.error(f" {e}リクエストでエラーが発生しました。")
+            else:
+                st.warning(
                 "ファイルが登録されませんでした。"
                 "有効なファイルをアップロードしてください。"
-            )
+                )
 
 
 if __name__ == "__main__":
