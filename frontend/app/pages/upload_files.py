@@ -37,7 +37,7 @@ def is_valid_file(file: Any) -> bool:
 def main() -> None:
     st.title("ファイルアップロード")
     # 学習帳名の入力
-    note_name = st.text_input("学習帳名を入力してください")
+    #note_name = st.text_input("学習帳名を入力してください")
     uploaded_files = st.file_uploader(
         "", accept_multiple_files=True, label_visibility="collapsed"
     )
