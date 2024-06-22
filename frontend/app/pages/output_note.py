@@ -1,43 +1,46 @@
-## Issue No.2
-## Title Input:画像入力インターフェース機能
-##タスク1,3,4
-##https://github.com/orgs/AIIT-Oikawa-PBL-2024/projects/9/views/1?sortedBy%5Bdirection%5D=asc&sortedBy%5BcolumnId%5D=108570462
-
-## 概要
-##AIサポート学習帳の画像アップロード画面
-##ファイルタイプを'png', 'pdf', 'jpeg', 'jpg'に制限する
-##ファイルサイズは‘.streamlit/config.toml’で変更（デフォルト200MB）
-
-
 import streamlit as st
-
-IMG_PATH = "imgs"
-
-with st.sidebar:
-    st.page_link("main.py", label="ホーム", icon="🏠")
-    st.page_link("pages/upload_image.py", label="ファイルアップロード", icon="1️⃣")
-    st.page_link("pages/input_text.py", label="テキスト入力", icon="2️⃣")
-    st.page_link("pages/output_note.py", label="AIサポート学習帳", icon="3️⃣")
-    st.page_link("pages/output_test.py", label="AIサポートテスト", icon="4️⃣")
-    st.page_link("pages/flyer.py", label="PBL フライヤー")
 
 
 def main() -> None:
-    st.markdown("# AIサポート学習帳")
-    file = st.file_uploader(
-        "講義テキストの画像をアップロードしてください.（アプロード可能なファイルタイプ：png,pdf,jpeg,jpg）",
-        type=["png", "pdf", "jpeg", "jpg"],
-    )
-    if file:
-        st.markdown(f"{file.name} をアップロードしました.")
-        # img_path = os.path.join(IMG_PATH, file.name)
-        # 画像を保存する
-        # with open(img_path, 'wb') as f:
-        #    f.write(file.read())
-        #
-        # 保存した画像を表示
-    # img = Image.open(img_path)
-    # st.image(img)
+    st.set_page_config(layout="wide")
+
+    # サイドバー
+    with st.sidebar:
+        st.page_link("main.py", label="ホーム", icon="🏠")
+        st.page_link("pages/upload_image.py", label="ファイルアップロード", icon="1️⃣")
+        st.page_link("pages/input_text.py", label="テキスト入力", icon="2️⃣")
+        st.page_link("pages/output_note.py", label="AIサポート学習帳", icon="3️⃣")
+        st.page_link("pages/output_test.py", label="AIサポートテスト", icon="4️⃣")
+        st.page_link("pages/flyer.py", label="PBL フライヤー")
+
+    # タイトル入力
+    title = st.text_input("エディタのタイトル", "無題のノート")
+    st.title(title)
+
+    # 2列レイアウト
+    col1, col2 = st.columns(2)
+
+    # 左側：マークダウン入力
+    with col1:
+        st.subheader("自由入力")
+        markdown_text = st.text_area("マークダウンで記入してください", height=500)
+        st.markdown(markdown_text)
+
+    # 右側：AI要約結果（編集可能）
+    with col2:
+        st.subheader("AI要約結果")
+        ai_summary = st.text_area(
+            "AI生成の要約（編集可能）",
+            "ここにAI生成の要約が表示されます。編集も可能です。",
+            height=500,
+        )
+
+    # 保存ボタン
+    _, _, _, save_col = st.columns([1, 1, 1, 1])
+    with save_col:
+        if st.button("保存", use_container_width=True):
+            # ここに保存のロジックを実装
+            st.success("保存しました！")
 
 
 if __name__ == "__main__":
