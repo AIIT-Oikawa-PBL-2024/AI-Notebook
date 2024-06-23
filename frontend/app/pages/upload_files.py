@@ -16,7 +16,7 @@ with st.sidebar:
 
 # Constants
 ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
-MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB in bytes
+#MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB in bytes
 
 
 def is_valid_file(file: Any) -> bool:
@@ -30,18 +30,12 @@ def is_valid_file(file: Any) -> bool:
         return False
 
     # Check file size
-    if file.size > MAX_FILE_SIZE:
-        st.error(
-            f"{file.name}をアップロードできませんでした。200 MB以下のファイルを"
-            "アップロードしてください。"
-        )
-        return False
-
-    else:
-        st.warning(
-            "ファイルが登録されませんでした。"
-            "有効なファイルをアップロードしてください。"
-        )
+    #if file.size > MAX_FILE_SIZE:
+    #    st.error(
+    #        f"{file.name}をアップロードできませんでした。200 MB以下のファイルを"
+    #        "アップロードしてください。"
+    #    )
+    #    return False
 
     return True
 
@@ -59,7 +53,7 @@ def main() -> None:
 
         for file in uploaded_files:
             if file.name in file_names:
-                st.warning(
+                st.error(
                     f" {file.name}ファイルは既にアップロードされています。"
                     "他のファイルをアップロードしてください。"
                 )
