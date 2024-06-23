@@ -6,15 +6,13 @@ import streamlit as st
 
 # サイドバーメニューを表示する
 with st.sidebar:
-    st.page_link("main.py", label="ホーム")
+    st.page_link("main.py", label="トップページ")
     st.page_link("pages/upload_files.py", label=
-                 "ファイルアップロード・AI学習帳作成")
-    st.page_link("pages/upload_files.py", label=
-                 "ノート")
+                 "ノート・AIサポート学習帳")
     st.page_link("pages/upload_files.py", label=
                  "AIサポートテスト")
     st.page_link("pages/upload_files.py", label=
-                 "ファイル一覧""（学習帳・AIサポートテスト作成）")
+                 "ファイル選択")
 
 # Constants
 ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
@@ -32,7 +30,7 @@ def is_valid_file(file: Any) -> bool:
         return False
 
     # Check file size
-    if file.size < MAX_FILE_SIZE:
+    if file.size > MAX_FILE_SIZE:
         st.error(
             f"{file.name}をアップロードできませんでした。200 MB以下のファイルを"
             "アップロードしてください。"
