@@ -6,15 +6,15 @@ import streamlit as st
 
 # サイドバーメニューを表示する
 with st.sidebar:
-    st.page_link("main.py", label="ホーム", icon="🏠")
+    st.page_link("main.py", label="ホーム")
     st.page_link("pages/upload_files.py", label=
-                 "ファイルアップロード・AI学習帳作成", icon="1⃣")
+                 "ファイルアップロード・AI学習帳作成")
     st.page_link("pages/upload_files.py", label=
-                 "ノート", icon="2⃣")
+                 "ノート")
     st.page_link("pages/upload_files.py", label=
-                 "AIサポートテスト", icon="3⃣")
+                 "AIサポートテスト")
     st.page_link("pages/upload_files.py", label=
-                 "ファイル一覧""（学習帳・AIサポートテスト作成）", icon="4⃣")
+                 "ファイル一覧""（学習帳・AIサポートテスト作成）")
 
 # Constants
 ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
@@ -32,7 +32,7 @@ def is_valid_file(file: Any) -> bool:
         return False
 
     # Check file size
-    if file.size > MAX_FILE_SIZE:
+    if file.size < MAX_FILE_SIZE:
         st.error(
             f"{file.name}をアップロードできませんでした。200 MB以下のファイルを"
             "アップロードしてください。"
@@ -44,7 +44,6 @@ def is_valid_file(file: Any) -> bool:
             "ファイルが登録されませんでした。"
             "有効なファイルをアップロードしてください。"
         )
-    return False
 
     return True
 
@@ -93,7 +92,7 @@ def main() -> None:
                                 "{response.status_code}"
                             )
                 except httpx.RequestError as e:
-                    st.error(f" {e}リクエストでエラーが発生しました。")
+                    st.error(f"リクエストでエラーが発生しました：{e}")
             elif st.button("学習帳出力"):
                 try:
                     with httpx.Client() as client:
@@ -110,7 +109,7 @@ def main() -> None:
                                 f"{response.status_code}"
                             )
                 except httpx.RequestError as e:
-                    st.error(f" {e}リクエストでエラーが発生しました。")
+                    st.error(f"リクエストでエラーが発生しました：{e}")
 
 
 
