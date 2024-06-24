@@ -23,23 +23,25 @@ def main() -> None:
     # 左側：マークダウン入力
     with col1:
         st.subheader("自由入力")
-        markdown_text = st.text_area("マークダウンで記入してください", height=500)
+        markdown_text = st.text_area("自由入力フィールド", height=500)
         st.markdown(markdown_text)
 
     # 右側：AI要約結果（編集可能）
     with col2:
         st.subheader("AI要約結果")
         ai_summary = st.text_area(
-            "AI生成の要約（編集可能）",
+            # ここに出力結果の変数が入る
+            "AI生成の要約",
             "ここにAI生成の要約が表示されます。編集も可能です。",
             height=500,
         )
+        st.markdown(ai_summary)
 
     # 保存ボタン
     _, _, _, save_col = st.columns([1, 1, 1, 1])
     with save_col:
         if st.button("保存", use_container_width=True):
-            # ここに保存のロジックを実装
+            # 保存処理
             st.success("保存しました！")
 
 
