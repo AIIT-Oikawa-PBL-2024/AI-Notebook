@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Sequence, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,14 +22,14 @@ router = APIRouter(
 @router.get("/")
 async def get_notes(
     db: AsyncSession = db_dependency, offset: int = 0, limit: int = 100
-) -> list[notes_schemas.NoteResponse]:
+) -> Sequence[notes_schemas.NoteResponse]:
     return await notes_cruds.get_notes(db, offset=offset, limit=limit)
 
 
 @router.get("/{user_id}/notes")
 async def get_notes_by_user(
     user_id: int, db: AsyncSession = db_dependency, offset: int = 0, limit: int = 100
-) -> list[notes_schemas.NoteByCurrentUserResponse]:
+) -> Sequence[notes_schemas.NoteByCurrentUserResponse]:
     user = await users_cruds.get_user_by_id(db, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="ユーザーが見つかりません。")
