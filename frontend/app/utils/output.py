@@ -1,20 +1,13 @@
+import asyncio
 import logging
-import os
 from typing import AsyncGenerator, List
 
 import httpx
 import streamlit as st
-from dotenv import load_dotenv
 
-# 環境変数を読み込む
-load_dotenv()
-
-# ログの設定
 logging.basicConfig(level=logging.INFO)
 
-# バックエンドAPIのURL
-BACKEND_HOST = os.getenv("BACKEND_HOST")
-BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
+BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
 
 
 async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, None]:
@@ -33,12 +26,12 @@ async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, 
     except httpx.RemoteProtocolError as e:
         logging.error(f"通信中にエラーが発生しました: {e}")
         return
-    except httpx.TimeoutException as e:
-        logging.error(f"タイムアウトしました: {e}")
-        st.error(f"タイムアウトしました: {e}")
     except httpx.RequestError as e:
         logging.error(f"リクエストエラーが発生しました: {e}")
         st.error(f"リクエストエラーが発生しました: {e}")
+    except httpx.TimeoutException as e:
+        logging.error(f"タイムアウトしました: {e}")
+        st.error(f"タイムアウトしました: {e}")
     except Exception as e:
         logging.error(f"問題が発生しました: {e}")
         st.error(f"問題が発生しました: {e}")
@@ -54,11 +47,11 @@ async def create_pdf_to_markdown_summary(filenames: List[str]) -> None:
     # await fetch_gemini_stream_data(filenames)
 
 
-# if __name__ == "__main__":
-#     # TODO: 別ページでアップロードされたファイル一覧からファイル名を取得する
-#     # uploaded_filenames = [file.name for file in uploaded_files]
+if __name__ == "__main__":
+    # TODO: 別ページでアップロードされたファイル一覧からファイル名を取得する
+    # uploaded_filenames = [file.name for file in uploaded_files]
 
-#     temp_uploaded_filenames = ["5_アジャイルⅡ.pdf"]
+    temp_uploaded_filenames = ["5_アジャイルⅡ.pdf"]
 
-#     if st.button("要約する"):
-#         asyncio.run(create_pdf_to_markdown_summary(temp_uploaded_filenames))
+    if st.button("要約する"):
+        asyncio.run(create_pdf_to_markdown_summary(temp_uploaded_filenames))
