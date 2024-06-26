@@ -3,24 +3,40 @@ from unittest.mock import patch, MagicMock, AsyncMock
 from app.pages.select_files import (
     get_files_list,
     show_files_list_df,
-    utc_to_jst,
+    time_format,
     update,
     get_selected_files,
     update_note_name,
+    show_select_files_page,
 )
 import streamlit as st
 import pandas as pd
+import logging
+import httpx
+from streamlit.testing.v1 import AppTest
+
+# ストリームリットのエラーメッセージをモック
+st.error = MagicMock()
+
+# Logger setup
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+# バックエンドAPIのURL
+BACKEND_DEV_API_URL = "http://localhost:8000/files/"
 
 
 # get_files_list 関数のテスト
 @pytest.mark.asyncio
-async def test_get_files_list(mocker: MagicMock) -> None:
+async def test_get_files_list_success(mocker: MagicMock) -> None:
     # モックされたレスポンスを設定
     mock_response = MagicMock()
     mock_response.json.return_value = [
         {"file_name": "file1.txt", "created_at": "2023-06-21T00:00:00Z"},
         {"file_name": "file2.txt", "created_at": "2023-06-21T01:00:00Z"},
     ]
+    mock_response.raise_for_status.return_value = None
 
     # httpx.AsyncClient の get メソッドをモック
     mocker.patch("httpx.AsyncClient.get", return_value=mock_response)
@@ -29,6 +45,66 @@ async def test_get_files_list(mocker: MagicMock) -> None:
     files = await get_files_list()
     assert len(files) == 2
     assert files[0] == {"file_name": "file1.txt", "created_at": "2023-06-21T00:00:00Z"}
+    assert files[1] == {"file_name": "file2.txt", "created_at": "2023-06-21T01:00:00Z"}
+
+
+# get_files_list 関数のテスト（HTTP Status Error）
+@pytest.mark.asyncio
+async def test_get_files_list_http_status_error(mocker: MagicMock) -> None:
+    # httpx.HTTPStatusError を発生させるモック
+    request = httpx.Request("GET", BACKEND_DEV_API_URL)
+    response = httpx.Response(status_code=500, request=request)
+    http_status_error = httpx.HTTPStatusError(
+        "HTTP error", request=request, response=response
+    )
+
+    mock_response = MagicMock()
+    mock_response.raise_for_status.side_effect = http_status_error
+
+    mocker.patch("httpx.AsyncClient.get", return_value=mock_response)
+
+    # Streamlitのエラーメッセージ関数をモック
+    mock_st_error = mocker.patch("streamlit.error")
+
+    # 関数を呼び出してエラーメッセージが表示されることを検証
+    files = await get_files_list()
+    assert files == []
+    mock_st_error.assert_called_with(
+        "ファイル一覧の取得に失敗しました(HTTP Status Error)"
+    )
+
+
+# get_files_list 関数のテスト（Request Error）
+@pytest.mark.asyncio
+async def test_get_files_list_request_error(mocker: MagicMock) -> None:
+    # httpx.RequestError を発生させるモック
+    mocker.patch(
+        "httpx.AsyncClient.get",
+        side_effect=httpx.RequestError("Request error", request=None),
+    )
+
+    # Streamlitのエラーメッセージ関数をモック
+    mock_st_error = mocker.patch("streamlit.error")
+
+    # 関数を呼び出してエラーメッセージが表示されることを検証
+    files = await get_files_list()
+    assert files == []
+    mock_st_error.assert_called_with("ファイル一覧の取得に失敗しました(Request Error)")
+
+
+# get_files_list 関数のテスト（その他の例外）
+@pytest.mark.asyncio
+async def test_get_files_list_general_exception(mocker: MagicMock) -> None:
+    # その他の例外を発生させるモック
+    mocker.patch("httpx.AsyncClient.get", side_effect=Exception("General error"))
+
+    # Streamlitのエラーメッセージ関数をモック
+    mock_st_error = mocker.patch("streamlit.error")
+
+    # 関数を呼び出してエラーメッセージが表示されることを検証
+    files = await get_files_list()
+    assert files == []
+    mock_st_error.assert_called_with("ファイル一覧の取得に失敗しました(Error)")
 
 
 # show_files_list_df 関数のテスト
@@ -57,11 +133,11 @@ async def test_show_files_list_df(mocker: MagicMock) -> None:
     assert len(mock_session_state.df) == 2
 
 
-# 日本時間に変換する関数のテスト
-def test_utc_to_jst() -> None:
-    utc_time = "2023-06-21T00:00:00Z"
-    jst_time = utc_to_jst(utc_time)
-    assert jst_time == "2023-06-21 09:00:00"
+# 時刻フォーマットを変換する関数のテスト
+def test_time_format() -> None:
+    jst_str = "2023-06-21T00:00:00Z"
+    jst_time = time_format(jst_str)
+    assert jst_time == "2023-06-21 00:00:00"
 
 
 # update 関数のテスト
@@ -147,3 +223,77 @@ def test_update_note_name(mocker: MagicMock) -> None:
 
         # note_nameが正しく更新されているかを検証
         assert st.session_state.note_name == "New Note Title"
+
+
+# show_select_files_page 関数のテスト
+@pytest.mark.asyncio
+async def test_show_select_files_page() -> None:
+    # テスト用のAppTestインスタンスを作成
+    at = AppTest.from_file("app/pages/select_files.py")
+
+    # アプリを実行
+    at.run()
+
+    # 初期状態の確認
+    print("Initial state:")
+    print(f"Headers: {[header.value for header in at.header]}")
+    print(f"Buttons: {[button.label for button in at.button]}")
+    print(f"Text inputs: {len(at.text_input)}")
+    print(f"Session state: {at.session_state}")
+
+    assert at.header[0].value == "ファイルリスト表示"
+    assert "ファイル一覧を取得" in [button.label for button in at.button]
+    assert "リセット" in [button.label for button in at.button]
+
+    # "ファイル一覧を取得"ボタンをクリック
+    file_list_button = next(
+        button for button in at.button if button.label == "ファイル一覧を取得"
+    )
+    file_list_button.click()
+    at.run()
+
+    # セッション状態を更新（ファイルが選択された状態をシミュレート）
+    at.session_state["df"] = pd.DataFrame(
+        {"file_name": ["file1.txt", "file2.txt"], "select": [True, True]}
+    )
+    at.session_state["df_updated"] = True
+
+    # アプリを再実行
+    at.run()
+
+    # 更新後の状態確認
+    print("\nUpdated state:")
+    print(f"Headers: {[header.value for header in at.header]}")
+    print(f"Buttons: {[button.label for button in at.button]}")
+    print(f"Text inputs: {len(at.text_input)}")
+    print(f"Session state: {at.session_state}")
+
+    # テキスト入力フィールドの存在を確認
+    assert len(at.text_input) > 0, "テキスト入力フィールドが表示されていません"
+
+    if len(at.text_input) > 0:
+        print(f"Text input label: {at.text_input[0].label}")
+        assert (
+            "ノートのタイトルを入力してEnterキーを押して下さい"
+            in at.text_input[0].label
+        )
+
+    # ボタンの確認
+    button_labels = [button.label for button in at.button]
+    print(f"Button labels: {button_labels}")
+    assert "学習帳を作成" in button_labels, "'学習帳を作成'ボタンが見つかりません"
+
+    # リセットボタンの動作を確認
+    reset_button = next(
+        (button for button in at.button if button.label == "リセット"), None
+    )
+    assert reset_button is not None, "'リセット'ボタンが見つかりません"
+    reset_button.click()
+    at.run()
+
+    # リセット後の状態確認
+    print("\nReset state:")
+    print(f"Session state: {at.session_state}")
+    assert at.session_state["df"] is None
+    assert at.session_state["df_updated"] == False
+    assert at.session_state["note_name"] == ""

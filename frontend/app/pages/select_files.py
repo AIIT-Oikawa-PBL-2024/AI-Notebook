@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
 import httpx
 import pandas as pd
@@ -13,13 +13,12 @@ load_dotenv()
 
 # ログの設定
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # バックエンドAPIのURL
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/"
 
-# 日本のタイムゾーンを設定
-JST = timezone(timedelta(hours=9))
 
 # セッション状態の初期化
 if "note_name" not in st.session_state:
@@ -32,22 +31,32 @@ if "selected_files" not in st.session_state:
     st.session_state.selected_files = []
 
 
-# UTCをJSTに変換する関数
-def utc_to_jst(utc_str: str) -> str:
-    utc_time = datetime.fromisoformat(utc_str.replace("Z", "+00:00"))
-    jst_time = utc_time.astimezone(JST)
+# 時刻フォーマットを変換する関数
+def time_format(jst_str: str) -> str:
+    jst_time = datetime.fromisoformat(jst_str.replace("Z", "+00:00"))
     return jst_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 # 非同期でファイル一覧を取得する関数
 async def get_files_list() -> list[str]:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            BACKEND_DEV_API_URL, timeout=100, headers={"accept": "application/json"}
-        )
-        response.raise_for_status()
-        files = response.json()
-        return files
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                BACKEND_DEV_API_URL, timeout=100, headers={"accept": "application/json"}
+            )
+            response.raise_for_status()
+            files = response.json()
+            return files
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP Status Error: {e}")
+        st.error("ファイル一覧の取得に失敗しました(HTTP Status Error)")
+    except httpx.RequestError as e:
+        logger.error(f"Request Error: {e}")
+        st.error("ファイル一覧の取得に失敗しました(Request Error)")
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        st.error("ファイル一覧の取得に失敗しました(Error)")
+    return []
 
 
 # 非同期でファイル一覧を作成して表示する関数
@@ -55,8 +64,8 @@ async def show_files_list_df() -> None:
     if st.session_state.df is None:
         files = await get_files_list()
         file_df = pd.DataFrame(files)
-        # created_at列をJSTに変換
-        file_df["created_at"] = file_df["created_at"].apply(utc_to_jst)
+        # created_at列の時刻フォーマットを変換
+        file_df["created_at"] = file_df["created_at"].apply(time_format)
         # 新しい boolean 型の列を一番左に追加
         file_df.insert(0, "select", False)
         st.session_state.df = file_df

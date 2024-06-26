@@ -3,16 +3,25 @@ import httpx
 from unittest.mock import patch, AsyncMock, MagicMock
 from pytest_httpx import HTTPXMock, IteratorStream
 
-from app.pages.output import (
+from app.utils.output import (
     fetch_gemini_stream_data,
     create_pdf_to_markdown_summary,
 )
+from dotenv import load_dotenv
+import os
+
+# 環境変数を読み込む
+load_dotenv()
 
 
+# バックエンドAPIのURL
+BACKEND_HOST = os.getenv("BACKEND_HOST")
+
+
+# 正常系のテスト(テストデータを返す)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
-
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
     httpx_mock.add_response(
         method="POST",
@@ -29,9 +38,10 @@ async def test_fetch_gemini_stream_data(httpx_mock: HTTPXMock) -> None:
             assert [part async for part in response.aiter_raw()] == [b"*Test Output*"]
 
 
+# 正常系のテスト(テストデータを返す)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_success(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_response(
@@ -50,9 +60,10 @@ async def test_fetch_gemini_stream_data_success(httpx_mock: HTTPXMock) -> None:
     assert data == ["chunk1", "chunk2"]
 
 
+# 異常系のテスト(HTTPステータスエラー)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_http_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -77,11 +88,12 @@ async def test_fetch_gemini_stream_data_http_error(httpx_mock: HTTPXMock) -> Non
                 pass
 
 
+# 異常系のテスト(リモートプロトコルエラー)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_remote_protocol_error(
     httpx_mock: HTTPXMock,
 ) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -105,9 +117,10 @@ async def test_fetch_gemini_stream_data_remote_protocol_error(
                 pass
 
 
+# 異常系のテスト(リクエストエラー)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_request_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -131,9 +144,10 @@ async def test_fetch_gemini_stream_data_request_error(httpx_mock: HTTPXMock) -> 
                 pass
 
 
+# 異常系のテスト(タイムアウトエラー)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_timeout_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -157,9 +171,10 @@ async def test_fetch_gemini_stream_data_timeout_error(httpx_mock: HTTPXMock) -> 
                 pass
 
 
+# 異常系のテスト(例外エラー)
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_exception_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -174,9 +189,10 @@ async def test_fetch_gemini_stream_data_exception_error(httpx_mock: HTTPXMock) -
                 pass
 
 
+# 正常系のテスト(テストデータを返す)
 @pytest.mark.asyncio
 async def test_create_pdf_to_markdown_summary(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_response(
