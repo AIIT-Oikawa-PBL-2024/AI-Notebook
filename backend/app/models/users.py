@@ -15,3 +15,4 @@ class User(Base):
 
     files = relationship("File", back_populates="user", cascade="delete")
     outputs = relationship("Output", back_populates="user", cascade="delete")
+    notes = relationship("Note", back_populates="user", cascade="delete")
