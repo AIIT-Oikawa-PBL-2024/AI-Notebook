@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import unicodedata
 from datetime import datetime
 
 import httpx
@@ -69,10 +68,6 @@ async def show_files_list_df() -> None:
         file_df.drop(columns=["id", "user_id"], inplace=True)
         # created_at列の時刻フォーマットを変換
         file_df["created_at"] = file_df["created_at"].apply(time_format)
-        # ファイル名列をUnicode正規化(NFC)
-        file_df["file_name"] = file_df["file_name"].apply(
-            lambda x: unicodedata.normalize("NFC", x)
-        )
         # 新しい boolean 型の列を一番左に追加
         file_df.insert(0, "select", False)
         st.session_state.df = file_df
