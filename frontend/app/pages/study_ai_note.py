@@ -1,3 +1,4 @@
+# 学習帳ページへの出力サンプルファイル（ノートページへの移植用）
 import asyncio
 import logging
 import os
@@ -5,10 +6,10 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 
-# streamlitの仕様なのか、相対・絶対インポートでエラーになる。
-# 以下のようにpagesディレクトリ起点ではインポート可能。
-# pytestではパスの読み込みエラーになるため、テストが失敗する。
-from pages.output import create_pdf_to_markdown_summary
+# ユーティリティ関数のインポート
+# Streemlitの仕様なのか、以下の相対パスでインポートする必要がある
+# pytestでテストする際は、エラーが発生する可能性があるため、注意が必要
+from utils.output import create_pdf_to_markdown_summary
 
 # 環境変数を読み込む
 load_dotenv()

@@ -3,7 +3,7 @@ import httpx
 from unittest.mock import patch, AsyncMock, MagicMock
 from pytest_httpx import HTTPXMock, IteratorStream
 
-from app.pages.output import (
+from app.utils.output import (
     fetch_gemini_stream_data,
     create_pdf_to_markdown_summary,
 )

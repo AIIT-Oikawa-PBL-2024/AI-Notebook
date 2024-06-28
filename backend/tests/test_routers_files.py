@@ -8,6 +8,7 @@ from sqlalchemy.future import select
 
 from app.main import app
 from app.models.users import User
+import unicodedata
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
@@ -147,3 +148,44 @@ async def test_delete_file_not_found(session: AsyncSession) -> None:
         assert response.status_code == 404
         data = response.json()
         assert data["detail"] == "ファイルが見つかりません"
+
+
+# 濁点を含むファイル名のNFC正規化テスト
+@pytest.mark.asyncio
+async def test_upload_file_with_dakuten(session: AsyncSession) -> None:
+    user_id = await get_user_id(session)
+
+    # NFD形式（濁点が分離された形式）の日本語ファイル名
+    nfd_filename = (
+        "テスト" + "\u3099" + "ファイル.pdf"
+    )  # "テストゞファイル.pdf"のNFD形式
+    nfc_filename = unicodedata.normalize("NFC", nfd_filename)
+
+    file_content = b"test file content with dakuten"
+    files = [
+        ("files", (nfd_filename, file_content, "application/pdf")),
+    ]
+
+    async with AsyncClient(
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://test",
+    ) as client:
+        response = await client.post(f"/files/upload?user_id={user_id}", files=files)
+        print(response.text)  # デバッグ用出力
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert len(data["success_files"]) == 1
+
+        # アップロードされたファイルの情報を取得
+        file_response = await client.get("/files/")
+        assert file_response.status_code == 200
+        file_data = file_response.json()
+
+        # 最後にアップロードされたファイルのファイル名を確認
+        uploaded_filename = file_data[-1]["file_name"]
+
+        # ファイル名がNFC形式になっていることを確認
+        assert uploaded_filename == nfc_filename
+        assert uploaded_filename != nfd_filename
+        assert unicodedata.is_normalized("NFC", uploaded_filename)
