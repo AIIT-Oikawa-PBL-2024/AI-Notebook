@@ -37,7 +37,7 @@ async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, 
         st.error(f"問題が発生しました: {e}")
 
 
-async def create_pdf_to_markdown_summary(filenames: List[str]) -> None:
+async def create_pdf_to_markdown_summary(filenames: List[str]) -> str:
     output = st.empty()
 
     stream_content = ""
@@ -45,6 +45,7 @@ async def create_pdf_to_markdown_summary(filenames: List[str]) -> None:
         stream_content += line
         output.markdown(stream_content)
     # await fetch_gemini_stream_data(filenames)
+    return stream_content
 
 
 if __name__ == "__main__":
