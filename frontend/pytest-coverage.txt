@@ -1,0 +1,30 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.9, pytest-8.2.2, pluggy-1.5.0
+rootdir: /frontend
+configfile: pytest.ini
+plugins: cov-5.0.0, httpx-0.30.0, asyncio-0.23.7, anyio-4.4.0, mock-3.14.0
+asyncio: mode=Mode.AUTO
+collected 20 items
+
+tests/test_output.py ........                                            [ 40%]
+tests/test_select_files.py ............                                  [100%]
+
+------------------- generated xml file: /frontend/pytest.xml -------------------
+
+---------- coverage: platform linux, python 3.11.9-final-0 -----------
+Name                         Stmts   Miss  Cover   Missing
+----------------------------------------------------------
+app/main.py                     39     39     0%   11-69
+app/pages/flyer.py              15     15     0%   11-33
+app/pages/input_text.py         16     16     0%   12-44
+app/pages/output_note.py        16     16     0%   12-44
+app/pages/output_test.py        16     16     0%   12-44
+app/pages/study_ai_note.py      29     29     0%   2-48
+app/pages/upload_image.py       16     16     0%   12-44
+app/utils/output.py             44     18    59%   28-42, 59-62
+----------------------------------------------------------
+TOTAL                          282    165    41%
+
+4 files skipped due to complete coverage.
+
+============================== 20 passed in 0.64s ==============================
