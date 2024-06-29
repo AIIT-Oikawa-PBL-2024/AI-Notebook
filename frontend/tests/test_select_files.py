@@ -33,8 +33,20 @@ async def test_get_files_list_success(mocker: MagicMock) -> None:
     # モックされたレスポンスを設定
     mock_response = MagicMock()
     mock_response.json.return_value = [
-        {"file_name": "file1.txt", "created_at": "2023-06-21T00:00:00Z"},
-        {"file_name": "file2.txt", "created_at": "2023-06-21T01:00:00Z"},
+        {
+            "id": 1,
+            "user_id": 1,
+            "file_name": "file1.txt",
+            "created_at": "2023-06-21T00:00:00Z",
+            "file_size": 1234,
+        },
+        {
+            "id": 2,
+            "user_id": 2,
+            "file_name": "file2.txt",
+            "created_at": "2023-06-21T01:00:00Z",
+            "file_size": 5678,
+        },
     ]
     mock_response.raise_for_status.return_value = None
 
@@ -44,8 +56,20 @@ async def test_get_files_list_success(mocker: MagicMock) -> None:
     # 関数を呼び出して結果を検証
     files = await get_files_list()
     assert len(files) == 2
-    assert files[0] == {"file_name": "file1.txt", "created_at": "2023-06-21T00:00:00Z"}
-    assert files[1] == {"file_name": "file2.txt", "created_at": "2023-06-21T01:00:00Z"}
+    assert files[0] == {
+        "id": 1,
+        "user_id": 1,
+        "file_name": "file1.txt",
+        "created_at": "2023-06-21T00:00:00Z",
+        "file_size": 1234,
+    }
+    assert files[1] == {
+        "id": 2,
+        "user_id": 2,
+        "file_name": "file2.txt",
+        "created_at": "2023-06-21T01:00:00Z",
+        "file_size": 5678,
+    }
 
 
 # get_files_list 関数のテスト（HTTP Status Error）
@@ -122,8 +146,20 @@ async def test_show_files_list_df(mocker: MagicMock) -> None:
         "app.pages.select_files.get_files_list",
         new_callable=AsyncMock,
         return_value=[
-            {"file_name": "file1.txt", "created_at": "2023-06-21T00:00:00Z"},
-            {"file_name": "file2.txt", "created_at": "2023-06-21T01:00:00Z"},
+            {
+                "id": 1,
+                "user_id": 1,
+                "file_name": "file1.txt",
+                "created_at": "2023-06-21T00:00:00Z",
+                "file_size": 1234,
+            },
+            {
+                "id": 2,
+                "user_id": 2,
+                "file_name": "file2.txt",
+                "created_at": "2023-06-21T01:00:00Z",
+                "file_size": 5678,
+            },
         ],
     )
 
@@ -269,7 +305,7 @@ async def test_show_select_files_page() -> None:
     print(f"Session state: {at.session_state}")
 
     # テキスト入力フィールドの存在を確認
-    assert len(at.text_input) > 0, "テキスト入力フィールドが表示されていません"
+    assert len(at.text_input) > 0, "テキスト入力フィールドが見つかりません"
 
     if len(at.text_input) > 0:
         print(f"Text input label: {at.text_input[0].label}")
@@ -278,22 +314,76 @@ async def test_show_select_files_page() -> None:
             in at.text_input[0].label
         )
 
-    # ボタンの確認
+    # "学習帳を作成"ボタンが表示されないことを確認（テキストが入力されていない場合）
     button_labels = [button.label for button in at.button]
     print(f"Button labels: {button_labels}")
-    assert "学習帳を作成" in button_labels, "'学習帳を作成'ボタンが見つかりません"
+    assert (
+        "学習帳を作成" not in button_labels
+    ), "'学習帳を作成'ボタンが表示されていますが、テキストが入力されていません"
 
-    # リセットボタンの動作を確認
-    reset_button = next(
-        (button for button in at.button if button.label == "リセット"), None
+    # テキスト入力フィールドに値を入力
+    at.session_state["note_input"] = "ノートのタイトル"
+    at.session_state["note_name"] = "ノートのタイトル"
+    at.run()
+
+    # 再度状態を確認
+    print("\nState after text input:")
+    print(f"Headers: {[header.value for header in at.header]}")
+    print(f"Buttons: {[button.label for button in at.button]}")
+    print(f"Text inputs: {len(at.text_input)}")
+    print(f"Session state: {at.session_state}")
+
+    # テキスト入力フィールドの値を確認
+    assert (
+        at.session_state["note_input"] == "ノートのタイトル"
+    ), f"Expected 'ノートのタイトル', but got {at.session_state['note_input']}"
+
+    # "学習帳を作成"ボタンが表示されることを確認（テキストが入力された場合）
+    button_labels = [button.label for button in at.button]
+    print(f"Button labels: {button_labels}")
+    assert "学習帳を作成" in button_labels, "'学習帳を作成'ボタンが表示されていません"
+
+    # "学習帳を作成"ボタンをクリック
+    create_note_button = next(
+        button for button in at.button if button.label == "学習帳を作成"
     )
-    assert reset_button is not None, "'リセット'ボタンが見つかりません"
+    create_note_button.click()
+    at.run()
+
+    # ページが遷移したことを確認
+    assert at.session_state["page"] == "pages/study_ai_note.py"
+
+
+# リセットボタンのテスト
+@pytest.mark.asyncio
+async def test_reset_button() -> None:
+    # テスト用のAppTestインスタンスを作成
+    at = AppTest.from_file("app/pages/select_files.py")
+
+    # アプリを実行
+    at.run()
+
+    # "ファイル一覧を取得"ボタンをクリック
+    file_list_button = next(
+        button for button in at.button if button.label == "ファイル一覧を取得"
+    )
+    file_list_button.click()
+    at.run()
+
+    # セッション状態を更新（ファイルが選択された状態をシミュレート）
+    at.session_state["df"] = pd.DataFrame(
+        {"file_name": ["file1.txt", "file2.txt"], "select": [True, True]}
+    )
+    at.session_state["df_updated"] = True
+
+    # アプリを再実行
+    at.run()
+
+    # リセットボタンをクリック
+    reset_button = next(button for button in at.button if button.label == "リセット")
     reset_button.click()
     at.run()
 
-    # リセット後の状態確認
-    print("\nReset state:")
-    print(f"Session state: {at.session_state}")
-    assert at.session_state["df"] is None
-    assert at.session_state["df_updated"] == False
+    # 入力がリセットされたことを確認
     assert at.session_state["note_name"] == ""
+    assert at.session_state["selected_files"] == []

@@ -64,13 +64,24 @@ async def show_files_list_df() -> None:
     if st.session_state.df is None:
         files = await get_files_list()
         file_df = pd.DataFrame(files)
+        # id列, user_id列を削除
+        file_df.drop(columns=["id", "user_id"], inplace=True)
         # created_at列の時刻フォーマットを変換
         file_df["created_at"] = file_df["created_at"].apply(time_format)
         # 新しい boolean 型の列を一番左に追加
         file_df.insert(0, "select", False)
         st.session_state.df = file_df
     st.data_editor(
-        st.session_state.df, key="changes", on_change=update, hide_index=True
+        st.session_state.df,
+        key="changes",
+        on_change=update,
+        hide_index=True,
+        disabled=("file_name", "file_size", "created_at"),
+        column_config={
+            "file_name": st.column_config.TextColumn(
+                "file_name",
+            )
+        },
     )
 
 
@@ -123,15 +134,16 @@ async def show_select_files_page() -> None:
 
             # 現在のノートタイトルを表示
             st.write(f"Note Title:  {st.session_state.note_name}")
-            st.divider()
 
-        # 学習帳作成ボタン
-        if st.button("学習帳を作成"):
-            st.session_state.selected_files = (
-                selected_files  # 選択されたファイルをセッション状態に保存
-            )
-            st.session_state.page = "pages/study_ai_note.py"  # ページを指定
-            st.switch_page("pages/study_ai_note.py")  # ページに遷移
+            # 学習帳作成ボタン
+            if selected_files and st.session_state.note_name:
+                st.divider()
+                if st.button("学習帳を作成"):
+                    st.session_state.selected_files = (
+                        selected_files  # 選択されたファイルをセッション状態に保存
+                    )
+                    st.session_state.page = "pages/study_ai_note.py"  # ページを指定
+                    st.switch_page("pages/study_ai_note.py")  # ページに遷移
 
     # リセットボタン
     st.divider()
@@ -140,7 +152,7 @@ async def show_select_files_page() -> None:
         st.rerun()
 
 
-# note_nameを更新する関数
+# ノート名を更新する関数
 def update_note_name() -> None:
     st.session_state.note_name = st.session_state.note_input
 

@@ -1,5 +1,6 @@
 import io
 import os
+import unicodedata
 
 from dotenv import load_dotenv
 from fastapi import HTTPException, UploadFile
@@ -49,11 +50,15 @@ async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
     bucket_name = os.getenv("BUCKET_NAME")
 
     for file in ext_correct_files:
+        # ブロブ名を正規化
+        if file.filename:
+            normalized_blobname = unicodedata.normalize("NFC", file.filename)
+
         client = storage.Client.from_service_account_json(credentials)
         bucket = storage.Bucket(client, bucket_name)
         file_content = await file.read()
         file_obj = io.BytesIO(file_content)
-        destination_blob_name = file.filename
+        destination_blob_name = normalized_blobname
         blob = bucket.blob(destination_blob_name)
         file_obj.seek(0)
         try:

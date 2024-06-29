@@ -100,9 +100,6 @@ jobs:
     - name: Install the project dependencies
       run: |
         poetry install --no-root
-        poetry add pytest pytest-cov
-        poetry add ruff
-        poetry add mypy
         
     - name: Lint with Ruff
       run: |
@@ -125,16 +122,16 @@ jobs:
       env:        
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
-    - name: Create a dummy file
-      run: |
-        echo "This is a dummy file for testing." > dummy-file.txt
+    # - name: Create a dummy file
+    #   run: |
+    #     echo "This is a dummy file for testing." > dummy-file.txt
 
-    - name: Upload dummy file to Google Cloud Storage
-      run: |
-        echo "Uploading dummy file to Google Cloud Storage..."
-        gsutil cp dummy-file.txt gs://$BUCKET_NAME/
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+    # - name: Upload dummy file to Google Cloud Storage
+    #   run: |
+    #     echo "Uploading dummy file to Google Cloud Storage..."
+    #     gsutil cp dummy-file.txt gs://$BUCKET_NAME/
+    #   env:
+    #     GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
     - name: Test with pytest         
       run: |
@@ -192,10 +189,7 @@ jobs:
     - name: Install the project dependencies
       run: |
         poetry install --no-root
-        poetry add pytest pytest-cov
-        poetry add ruff
-        poetry add mypy
-      
+          
     - name: Lint with Ruff
       run: |
         poetry run ruff check ./app --output-format=github         
