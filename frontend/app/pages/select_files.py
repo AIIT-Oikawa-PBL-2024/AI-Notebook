@@ -110,7 +110,7 @@ def get_selected_files() -> list[str]:
 async def show_select_files_page() -> None:
     st.set_page_config(layout="wide")
     st.session_state.page = "pages/select_files.py"
-    st.header("AIノートを作成", divider="rainbow")
+    st.header("AIノートを作成", divider="blue")
 
     # ボタンの配置
     col1, col2, _, _ = st.columns([1, 1, 1, 1])
@@ -136,10 +136,12 @@ async def show_select_files_page() -> None:
         # 選択されたファイルを表示
         selected_files = get_selected_files()
         if selected_files:
-            st.write("選択されたファイル:")
+            st.write(":blue-background[選択されたファイル]")
             st.text(selected_files)
+            st.divider()
 
             # ノート名を入力
+            st.write(":blue-background[ノート名]")
             st.text_input(
                 "AIで作成するノートのタイトルを100文字以内で入力してEnterキーを押して下さい",
                 key="note_input",
