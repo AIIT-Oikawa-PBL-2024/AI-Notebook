@@ -22,8 +22,18 @@ BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
 
-# 学習帳ページの処理
 def show_output_page() -> None:
+    """
+    Display the output page for the study notebook.
+
+    This function shows the output page for the study notebook. It allows users to select files and
+    generates a PDF summary of the selected files using the `create_pdf_to_markdown_summary` function.
+    The generated PDF is then displayed to the user.
+
+    Raises:
+        Exception: If an error occurs during the processing of the selected files.
+
+    """
     st.header("学習帳ページ", divider="rainbow")
     if "selected_files" not in st.session_state:
         st.session_state.selected_files = []

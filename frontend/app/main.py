@@ -22,16 +22,17 @@ BACKEND_HOST = os.getenv("BACKEND_HOST")
 
 IMG_PATH = "imgs"
 
-with st.sidebar:
-    st.page_link("main.py", label="ホーム", icon="🏠")
-    st.page_link("pages/upload_image.py", label="ファイルアップロード", icon="1️⃣")
-    st.page_link("pages/input_text.py", label="テキスト入力", icon="2️⃣")
-    st.page_link("pages/output_note.py", label="AIサポート学習帳", icon="3️⃣")
-    st.page_link("pages/output_test.py", label="AIサポートテスト", icon="4️⃣")
-    st.page_link("pages/flyer.py", label="PBL フライヤー")
-
 
 def upload_files() -> None:
+    """
+    Uploads image files to the AI Support Learning Book.
+
+    This function allows the user to upload image files (png, pdf, jpeg, jpg) to the AI Support Learning Book.
+    The uploaded files are saved in the 'imgs' directory.
+
+    Returns:
+        None
+    """
     st.markdown("# AIサポート学習帳　ファイルアップロード")
     files = st.file_uploader(
         "講義テキストの画像をアップロードしてください.",
@@ -47,6 +48,15 @@ def upload_files() -> None:
 
 
 def submit() -> None:
+    """
+    Submits the uploaded files to the backend server.
+
+    This function sends a request to the backend server with the uploaded files.
+    If the submission is successful, the server's response message is displayed.
+
+    Returns:
+        None
+    """
     if st.button("Submit"):
         try:
             response = requests.get(BACKEND_HOST)
@@ -58,6 +68,15 @@ def submit() -> None:
 
 
 def main() -> None:
+    """
+    Main function of the AI Support Learning Book application.
+
+    This function is the entry point of the application.
+    It calls the 'submit' and 'upload_files' functions and displays the uploaded image.
+
+    Returns:
+        None
+    """
     submit()
     upload_files()
 

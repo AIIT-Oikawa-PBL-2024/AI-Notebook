@@ -33,18 +33,7 @@ if "selected_files" not in st.session_state:
 
 # 時刻フォーマットを変換する関数
 def time_format(jst_str: str) -> str:
-    jst_time = datetime.fromisoformat(jst_str.replace("Z", "+00:00"))
-    return jst_time.strftime("%Y-%m-%d %H:%M:%S")
-
-
-# 非同期でファイル一覧を取得する関数
-async def get_files_list() -> list[str]:
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                BACKEND_DEV_API_URL, timeout=100, headers={"accept": "application/json"}
-            )
-            response.raise_for_status()
+    jst_time = datetime.fromiso.raise_for_status()
             files = response.json()
             return files
     except httpx.HTTPStatusError as e:
