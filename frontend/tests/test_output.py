@@ -13,7 +13,7 @@ from app.utils.output import (
 
 load_dotenv()
 
-BACKEND_HOST = os.getenv("BACKEND_DEV_HOST")
+BACKEND_HOST = os.getenv("BACKEND_HOST")
 
 
 @pytest.mark.asyncio

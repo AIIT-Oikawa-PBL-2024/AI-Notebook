@@ -11,7 +11,7 @@ load_dotenv(find_dotenv())
 
 logging.basicConfig(level=logging.INFO)
 
-BACKEND_HOST = os.getenv("BACKEND_DEV_HOST")
+BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
 
