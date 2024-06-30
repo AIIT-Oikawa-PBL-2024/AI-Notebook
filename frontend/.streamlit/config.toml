@@ -3,3 +3,4 @@ maxUploadSize = 200
 showSidebarNavigation = false
 [theme]
 sidebarEnabled = false
+primaryColor = "#0000FF"
