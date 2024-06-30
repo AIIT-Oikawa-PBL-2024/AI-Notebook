@@ -12,7 +12,7 @@ load_dotenv(find_dotenv())
 logging.basicConfig(level=logging.INFO)
 
 BACKEND_HOST = os.getenv("BACKEND_DEV_HOST")
-BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
 
 async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, None]:
