@@ -1,13 +1,18 @@
 import asyncio
 import logging
+import os
 from typing import AsyncGenerator, List
 
 import httpx
 import streamlit as st
+from dotenv import find_dotenv, load_dotenv
+
+load_dotenv(find_dotenv())
 
 logging.basicConfig(level=logging.INFO)
 
-BACKEND_DEV_API_URL = "http://ai-notebook-backend-1:8000/outputs/request_stream"
+BACKEND_HOST = os.getenv("BACKEND_DEV_HOST")
+BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
 
 
 async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, None]:

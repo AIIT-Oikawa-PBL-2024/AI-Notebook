@@ -82,6 +82,7 @@ async def show_files_list_df() -> None:
                 "file_name",
             )
         },
+        use_container_width=True,
     )
 
 
@@ -107,10 +108,24 @@ def get_selected_files() -> list[str]:
 
 # ファイル選択ページの処理
 async def show_select_files_page() -> None:
+    st.set_page_config(layout="wide")
     st.session_state.page = "pages/select_files.py"
-    st.header("ファイルリスト表示", divider="rainbow")
-    if st.button("ファイル一覧を取得"):
+    st.header("AIノートを作成", divider="blue")
+
+    # ボタンの配置
+    col1, col2, _, _ = st.columns([1, 1, 1, 1])
+    with col1:
+        get_files_button = st.button("ファイル一覧を取得", use_container_width=True)
+    with col2:
+        reset_button = st.button("リセット", use_container_width=True)
+
+    # ボタンが押された場合の処理
+    if get_files_button:
         await show_files_list_df()
+
+    if reset_button:
+        st.session_state.clear()
+        st.rerun()
 
     # データフレームがセッション状態にある場合、表示
     if st.session_state.df is not None:
@@ -121,35 +136,34 @@ async def show_select_files_page() -> None:
         # 選択されたファイルを表示
         selected_files = get_selected_files()
         if selected_files:
-            st.write("選択されたファイル:")
+            st.write(":blue-background[選択されたファイル]")
             st.text(selected_files)
+            st.divider()
 
             # ノート名を入力
+            st.write(":blue-background[ノート名]")
             st.text_input(
-                "ノートのタイトルを入力してEnterキーを押して下さい",
+                "AIで作成するノートのタイトルを100文字以内で入力してEnterキーを押して下さい",
                 key="note_input",
                 value=st.session_state.note_name,
                 on_change=update_note_name,
+                max_chars=100,
             )
 
             # 現在のノートタイトルを表示
             st.write(f"Note Title:  {st.session_state.note_name}")
 
-            # 学習帳作成ボタン
+            # AIノート作成ボタン
             if selected_files and st.session_state.note_name:
                 st.divider()
-                if st.button("学習帳を作成"):
+                if st.button(
+                    "AIノートを作成", use_container_width=True, type="primary"
+                ):
                     st.session_state.selected_files = (
                         selected_files  # 選択されたファイルをセッション状態に保存
                     )
                     st.session_state.page = "pages/study_ai_note.py"  # ページを指定
                     st.switch_page("pages/study_ai_note.py")  # ページに遷移
-
-    # リセットボタン
-    st.divider()
-    if st.button("リセット"):
-        st.session_state.clear()
-        st.rerun()
 
 
 # ノート名を更新する関数

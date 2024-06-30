@@ -277,7 +277,7 @@ async def test_show_select_files_page() -> None:
     print(f"Text inputs: {len(at.text_input)}")
     print(f"Session state: {at.session_state}")
 
-    assert at.header[0].value == "ファイルリスト表示"
+    assert at.header[0].value == "AIノートを作成"
     assert "ファイル一覧を取得" in [button.label for button in at.button]
     assert "リセット" in [button.label for button in at.button]
 
@@ -310,16 +310,16 @@ async def test_show_select_files_page() -> None:
     if len(at.text_input) > 0:
         print(f"Text input label: {at.text_input[0].label}")
         assert (
-            "ノートのタイトルを入力してEnterキーを押して下さい"
+            "AIで作成するノートのタイトルを100文字以内で入力してEnterキーを押して下さい"
             in at.text_input[0].label
         )
 
-    # "学習帳を作成"ボタンが表示されないことを確認（テキストが入力されていない場合）
+    # "AIノートを作成"ボタンが表示されないことを確認（テキストが入力されていない場合）
     button_labels = [button.label for button in at.button]
     print(f"Button labels: {button_labels}")
     assert (
-        "学習帳を作成" not in button_labels
-    ), "'学習帳を作成'ボタンが表示されていますが、テキストが入力されていません"
+        "AIノートを作成" not in button_labels
+    ), "AIノートを作成'ボタンが表示されていますが、テキストが入力されていません"
 
     # テキスト入力フィールドに値を入力
     at.session_state["note_input"] = "ノートのタイトル"
@@ -338,14 +338,16 @@ async def test_show_select_files_page() -> None:
         at.session_state["note_input"] == "ノートのタイトル"
     ), f"Expected 'ノートのタイトル', but got {at.session_state['note_input']}"
 
-    # "学習帳を作成"ボタンが表示されることを確認（テキストが入力された場合）
+    # "AIノートを作成"ボタンが表示されることを確認（テキストが入力された場合）
     button_labels = [button.label for button in at.button]
     print(f"Button labels: {button_labels}")
-    assert "学習帳を作成" in button_labels, "'学習帳を作成'ボタンが表示されていません"
+    assert (
+        "AIノートを作成" in button_labels
+    ), "'AIノートを作成'ボタンが表示されていません"
 
-    # "学習帳を作成"ボタンをクリック
+    # "AIノートを作成"ボタンをクリック
     create_note_button = next(
-        button for button in at.button if button.label == "学習帳を作成"
+        button for button in at.button if button.label == "AIノートを作成"
     )
     create_note_button.click()
     at.run()

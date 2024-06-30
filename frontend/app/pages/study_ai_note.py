@@ -24,7 +24,7 @@ BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
 # 学習帳ページの処理
 def show_output_page() -> None:
-    st.header("学習帳ページ", divider="rainbow")
+    st.header("AIノート", divider="blue")
     if "selected_files" not in st.session_state:
         st.session_state.selected_files = []
     else:
