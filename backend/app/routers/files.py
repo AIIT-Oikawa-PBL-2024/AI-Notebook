@@ -1,4 +1,5 @@
 import logging
+import unicodedata
 from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
@@ -45,11 +46,14 @@ async def upload_files(
 
     for file in files:
         if file.filename and file.size:
+            # ファイル名を正規化
+            normalized_filename = unicodedata.normalize("NFC", file.filename)
+
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
 
             file_create = files_schemas.FileCreate(
-                file_name=file.filename,
+                file_name=normalized_filename,
                 file_size=file.size,
                 user_id=1,  # ユーザIDは仮で1を設定
                 created_at=now_japan,  # 日本時間の現在日時を設定
