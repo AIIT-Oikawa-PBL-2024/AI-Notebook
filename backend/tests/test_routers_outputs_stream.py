@@ -15,6 +15,12 @@ from app.main import app
 # 環境変数を設定するフィクスチャ
 @pytest.fixture
 def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
+    """
+    環境変数を設定するフィクスチャ
+
+    :param monkeypatch: pytestのMonkeyPatchオブジェクト
+    :type monkeypatch: MonkeyPatch
+    """
     # 環境変数を設定
     monkeypatch.setenv("PROJECT_ID", "your_project_id")
     monkeypatch.setenv("REGION", "your_region")
@@ -25,6 +31,14 @@ def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
 async def session(
     setup_and_teardown_database: AsyncGenerator[AsyncSession, None],
 ) -> AsyncGenerator[AsyncSession, None]:
+    """
+    データベースのセットアップとテアダウンを行うフィクスチャ
+
+    :param setup_and_teardown_database: データベースのセットアップとテアダウンを行う非同期ジェネレータ
+    :type setup_and_teardown_database: AsyncGenerator[AsyncSession, None]
+    :yield: 非同期セッション
+    :rtype: AsyncGenerator[AsyncSession, None]
+    """
     async with setup_and_teardown_database as session:  # type: ignore
         yield session
 
@@ -32,6 +46,12 @@ async def session(
 # モックのコンテンツ
 class MockContent:
     def to_dict(self) -> dict:
+        """
+        モックのコンテンツを辞書形式で返す
+
+        :return: モックのコンテンツ
+        :rtype: dict
+        """
         return {
             "candidates": [{"content": {"parts": [{"text": "生成されたコンテンツ"}]}}]
         }
@@ -43,6 +63,16 @@ class MockContent:
 async def test_request_content_stream_success(
     mock_generate_content_stream: Mock, mock_env_vars: None, session: AsyncSession
 ) -> None:
+    """
+    正常にコンテンツが生成される場合のテスト
+
+    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
+    :type mock_generate_content_stream: Mock
+    :param mock_env_vars: 環境変数を設定するフィクスチャ
+    :type mock_env_vars: None
+    :param session: 非同期セッション
+    :type session: AsyncSession
+    """
     # フィクスチャを適用
     mock_env_vars
 
@@ -71,6 +101,14 @@ async def test_request_content_stream_success(
 async def test_request_content_stream_file_not_found(
     mock_generate_content_stream: Mock, mock_env_vars: None
 ) -> None:
+    """
+    指定されたファイルが見つからない場合のテスト
+
+    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
+    :type mock_generate_content_stream: Mock
+    :param mock_env_vars: 環境変数を設定するフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_generate_content_stream.side_effect = NotFound("File not found")
@@ -94,6 +132,14 @@ async def test_request_content_stream_file_not_found(
 async def test_request_content_stream_invalid_argument(
     mock_generate_content_stream: Mock, mock_env_vars: None
 ) -> None:
+    """
+    無効なファイル形式が指定された場合のテスト
+
+    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
+    :type mock_generate_content_stream: Mock
+    :param mock_env_vars: 環境変数を設定するフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_generate_content_stream.side_effect = InvalidArgument("Invalid file format")
@@ -114,6 +160,14 @@ async def test_request_content_stream_invalid_argument(
 async def test_request_content_stream_google_api_error(
     mock_generate_content_stream: Mock, mock_env_vars: None
 ) -> None:
+    """
+    Google APIエラーが発生した場合のテスト
+
+    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
+    :type mock_generate_content_stream: Mock
+    :param mock_env_vars: 環境変数を設定するフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_generate_content_stream.side_effect = GoogleAPIError("Google API error")
@@ -137,6 +191,14 @@ async def test_request_content_stream_google_api_error(
 async def test_request_content_stream_unexpected_error(
     mock_generate_content_stream: Mock, mock_env_vars: None
 ) -> None:
+    """
+    予期せぬエラーが発生した場合のテスト
+
+    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
+    :type mock_generate_content_stream: Mock
+    :param mock_env_vars: 環境変数を設定するフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_generate_content_stream.side_effect = Exception("Unexpected error")
@@ -163,6 +225,18 @@ async def test_request_content_stream_final_content_logging(
     caplog: pytest.LogCaptureFixture,
     session: AsyncSession,
 ) -> None:
+    """
+    最終的なコンテンツが結合されてログに記録されることを確認するテスト
+
+    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
+    :type mock_generate_content_stream: Mock
+    :param mock_env_vars: 環境変数を設定するフィクスチャ
+    :type mock_env_vars: None
+    :param caplog: ログキャプチャフィクスチャ
+    :type caplog: pytest.LogCaptureFixture
+    :param session: 非同期セッション
+    :type session: AsyncSession
+    """
     # フィクスチャを適用
     mock_env_vars
 

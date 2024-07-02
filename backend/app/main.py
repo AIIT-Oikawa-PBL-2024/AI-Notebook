@@ -24,4 +24,10 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root() -> dict[str, str]:  # pragma: no cover
+    """
+    ルートエンドポイントを読み取ります。
+
+    :return: メッセージを含む辞書
+    :rtype: dict[str, str]
+    """
     return {"message": "Hello World"}
