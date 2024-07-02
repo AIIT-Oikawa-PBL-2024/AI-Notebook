@@ -46,7 +46,7 @@ async def test_create_note(session: AsyncSession, test_user_id: int) -> None:
 async def test_get_note_by_id(
     session: AsyncSession, create_test_note: notes_models.Note
 ) -> None:
-    note_id = create_test_note.id
+    note_id = int(create_test_note.id)
     note = await notes_cruds.get_note_by_id(session, note_id)
 
     assert note is not None
@@ -71,7 +71,7 @@ async def test_get_notes_by_user_id(
     session: AsyncSession, create_test_note: notes_models.Note
 ) -> None:
     notes = await notes_cruds.get_notes_by_user_id(
-        session, user_id=create_test_note.user_id, offset=0, limit=10
+        session, user_id=int(create_test_note.user_id), offset=0, limit=10
     )
 
     assert len(notes) > 0
@@ -84,7 +84,7 @@ async def test_get_notes_by_user_id(
 async def test_update_note(
     session: AsyncSession, create_test_note: notes_models.Note
 ) -> None:
-    note_id = create_test_note.id
+    note_id = int(create_test_note.id)
     note_update = notes_shemas.NoteUpdate(
         title="updated_title", content="updated_content"
     )
@@ -99,6 +99,6 @@ async def test_update_note(
 async def test_delete_note(
     session: AsyncSession, create_test_note: notes_models.Note
 ) -> None:
-    note_id = create_test_note.id
+    note_id = int(create_test_note.id)
     response = await notes_cruds.delete_note(session, note_id)
     assert response == True
