@@ -55,15 +55,6 @@ async def test_get_note_by_id(
     assert note.user_id == create_test_note.user_id
 
 
-# @pytest.mark.asyncio
-# async def test_get_note_by_id_not_exist(
-#     session: AsyncSession, create_test_note: notes_models.Note
-# ) -> None:
-#     note = await notes_cruds.get_note_by_id(session, 999999999)
-#
-#     assert note is None
-
-
 @pytest.mark.asyncio
 async def test_get_notes(
     session: AsyncSession, create_test_note: notes_models.Note
@@ -104,18 +95,6 @@ async def test_update_note(
     assert updated_note.user_id == create_test_note.user_id
 
 
-# @pytest.mark.asyncio
-# async def test_update_note_not_exist(
-#     session: AsyncSession, create_test_note: notes_models.Note
-# ) -> None:
-#     note_id = 999999999
-#     note_update = notes_shemas.NoteUpdate(
-#         title="updated_title", content="updated_content"
-#     )
-#     updated_note = await notes_cruds.update_note(session, note_id, note_update)
-#     assert updated_note is None
-
-
 @pytest.mark.asyncio
 async def test_delete_note(
     session: AsyncSession, create_test_note: notes_models.Note
@@ -123,5 +102,3 @@ async def test_delete_note(
     note_id = create_test_note.id
     response = await notes_cruds.delete_note(session, note_id)
     assert response == True
-    # note = await notes_cruds.get_note_by_id(session, note_id)
-    # assert note is None
