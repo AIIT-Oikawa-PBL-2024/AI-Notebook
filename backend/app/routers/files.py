@@ -92,31 +92,23 @@ async def get_file_by_id(
     return file
 
 
-# ファイルの削除
-@router.delete("/{file_id}", response_model=dict)
-async def delete_file(file_id: int, db: AsyncSession = db_dependency) -> dict:
-    file = await files_cruds.get_file_by_id(db, file_id)
-    if not file:
-        raise HTTPException(status_code=404, detail="ファイルが見つかりません")
-    await files_cruds.delete_file(db, file)
-    return {"detail": "ファイルが削除されました"}
-
-
-# ファイル名のリストによるファイルの削除
+# ファイル名のリストとユーザーIDによるファイルの削除
 @router.delete("/delete_files", response_model=dict)
-async def delete_files_by_name(
-    files: list[str], db: AsyncSession = db_dependency
+async def delete_files(
+    files: list[str], user_id: int, db: AsyncSession = db_dependency
 ) -> dict:
     """
-    ファイル名を指定してファイルを削除します。
+    ファイル名とユーザーIDによってファイルを削除します。
 
     :param files: 削除するファイルのリスト
     :type files: list[str]
+    :param user_id: ユーザーのID
+    :type user_id: int
     :param db: データベースセッション (省略可能)
-    :type db: AsyncSession
-    :return: 削除結果の辞書
+    :type db: AsyncSession, optional
+    :return: 削除の結果を示す辞書
     :rtype: dict
     """
-    for file in files:
-        await files_cruds.delete_file_by_name(db, file)
+    for file_name in files:
+        await files_cruds.delete_file_by_name_and_userid(db, file_name, user_id)
     return {"detail": "ファイルが削除されました"}
