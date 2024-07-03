@@ -1,15 +1,17 @@
-# 学習帳ページへの出力サンプルファイル（ノートページへの移植用）
 import asyncio
 import logging
 import os
+import sys
 
 import streamlit as st
 from dotenv import load_dotenv
 
-# ユーティリティ関数のインポート
-# Streemlitの仕様なのか、以下の相対パスでインポートする必要がある
-# pytestでテストする際は、エラーが発生する可能性があるため、注意が必要
-from utils.output import create_pdf_to_markdown_summary
+# プロジェクトルートのパスを取得
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+# プロジェクトルートをPythonパスに追加
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 # 環境変数を読み込む
 load_dotenv()
@@ -21,13 +23,23 @@ logging.basicConfig(level=logging.INFO)
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
+# セッション状態の初期化
+if "study_ai_note" not in st.session_state:
+    st.session_state.study_ai_note = ""
 
-# 学習帳ページの処理
+
 def show_output_page() -> None:
+    """
+    AIノートページを表示する関数。
+
+    - ヘッダーを表示し、選択されたファイルを表示する。
+    - 選択されたファイルがある場合、AIノートを生成し、セッション状態に保存する。
+
+    :return: None
+    """
     st.header("AIノート", divider="blue")
-    if "selected_files" not in st.session_state:
-        st.session_state.selected_files = []
-    else:
+
+    if "selected_files" in st.session_state and st.session_state.selected_files:
         note_name = st.session_state["note_name"]
         st.subheader(f"Note Title: {note_name}")
         st.write("選択されたファイル:")
@@ -35,13 +47,38 @@ def show_output_page() -> None:
         selected_files = st.session_state.get("selected_files", [])
 
         if selected_files:
-            try:
-                with st.spinner("処理中です。お待ちください..."):
-                    asyncio.run(create_pdf_to_markdown_summary(selected_files))
-                st.success("処理が完了しました")
-            except Exception as e:
-                logging.error(f"問題が発生しました: {e}")
-                st.error(f"エラーが発生しました: {e}")
+            with st.spinner("処理中です。お待ちください..."):
+                study_ai_note = create_study_ai_note(selected_files)
+            st.session_state.study_ai_note = study_ai_note
+            st.success("処理が完了しました")
+            # st.session_state.page = "pages/quill_sample.py"  # ページを指定
+            # st.switch_page("pages/quill_sample.py")  # ページに遷移
+    else:
+        st.write("ファイルが選択されていません")
+
+
+# キャッシュを使用して、選択されたファイルからAIノートを生成する関数
+@st.cache_resource(show_spinner=False)
+def create_study_ai_note(selected_files: list) -> str | None:
+    """
+    選択されたファイルからAIノートを生成する関数。
+
+    :param selected_files: AIノートを生成するための選択されたファイルのリスト
+    :type selected_files: list
+    :return: 生成されたAIノートの文字列、エラー時はNone
+    :rtype: str | None
+    """
+
+    # ユーティリティ関数のインポート
+    from app.utils.output import create_pdf_to_markdown_summary
+
+    try:
+        study_ai_note = asyncio.run(create_pdf_to_markdown_summary(selected_files))
+        return study_ai_note
+    except Exception as e:
+        logging.error(f"AIノートの生成中にエラーが発生しました: {e}")
+        st.error(f"AIノートの生成中にエラーが発生しました: {e}")
+        return None
 
 
 if __name__ == "__main__":
