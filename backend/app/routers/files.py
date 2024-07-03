@@ -100,3 +100,23 @@ async def delete_file(file_id: int, db: AsyncSession = db_dependency) -> dict:
         raise HTTPException(status_code=404, detail="ファイルが見つかりません")
     await files_cruds.delete_file(db, file)
     return {"detail": "ファイルが削除されました"}
+
+
+# ファイル名のリストによるファイルの削除
+@router.delete("/delete_files", response_model=dict)
+async def delete_files_by_name(
+    files: list[str], db: AsyncSession = db_dependency
+) -> dict:
+    """
+    ファイル名を指定してファイルを削除します。
+
+    :param files: 削除するファイルのリスト
+    :type files: list[str]
+    :param db: データベースセッション (省略可能)
+    :type db: AsyncSession
+    :return: 削除結果の辞書
+    :rtype: dict
+    """
+    for file in files:
+        await files_cruds.delete_file_by_name(db, file)
+    return {"detail": "ファイルが削除されました"}

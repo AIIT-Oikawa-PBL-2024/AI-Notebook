@@ -58,3 +58,25 @@ async def delete_file(db: AsyncSession, original_file: files_models.File) -> Non
     await db.delete(original_file)  # ファイルを削除
     await db.commit()  # 変更をコミット
     return
+
+
+# ファイル名から特定のファイルを削除する関数
+async def delete_file_by_name(db: AsyncSession, file_name: str) -> None:
+    """
+    ファイル名を指定してファイルを削除します。
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_name: 削除するファイルの名前
+    :type file_name: str
+    :return: None
+    """
+    # 指定されたファイル名のファイル情報を選択
+    result: Result = await db.execute(
+        select(files_models.File).filter(files_models.File.file_name == file_name)
+    )
+    file = result.scalars().first()  # 結果の最初のファイルを取得
+    if file:
+        await db.delete(file)  # ファイルを削除
+        await db.commit()  # 変更をコミット
+    return
