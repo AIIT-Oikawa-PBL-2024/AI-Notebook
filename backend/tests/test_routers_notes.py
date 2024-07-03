@@ -22,7 +22,8 @@ async def session(
 async def client(session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides[get_db] = lambda: session
     async with AsyncClient(
-        transport=ASGITransport(app), base_url="http://testserver"
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://testserver",
     ) as ac:
         yield ac
 
