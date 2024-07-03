@@ -175,7 +175,7 @@ async def show_select_files_page() -> None:
             st.divider()
 
             # ノート名を入力
-            st.write(":blue-background[��ート名]")
+            st.write(":blue-background[ノート名]")
             st.text_input(
                 "AIで作成するノートのタイトルを100文字以内で入力してEnterキーを押して下さい",
                 key="note_input",

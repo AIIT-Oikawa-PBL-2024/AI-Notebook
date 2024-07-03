@@ -122,7 +122,7 @@ async def test_get_files_list_request_error(mocker: MagicMock) -> None:
         side_effect=httpx.RequestError("Request error", request=None),
     )
 
-    # Streamlit���エラーメッセージ関数をモック
+    # Streamlitのエラーメッセージ関数をモック
     mock_st_error = mocker.patch("streamlit.error")
 
     # 関数を呼び出してエラーメッセージが表示されることを検証
@@ -155,7 +155,7 @@ async def test_get_files_list_general_exception(mocker: MagicMock) -> None:
 @pytest.mark.asyncio
 async def test_show_files_list_df(mocker: MagicMock) -> None:
     """
-    show_files_list_df関数のテスト���行います。
+    show_files_list_df関数のテストを行います。
 
     :param mocker: MagicMockオブジェクト
     """
