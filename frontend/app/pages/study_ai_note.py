@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 # Streemlitの仕様なのか、以下の相対パスでインポートする必要がある
 # pytestでテストする際は、エラーが発生する可能性があるため、注意が必要
 from utils.output import create_pdf_to_markdown_summary
+from utils.sidebar import show_sidebar
 
 # 環境変数を読み込む
 load_dotenv()
@@ -45,4 +46,5 @@ def show_output_page() -> None:
 
 
 if __name__ == "__main__":
+    show_sidebar()
     show_output_page()
