@@ -14,6 +14,7 @@ import requests  # type: ignore
 import streamlit as st
 from dotenv import load_dotenv
 from PIL import Image
+from utils.sidebar import show_sidebar
 
 # 環境変数を読み込む
 load_dotenv()
@@ -21,14 +22,6 @@ load_dotenv()
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 
 IMG_PATH = "imgs"
-
-with st.sidebar:
-    st.page_link("main.py", label="ホーム", icon="🏠")
-    st.page_link("pages/upload_image.py", label="ファイルアップロード", icon="1️⃣")
-    st.page_link("pages/input_text.py", label="テキスト入力", icon="2️⃣")
-    st.page_link("pages/output_note.py", label="AIサポート学習帳", icon="3️⃣")
-    st.page_link("pages/output_test.py", label="AIサポートテスト", icon="4️⃣")
-    st.page_link("pages/flyer.py", label="PBL フライヤー")
 
 
 def upload_files() -> None:
@@ -66,4 +59,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    show_sidebar()
     main()

@@ -7,6 +7,7 @@ import httpx
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
+from utils.sidebar import show_sidebar
 
 # 環境変数を読み込む
 load_dotenv()
@@ -212,4 +213,5 @@ def update_note_name() -> None:
 
 # ファイル選択ページの処理を実行
 if __name__ == "__main__":
+    show_sidebar()
     asyncio.run(show_select_files_page())
