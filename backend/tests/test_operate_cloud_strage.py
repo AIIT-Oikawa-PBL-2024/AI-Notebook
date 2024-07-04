@@ -4,7 +4,11 @@ import pytest
 from dotenv import load_dotenv
 from fastapi import UploadFile, HTTPException
 from fastapi.testclient import TestClient
-from app.utils.operate_cloud_storage import post_files, upload_files
+from app.utils.operate_cloud_storage import (
+    post_files,
+    upload_files,
+    delete_files_from_gcs,
+)
 from app.main import app
 from unittest.mock import patch, MagicMock
 from google.api_core.exceptions import GoogleAPIError
@@ -152,3 +156,30 @@ async def test_upload_files_nfc_normalization() -> None:
         assert called_filename == nfc_filename
         assert called_filename != nfd_filename
         assert unicodedata.is_normalized("NFC", called_filename)
+
+
+@pytest.mark.asyncio
+async def test_delete_files_from_gcs() -> None:
+    # アップロードするダミーファイル名
+    file_paths = [
+        "5_アジャイルⅡ.pdf",
+        "AI-powered Code Review with LLM.pdf",
+    ]
+
+    # BytesIOでダミーファイルを作成してリクエストデータを作成
+    files: list[UploadFile] = []
+    for file_path in file_paths:
+        dummy_content = b"dummy pdf content"  # ダミーのPDFコンテンツ (必要に応じて変更)
+        files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_path))
+
+    await post_files(files)
+
+    # ファイルの削除
+    deletefiles: list[str] = [
+        "5_アジャイルⅡ.pdf",
+        "AI-powered Code Review with LLM.pdf",
+    ]
+    result = await delete_files_from_gcs(deletefiles)
+
+    assert result["success"] == True
+    assert len(result["success_files"]) == 2  # 削除に成功したファイル数を検証

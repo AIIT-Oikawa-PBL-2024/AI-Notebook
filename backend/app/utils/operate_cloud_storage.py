@@ -102,3 +102,57 @@ async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
         }
 
     return {"success": True, "success_files": success_files}
+
+
+async def delete_files_from_gcs(files: list[str]) -> dict:
+    """
+    Google Cloud Storageからファイルを削除します。
+
+    :param files: 削除するファイルのリスト
+    :type files: list[str]
+    :return: 削除の結果を示す辞書
+    :rtype: dict
+    """
+
+    success_files, failed_files = [], []
+
+    # 環境変数から認証情報を取得
+    credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    bucket_name = os.getenv("BUCKET_NAME")
+
+    for filename in files:
+        # ブロブ名を正規化
+        normalized_blobname = unicodedata.normalize("NFC", filename)
+
+        client = storage.Client.from_service_account_json(credentials)
+        bucket = storage.Bucket(client, bucket_name)
+        blob = bucket.blob(normalized_blobname)
+
+        try:
+            blob.delete()
+            success_message = f"ファイル {normalized_blobname} が削除されました"
+            success_files.append(
+                {"message": success_message, "filename": normalized_blobname}
+            )
+        except GoogleAPIError as e:
+            error_msg_part = (
+                f"ファイル {normalized_blobname} の削除中にエラーが発生しました: "
+            )
+            error_message = error_msg_part + str(e)
+            failed_files.append(error_message)
+        except Exception as e:
+            base_msg = "ファイルの削除中に予期しないエラーが発生しました: "
+            error_detail = str(e)
+            filename_msg = f"{normalized_blobname} "
+            error_message = filename_msg + base_msg + error_detail
+            failed_files.append(error_message)
+
+    if failed_files:
+        error_details = "\n".join(failed_files)
+        return {
+            "success": False,
+            "success_files": success_files,
+            "failed_files": error_details,
+        }
+
+    return {"success": True, "success_files": success_files}

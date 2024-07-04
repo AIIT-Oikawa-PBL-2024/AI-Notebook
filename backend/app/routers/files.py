@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
-from app.utils.operate_cloud_storage import post_files
+from app.utils.operate_cloud_storage import delete_files_from_gcs, post_files
 
 # 環境変数を読み込む
 load_dotenv()
@@ -98,17 +98,26 @@ async def delete_files(
     files: list[str], user_id: int, db: AsyncSession = db_dependency
 ) -> dict:
     """
-    ファイル名とユーザーIDによってファイルを削除します。
+    ファイルを削除するAPIエンドポイントです。
 
     :param files: 削除するファイルのリスト
     :type files: list[str]
-    :param user_id: ユーザーのID
+    :param user_id: ユーザーID
     :type user_id: int
     :param db: データベースセッション (省略可能)
     :type db: AsyncSession, optional
-    :return: 削除の結果を示す辞書
+    :return: 削除結果の辞書
     :rtype: dict
     """
+    # ファイルをDBから削除
     for file_name in files:
         await files_cruds.delete_file_by_name_and_userid(db, file_name, user_id)
-    return {"detail": "ファイルが削除されました"}
+
+    # ファイルをGoogle Cloud Storageから削除
+    response_data = {}
+    delete_result = await delete_files_from_gcs(files)
+
+    response_data["success"] = delete_result.get("success", False)
+    response_data["success_files"] = delete_result.get("success_files", [])
+    response_data["failed_files"] = delete_result.get("failed_files", [])
+    return response_data

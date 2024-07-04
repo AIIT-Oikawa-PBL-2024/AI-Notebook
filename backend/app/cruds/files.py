@@ -58,7 +58,7 @@ async def delete_file_by_name_and_userid(
     db: AsyncSession, file_name: str, user_id: int
 ) -> None:
     """
-    指定されたファイル名とユーザーIDに一致するファイルを削除します。
+    指定されたファイル名とユーザーIDに基づいてファイルを削除します。
 
     :param db: データベースセッション
     :type db: AsyncSession
@@ -74,7 +74,7 @@ async def delete_file_by_name_and_userid(
         .filter(files_models.File.file_name == file_name)
         .filter(files_models.File.user_id == user_id)
     )
-    file = result.scalars().first()
-    await db.delete(file)
-    await db.commit()
+    for file in result.scalars():
+        await db.delete(file)
+        await db.commit()
     return

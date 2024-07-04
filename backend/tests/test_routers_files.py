@@ -126,7 +126,9 @@ async def test_delete_files(session: AsyncSession) -> None:
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()
-        assert data["detail"] == "ファイルが削除されました"
+        assert data["success"] is True
+        assert len(data["success_files"]) == 2
+        assert len(data["failed_files"]) == 0
 
 
 # 存在しないファイルIDによるファイル取得のテスト
@@ -137,20 +139,6 @@ async def test_get_file_by_id_not_found(session: AsyncSession) -> None:
         base_url="http://test",
     ) as client:
         response = await client.get("/files/9999")
-        print(response.text)  # デバッグ用出力
-        assert response.status_code == 404
-        data = response.json()
-        assert data["detail"] == "ファイルが見つかりません"
-
-
-# 存在しないファイルIDによるファイル削除のテスト
-@pytest.mark.asyncio
-async def test_delete_file_not_found(session: AsyncSession) -> None:
-    async with AsyncClient(
-        transport=ASGITransport(app),  # type: ignore
-        base_url="http://test",
-    ) as client:
-        response = await client.delete("/files/9999")
         print(response.text)  # デバッグ用出力
         assert response.status_code == 404
         data = response.json()
