@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/"
 
-
 # セッション状態の初期化
 if "note_name" not in st.session_state:
     st.session_state.note_name = ""
@@ -33,12 +32,26 @@ if "selected_files" not in st.session_state:
 
 # 時刻フォーマットを変換する関数
 def time_format(jst_str: str) -> str:
+    """
+    JST形式の文字列を指定のフォーマットに変換する。
+
+    :param jst_str: JST形式の日時文字列
+    :type jst_str: str
+    :return: 変換後の日時文字列
+    :rtype: str
+    """
     jst_time = datetime.fromisoformat(jst_str.replace("Z", "+00:00"))
     return jst_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 # 非同期でファイル一覧を取得する関数
 async def get_files_list() -> list[str]:
+    """
+    バックエンドAPIからファイル一覧を非同期で取得する。
+
+    :return: ファイル一覧
+    :rtype: list[str]
+    """
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -61,6 +74,11 @@ async def get_files_list() -> list[str]:
 
 # 非同期でファイル一覧を作成して表示する関数
 async def show_files_list_df() -> None:
+    """
+    ファイル一覧をデータフレーム形式で表示する。
+
+    :return: None
+    """
     if st.session_state.df is None:
         files = await get_files_list()
         file_df = pd.DataFrame(files)
@@ -88,6 +106,11 @@ async def show_files_list_df() -> None:
 
 # データを更新する関数
 def update() -> None:
+    """
+    データフレームの変更をセッション状態に反映する。
+
+    :return: None
+    """
     if "changes" in st.session_state:
         changes = st.session_state.changes.get("edited_rows", {})
         for idx, change in changes.items():
@@ -98,6 +121,12 @@ def update() -> None:
 
 # 選択されたファイル名をリスト形式で取得する関数
 def get_selected_files() -> list[str]:
+    """
+    選択されたファイル名をリスト形式で取得する。
+
+    :return: 選択されたファイル名のリスト
+    :rtype: list[str]
+    """
     if st.session_state.df is not None:
         selected_files = st.session_state.df[st.session_state.df["select"]][
             "file_name"
@@ -108,6 +137,11 @@ def get_selected_files() -> list[str]:
 
 # ファイル選択ページの処理
 async def show_select_files_page() -> None:
+    """
+    ファイル選択ページを表示する。
+
+    :return: None
+    """
     st.set_page_config(layout="wide")
     st.session_state.page = "pages/select_files.py"
     st.header("AIノートを作成", divider="blue")
@@ -168,6 +202,11 @@ async def show_select_files_page() -> None:
 
 # ノート名を更新する関数
 def update_note_name() -> None:
+    """
+    ノート名をセッション状態に反映する。
+
+    :return: None
+    """
     st.session_state.note_name = st.session_state.note_input
 
 
