@@ -11,6 +11,12 @@ from vertexai.generative_models import GenerationConfig
 # 環境変数を設定するフィクスチャ
 @pytest.fixture
 def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
+    """
+    環境変数を設定するフィクスチャ
+
+    :param monkeypatch: pytestのMonkeyPatchオブジェクト
+    :type monkeypatch: MonkeyPatch
+    """
     # 環境変数を設定
     monkeypatch.setenv("PROJECT_ID", "your_project_id")
     monkeypatch.setenv("REGION", "your_region")
@@ -24,6 +30,16 @@ def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
 async def test_generate_content_stream_success(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    正常系のテスト
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
 
@@ -31,6 +47,18 @@ async def test_generate_content_stream_success(
     def mock_generate_content(
         contents: list, generation_config: GenerationConfig, stream: bool = True
     ) -> Generator:
+        """
+        モックのコンテンツ生成関数
+
+        :param contents: コンテンツのリスト
+        :type contents: list
+        :param generation_config: GenerationConfigオブジェクト
+        :type generation_config: GenerationConfig
+        :param stream: ストリーミングフラグ
+        :type stream: bool
+        :return: コンテンツのジェネレータ
+        :rtype: Generator
+        """
         responses = [
             {
                 "candidates": [
@@ -74,6 +102,16 @@ async def test_generate_content_stream_success(
 async def test_generate_content_stream_not_found(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    ファイルが見つからない場合のエラーハンドリングのテスト
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
 
@@ -93,6 +131,16 @@ async def test_generate_content_stream_not_found(
 async def test_generate_content_stream_invalid_argument(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    無効な引数の場合のエラーハンドリングのテスト
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_GenerativeModel.return_value.generate_content.side_effect = InvalidArgument(
@@ -114,6 +162,16 @@ async def test_generate_content_stream_invalid_argument(
 async def test_generate_content_stream_google_api_error(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    Google APIエラーの場合のエラーハンドリングのテスト
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_GenerativeModel.return_value.generate_content.side_effect = GoogleAPIError(
@@ -135,6 +193,16 @@ async def test_generate_content_stream_google_api_error(
 async def test_generate_content_stream_unexpected_error(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    その他の予期しないエラーの場合のエラーハンドリングのテスト
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_GenerativeModel.return_value.generate_content.side_effect = Exception(
@@ -156,6 +224,16 @@ async def test_generate_content_stream_unexpected_error(
 async def test_generate_content_stream_attribute_error(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    エラーハンドリングのテスト（モデル属性エラー）
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_GenerativeModel.return_value.generate_content.side_effect = AttributeError(
@@ -177,6 +255,16 @@ async def test_generate_content_stream_attribute_error(
 async def test_generate_content_stream_type_error(
     mock_check_file_exists: Mock, mock_GenerativeModel: Mock, mock_env_vars: None
 ) -> None:
+    """
+    エラーハンドリングのテスト（タイプエラー）
+
+    :param mock_check_file_exists: ファイル存在確認のモック
+    :type mock_check_file_exists: Mock
+    :param mock_GenerativeModel: GenerativeModelのモック
+    :type mock_GenerativeModel: Mock
+    :param mock_env_vars: 環境変数のモックフィクスチャ
+    :type mock_env_vars: None
+    """
     # フィクスチャを適用
     mock_env_vars
     mock_GenerativeModel.return_value.generate_content.side_effect = TypeError(

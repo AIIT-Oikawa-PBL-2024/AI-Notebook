@@ -33,6 +33,12 @@ TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind
 
 # データベースセッションの依存関係をオーバーライド
 async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    データベースセッションの依存関係をオーバーライドします。
+
+    :yield: 非同期ジェネレータとしてのデータベースセッション
+    :rtype: AsyncGenerator[AsyncSession, None]
+    """
     async with TestingSessionLocal() as session:
         yield session
 
@@ -44,6 +50,12 @@ app.dependency_overrides[get_db] = override_get_db
 # データベースのセットアップとクリーンアップを行うフィクスチャ
 @pytest.fixture(scope="function")
 async def setup_and_teardown_database() -> AsyncGenerator[AsyncSession, None]:
+    """
+    テスト用データベースのセットアップとクリーンアップを行うフィクスチャ。
+
+    :yield: 非同期ジェネレータとしてのデータベースセッション
+    :rtype: AsyncGenerator[AsyncSession, None]
+    """
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -75,6 +87,14 @@ async def setup_and_teardown_database() -> AsyncGenerator[AsyncSession, None]:
 async def test_user_id(
     setup_and_teardown_database: AsyncGenerator[AsyncSession, None],
 ) -> int:
+    """
+    テスト用ユーザーIDを提供するフィクスチャ。
+
+    :param setup_and_teardown_database: データベースのセットアップとクリーンアップを行うフィクスチャ
+    :type setup_and_teardown_database: AsyncGenerator[AsyncSession, None]
+    :return: テスト用ユーザーのID
+    :rtype: int
+    """
     async with setup_and_teardown_database as session:  # type: ignore
         result = await session.execute(
             select(User).where(User.email == "test@example.com")

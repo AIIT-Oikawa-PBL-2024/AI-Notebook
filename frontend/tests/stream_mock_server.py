@@ -5,10 +5,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
 import asyncio
 
+
+from typing import AsyncGenerator
+
+
 app = FastAPI()
 
 
-async def mock_stream() -> str:
+async def mock_stream() -> AsyncGenerator[str, None]:
     for i in range(10):
         yield f"## line {i}\n"
         await asyncio.sleep(1)
