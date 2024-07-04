@@ -10,7 +10,16 @@ import app.schemas.files as files_schemas
 async def create_file(
     db: AsyncSession, file_create: files_schemas.FileCreate
 ) -> files_models.File:
-    # ファイルのインスタンスを作成
+    """
+    新しいファイルを作成する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_create: 作成するファイルの情報
+    :type file_create: files_schemas.FileCreate
+    :return: 作成されたファイルのインスタンス
+    :rtype: files_models.File
+    """
     file = files_models.File(**file_create.model_dump())
     db.add(file)  # ファイルをデータベースに追加
     await db.commit()  # 変更をコミット
@@ -20,7 +29,14 @@ async def create_file(
 
 # 全ファイルを取得する関数
 async def get_files(db: AsyncSession) -> list[files_schemas.File]:
-    # ファイル情報を選択
+    """
+    全ファイルを取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: ファイルのリスト
+    :rtype: list[files_schemas.File]
+    """
     result: Result = await db.execute(
         select(
             files_models.File.id,
@@ -46,7 +62,16 @@ async def get_files(db: AsyncSession) -> list[files_schemas.File]:
 
 # ファイルIDから特定のファイルを取得する関数
 async def get_file_by_id(db: AsyncSession, file_id: int) -> files_models.File | None:
-    # 指定されたファイルIDのファイル情報を選択
+    """
+    ファイルIDから特定のファイルを取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_id: 取得するファイルのID
+    :type file_id: int
+    :return: 取得されたファイルのインスタンス、存在しない場合はNone
+    :rtype: files_models.File | None
+    """
     result: Result = await db.execute(
         select(files_models.File).filter(files_models.File.id == file_id)
     )
@@ -55,6 +80,15 @@ async def get_file_by_id(db: AsyncSession, file_id: int) -> files_models.File | 
 
 # ファイルIDから特定のファイルを削除する関数
 async def delete_file(db: AsyncSession, original_file: files_models.File) -> None:
-    await db.delete(original_file)  # ファイルを削除
-    await db.commit()  # 変更をコミット
+    """
+    ファイルIDから特定のファイルを削除する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param original_file: 削除するファイルのインスタンス
+    :type original_file: files_models.File
+    :return: None
+    """
+    await db.delete(original_file)
+    await db.commit()
     return

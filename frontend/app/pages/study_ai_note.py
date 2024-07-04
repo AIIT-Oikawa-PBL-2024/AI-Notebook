@@ -24,6 +24,15 @@ BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
 # 学習帳ページの処理
 def show_output_page() -> None:
+    """
+    学習帳ページを表示する。
+
+    - ヘッダーを表示
+    - セッション状態に選択されたファイルがある場合、そのファイル名を表示
+    - 選択されたファイルを処理し、結果を表示
+
+    :return: None
+    """
     st.header("AIノート", divider="blue")
     if "selected_files" not in st.session_state:
         st.session_state.selected_files = []
