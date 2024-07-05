@@ -109,9 +109,18 @@ async def delete_files(
     :return: 削除結果の辞書
     :rtype: dict
     """
-    # ファイルをDBから削除
-    for file_name in files:
-        await files_cruds.delete_file_by_name_and_userid(db, file_name, user_id)
+    try:
+        # ファイルをDBから削除
+        for file_name in files:
+            await files_cruds.delete_file_by_name_and_userid(db, file_name, user_id)
+
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"{file_name} ファイルの削除に失敗しました",
+        ) from e
 
     # ファイルをGoogle Cloud Storageから削除
     response_data = {}

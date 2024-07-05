@@ -172,14 +172,27 @@ async def test_delete_files_from_gcs() -> None:
         dummy_content = b"dummy pdf content"  # ダミーのPDFコンテンツ (必要に応じて変更)
         files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_path))
 
+    # ファイルをアップロード
     await post_files(files)
 
-    # ファイルの削除
+    # 削除するファイル名のリスト
     deletefiles: list[str] = [
         "5_アジャイルⅡ.pdf",
         "AI-powered Code Review with LLM.pdf",
     ]
+
+    # ファイルの削除
     result = await delete_files_from_gcs(deletefiles)
 
+    # 結果の検証
     assert result["success"] == True
     assert len(result["success_files"]) == 2  # 削除に成功したファイル数を検証
+
+    # エラーハンドリングのテストケースを追加
+    with patch(
+        "google.cloud.storage.Blob.delete",
+        side_effect=GoogleAPIError("Delete failed"),
+    ):
+        result = await delete_files_from_gcs(deletefiles)
+        assert result["success"] == False
+        assert "Delete failed" in result["failed_files"]

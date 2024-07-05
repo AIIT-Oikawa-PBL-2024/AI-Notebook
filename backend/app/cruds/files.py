@@ -69,12 +69,15 @@ async def delete_file_by_name_and_userid(
     :return: None
     :rtype: None
     """
-    result: Result = await db.execute(
-        select(files_models.File)
-        .filter(files_models.File.file_name == file_name)
-        .filter(files_models.File.user_id == user_id)
-    )
-    for file in result.scalars():
-        await db.delete(file)
+    try:
+        result: Result = await db.execute(
+            select(files_models.File)
+            .filter(files_models.File.file_name == file_name)
+            .filter(files_models.File.user_id == user_id)
+        )
+        for file in result.scalars():
+            await db.delete(file)
         await db.commit()
-    return
+    except Exception as e:
+        await db.rollback()
+        raise e

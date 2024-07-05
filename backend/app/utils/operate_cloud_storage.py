@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import unicodedata
 
@@ -113,19 +114,18 @@ async def delete_files_from_gcs(files: list[str]) -> dict:
     :return: 削除の結果を示す辞書
     :rtype: dict
     """
-
     success_files, failed_files = [], []
 
     # 環境変数から認証情報を取得
     credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     bucket_name = os.getenv("BUCKET_NAME")
 
+    client = storage.Client.from_service_account_json(credentials)
+    bucket = storage.Bucket(client, bucket_name)
+
     for filename in files:
         # ブロブ名を正規化
         normalized_blobname = unicodedata.normalize("NFC", filename)
-
-        client = storage.Client.from_service_account_json(credentials)
-        bucket = storage.Bucket(client, bucket_name)
         blob = bucket.blob(normalized_blobname)
 
         try:
@@ -140,12 +140,14 @@ async def delete_files_from_gcs(files: list[str]) -> dict:
             )
             error_message = error_msg_part + str(e)
             failed_files.append(error_message)
+            logging.error(error_message)
         except Exception as e:
             base_msg = "ファイルの削除中に予期しないエラーが発生しました: "
             error_detail = str(e)
             filename_msg = f"{normalized_blobname} "
             error_message = filename_msg + base_msg + error_detail
             failed_files.append(error_message)
+            logging.error(error_message)
 
     if failed_files:
         error_details = "\n".join(failed_files)
