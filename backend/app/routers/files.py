@@ -36,6 +36,17 @@ async def upload_files(
     files: list[UploadFile],
     db: AsyncSession = db_dependency,
 ) -> dict:
+    """
+    ファイルをGoogle Cloud Storageにアップロードし、ファイル名をDBに登録します。
+
+    :param files: アップロードするファイルのリスト
+    :type files: list[UploadFile]
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: アップロード結果の辞書
+    :rtype: dict
+    :raises HTTPException: アップロードまたはデータベース登録に失敗した場合
+    """
     response_data = {}
 
     # ファイルをGoogle Cloud Storageにアップロード
@@ -78,6 +89,14 @@ async def upload_files(
 # ファイルの一覧取得
 @router.get("/", response_model=list[files_schemas.File])
 async def get_files(db: AsyncSession = db_dependency) -> list[files_schemas.File]:
+    """
+    データベースからファイルの一覧を取得します。
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: ファイルのリスト
+    :rtype: list[files_schemas.File]
+    """
     return await files_cruds.get_files(db)
 
 
@@ -86,6 +105,17 @@ async def get_files(db: AsyncSession = db_dependency) -> list[files_schemas.File
 async def get_file_by_id(
     file_id: int, db: AsyncSession = db_dependency
 ) -> files_schemas.File:
+    """
+    指定されたIDのファイルをデータベースから取得します。
+
+    :param file_id: ファイルのID
+    :type file_id: int
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: ファイル情報
+    :rtype: files_schemas.File
+    :raises HTTPException: ファイルが見つからない場合
+    """
     file = await files_cruds.get_file_by_id(db, file_id)
     if not file:
         raise HTTPException(status_code=404, detail="ファイルが見つかりません")
