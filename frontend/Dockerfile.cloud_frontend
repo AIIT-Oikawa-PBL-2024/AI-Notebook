@@ -16,7 +16,8 @@ COPY frontend/pyproject.toml frontend/poetry.lock /frontend/
 
 
 # デプロイに必要
-COPY frontend/ /frontend/
+COPY frontend/app /frontend/app
+COPY frontend/.streamlit /frontend/.streamlit
 COPY frontend/entrypoint.sh /frontend/entrypoint.sh
 
 # poetryの設定と依存関係のインストール
