@@ -46,7 +46,9 @@ async def request_content(
     :rtype: StreamingResponse
     :raises HTTPException 404: 指定されたファイルが見つからない場合
     :raises HTTPException 400: ファイル名の形式が無効な場合
-    :raises HTTPException 500: コンテンツの生成中にエラーが発生した場合、またはGoogle APIからエラーが返された場合、またはコンテンツのストリーミング中にエラーが発生した場合
+    :raises HTTPException 500: コンテンツの生成中にエラーが発生した場合、
+                               またはGoogle APIからエラーが返された場合、
+                               またはコンテンツのストリーミング中にエラーが発生した場合
     """
     # ロギング
     logging.info(f"Requesting content generation for files: {files}")
