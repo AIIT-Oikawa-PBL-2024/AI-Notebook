@@ -61,7 +61,7 @@ def main() -> None:
     submit()
     upload_files()
 
-    img = Image.open("AIサポート学習帳.jpg")
+    img = Image.open("app/statics/PBLフライヤー1Q.jpg")
     st.image(img, use_column_width=True)
 
 
