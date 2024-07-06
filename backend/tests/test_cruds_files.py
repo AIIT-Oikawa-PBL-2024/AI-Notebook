@@ -47,6 +47,7 @@ async def test_create_file(session: AsyncSession, test_user_id: int) -> None:
         created_at=datetime.now(JST),
     )
     file = await files_cruds.create_file(session, file_create)
+
     assert file.id is not None
     assert file.file_name == "test_file.pdf"
     assert file.file_size == 12345
@@ -122,10 +123,9 @@ async def test_get_file_by_id_not_found(session: AsyncSession) -> None:
     retrieved_file = await files_cruds.get_file_by_id(session, 9999)
     assert retrieved_file is None
 
-
-# ファイル削除のテスト
+# ファイル名のリストとユーザーIDによるファイル削除のテスト
 @pytest.mark.asyncio
-async def test_delete_file(session: AsyncSession, test_user_id: int) -> None:
+async def test_delete_file_by_name(session: AsyncSession, test_user_id: int) -> None:
     """
     ファイル削除のテスト。
 
@@ -143,7 +143,9 @@ async def test_delete_file(session: AsyncSession, test_user_id: int) -> None:
     )
     file = await files_cruds.create_file(session, file_create)
 
-    await files_cruds.delete_file(session, file)
+    await files_cruds.delete_file_by_name_and_userid(
+        session, "test_file.pdf", test_user_id
+    )
     file_id = int(file.id)
 
     retrieved_file = await files_cruds.get_file_by_id(session, file_id)

@@ -78,17 +78,32 @@ async def get_file_by_id(db: AsyncSession, file_id: int) -> files_models.File | 
     return result.scalars().first()  # 結果の最初のファイルを返す
 
 
-# ファイルIDから特定のファイルを削除する関数
-async def delete_file(db: AsyncSession, original_file: files_models.File) -> None:
+
+# ファイル名とユーザーIDから特定のファイルを削除する関数
+async def delete_file_by_name_and_userid(
+    db: AsyncSession, file_name: str, user_id: int
+) -> None:
     """
-    ファイルIDから特定のファイルを削除する関数
+    指定されたファイル名とユーザーIDに基づいてファイルを削除します。
 
     :param db: データベースセッション
     :type db: AsyncSession
-    :param original_file: 削除するファイルのインスタンス
-    :type original_file: files_models.File
+    :param file_name: 削除するファイルの名前
+    :type file_name: str
+    :param user_id: ファイルを所有するユーザーのID
+    :type user_id: int
     :return: None
+    :rtype: None
     """
-    await db.delete(original_file)
-    await db.commit()
-    return
+    try:
+        result: Result = await db.execute(
+            select(files_models.File)
+            .filter(files_models.File.file_name == file_name)
+            .filter(files_models.File.user_id == user_id)
+        )
+        for file in result.scalars():
+            await db.delete(file)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e
