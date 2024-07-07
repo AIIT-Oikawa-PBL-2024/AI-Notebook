@@ -1,9 +1,9 @@
-# AI-NoteBook-template
+# AI-Notebook
 
 フロントエンドは Streamlit、バックエンドは FastAPI を利用
 
 ```
-copilot-practice2
+AI-Notebook
 ├── .devcontainer
 │   └── backend
 |   |     └── devcontainer.json
@@ -28,8 +28,13 @@ copilot-practice2
 │   │    └── utils
 │   ├── tests
 │   ├── Dockerfile.backend
+│   ├── Dockerfile.cloud_backend
+│   ├── entrypoint.sh
 │   ├── poetry.lock
-│   └── pyproject.toml
+│   ├── pyproject.toml
+│   ├── pytest.ini
+│   └── README.md
+
 ├── frontend
 │   ├── .vscode
 │   │    └── settings.json
@@ -38,8 +43,12 @@ copilot-practice2
 │   ├── app.py
 │   ├── tests
 │   ├── Dockerfile.frontend
+│   ├── Dockerfile.cloud_frontend
+│   ├── entrypoint.sh
 │   ├── poetry.lock
-│   └── pyproject.toml
+│   ├── pyproject.toml
+│   ├── pytest.ini
+│   └── README.md
 ├── docker-compose.yml
 ├── .env.sample
 ├── .coderabbit.yaml

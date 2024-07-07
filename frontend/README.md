@@ -32,6 +32,7 @@
         `--role="roles/run.admin"`
 
 ### Dockerイメージの作成
+- `cd frontend`
 - `docker build -t gcr.io/<PJNAME>/<APPNAME>:latest --platform linux/amd64 \`
     `-f frontend/Dockerfile.cloud_frontend .`
 

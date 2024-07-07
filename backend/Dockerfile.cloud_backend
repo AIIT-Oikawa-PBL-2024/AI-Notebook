@@ -12,14 +12,14 @@ WORKDIR /backend
 RUN pip install --no-cache-dir poetry==1.8.3
 
 # 依存ファイルをコピーして依存関係をインストール
-COPY backend/pyproject.toml backend/poetry.lock /backend/
+COPY pyproject.toml poetry.lock ./
 
-# デプロイに必要
-COPY backend/app /backend/app
-COPY backend/entrypoint.sh /backend/entrypoint.sh
-
-# poetryの設定
+# poetryの設定と依存関係のインストール
 RUN poetry config virtualenvs.in-project true && poetry install --no-root --no-dev
+
+# デプロイに必要なファイルをコピー
+COPY app ./app
+COPY entrypoint.sh ./entrypoint.sh
 
 # gcloud SDKのインストール(最新google-cloud-sdkを使うため、version指定しない)
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
