@@ -1,12 +1,20 @@
 import asyncio
 import logging
 import os
+import sys
 from datetime import datetime
 
 import httpx
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
+
+# プロジェクトルートのパスを取得
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+# プロジェクトルートをPythonパスに追加
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 # 環境変数を読み込む
 load_dotenv()
@@ -142,7 +150,7 @@ async def show_select_files_page() -> None:
 
     :return: None
     """
-    st.set_page_config(layout="wide")
+    # st.set_page_config(layout="wide")
     st.session_state.page = "pages/select_files.py"
     st.header("AIノートを作成", divider="blue")
 
@@ -212,4 +220,7 @@ def update_note_name() -> None:
 
 # ファイル選択ページの処理を実行
 if __name__ == "__main__":
+    from app.utils.sidebar import show_sidebar
+
+    show_sidebar()
     asyncio.run(show_select_files_page())

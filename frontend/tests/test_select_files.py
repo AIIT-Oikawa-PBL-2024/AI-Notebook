@@ -11,8 +11,11 @@ from app.pages.select_files import (
 )
 import streamlit as st
 import pandas as pd
-import logging
+
+
 import httpx
+import logging
+
 from streamlit.testing.v1 import AppTest
 
 # ストリームリットのエラーメッセージをモック
@@ -315,7 +318,7 @@ async def test_show_select_files_page() -> None:
     """
     :概要: show_select_files_page関数のテストを行います。
 
-    :詳細: 
+    :詳細:
         - 初期状態の確認
         - "ファイル一覧を取得"ボタンのクリック
         - セッション状態の更新
@@ -325,7 +328,8 @@ async def test_show_select_files_page() -> None:
         - ページ遷移の確認
     """
     # テスト用のAppTestインスタンスを作成
-    at = AppTest.from_file("app/pages/select_files.py")
+    at = AppTest.from_file("app/main.py").run()
+    at.switch_page("pages/select_files.py").run()
 
     # アプリを実行
     at.run()
@@ -422,7 +426,7 @@ async def test_reset_button() -> None:
     """
     :概要: リセットボタンのテストを行います。
 
-    :詳細: 
+    :詳細:
         - 初期状態の確認
         - "ファイル一覧を取得"ボタンのクリック
         - セッション状態の更新
@@ -430,7 +434,9 @@ async def test_reset_button() -> None:
         - 入力がリセットされたことを確認
     """
     # テスト用のAppTestインスタンスを作成
-    at = AppTest.from_file("app/pages/select_files.py")
+    at = AppTest.from_file("app/main.py").run()
+    at.switch_page("pages/select_files.py").run()
+    # at = AppTest.from_file("app/pages/select_files.py")
 
     # アプリを実行
     at.run()
@@ -459,4 +465,3 @@ async def test_reset_button() -> None:
     # 入力がリセットされたことを確認
     assert at.session_state["note_name"] == ""
     assert at.session_state["selected_files"] == []
-

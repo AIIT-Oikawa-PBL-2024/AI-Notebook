@@ -82,4 +82,7 @@ def create_study_ai_note(selected_files: list) -> str | None:
 
 
 if __name__ == "__main__":
+    from app.utils.sidebar import show_sidebar
+
+    show_sidebar()
     show_output_page()

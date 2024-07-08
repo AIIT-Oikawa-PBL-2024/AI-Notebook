@@ -10,19 +10,13 @@
 
 
 import streamlit as st
+from utils.sidebar import show_sidebar
 
 IMG_PATH = "imgs"
 
-with st.sidebar:
-    st.page_link("main.py", label="ホーム", icon="🏠")
-    st.page_link("pages/upload_image.py", label="ファイルアップロード", icon="1️⃣")
-    st.page_link("pages/input_text.py", label="テキスト入力", icon="2️⃣")
-    st.page_link("pages/output_note.py", label="AIサポート学習帳", icon="3️⃣")
-    st.page_link("pages/output_test.py", label="AIサポートテスト", icon="4️⃣")
-    st.page_link("pages/flyer.py", label="PBL フライヤー")
-
 
 def main() -> None:
+    show_sidebar()
     st.markdown("# AIサポート学習帳")
     file = st.file_uploader(
         "講義テキストの画像をアップロードしてください.（アプロード可能なファイルタイプ：png,pdf,jpeg,jpg）",
