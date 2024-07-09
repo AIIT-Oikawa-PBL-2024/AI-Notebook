@@ -28,6 +28,10 @@ BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/"
 
 # セッション状態の初期化
+if "title_name" not in st.session_state:
+    st.session_state.title_name = ""
+if "exercise_name" not in st.session_state:
+    st.session_state.exercise_name = ""
 if "note_name" not in st.session_state:
     st.session_state.note_name = ""
 if "df" not in st.session_state:
@@ -155,7 +159,7 @@ async def show_select_files_page() -> None:
     st.header("AIノートを作成", divider="blue")
 
     # ボタンの配置
-    col1, col2, _, _ = st.columns([1, 1, 1, 1])
+    col1, col2, _, _ = st.columns([1.5, 1, 1, 1])
     with col1:
         get_files_button = st.button("ファイル一覧を取得", use_container_width=True)
     with col2:
@@ -182,40 +186,54 @@ async def show_select_files_page() -> None:
             st.text(selected_files)
             st.divider()
 
-            # ノート名を入力
-            st.write(":blue-background[ノート名]")
+            # タイトルを入力
+            st.write(":blue-background[タイトル]")
             st.text_input(
-                "AIで作成するノートのタイトルを100文字以内で入力してEnterキーを押して下さい",
-                key="note_input",
-                value=st.session_state.note_name,
-                on_change=update_note_name,
+                "AIで作成するノートや練習問題のタイトルを100文字以内で入力してEnterキーを押して下さい",
+                key="title_input",
+                value=st.session_state.title_name,
+                on_change=update_title_name,
                 max_chars=100,
             )
 
-            # 現在のノートタイトルを表示
-            st.write(f"Note Title:  {st.session_state.note_name}")
+            # 現在のタイトルを表示
+            st.write(f"Title:  {st.session_state.title_name}")
 
             # AIノート作成ボタン
-            if selected_files and st.session_state.note_name:
+            if selected_files and st.session_state.title_name:
                 st.divider()
                 if st.button(
                     "AIノートを作成", use_container_width=True, type="primary"
                 ):
+                    st.session_state.note_name = st.session_state.title_name
                     st.session_state.selected_files = (
                         selected_files  # 選択されたファイルをセッション状態に保存
                     )
                     st.session_state.page = "pages/study_ai_note.py"  # ページを指定
                     st.switch_page("pages/study_ai_note.py")  # ページに遷移
 
+            # AI練習問題作成ボタン
+            if selected_files and st.session_state.title_name:
+                st.divider()
+                if st.button(
+                    "AI練習問題を作成", use_container_width=True, type="primary"
+                ):
+                    st.session_state.exercise_name = st.session_state.title_name
+                    st.session_state.selected_files = (
+                        selected_files  # 選択されたファイルをセッション状態に保存
+                    )
+                    st.session_state.page = "pages/study_ai_exercise.py"  # ページを指定
+                    st.switch_page("pages/study_ai_exercise.py")  # ページに遷移
 
-# ノート名を更新する関数
-def update_note_name() -> None:
+
+# タイトル名を更新する関数
+def update_title_name() -> None:
     """
-    ノート名をセッション状態に反映する。
+    タイトル名をセッション状態に反映する。
 
     :return: None
     """
-    st.session_state.note_name = st.session_state.note_input
+    st.session_state.title_name = st.session_state.title_input
 
 
 # ファイル選択ページの処理を実行
