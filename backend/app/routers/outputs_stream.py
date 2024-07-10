@@ -30,12 +30,26 @@ JST = timezone(timedelta(hours=9))
 db_dependency = Depends(get_db)
 
 
-# 複数のファイル名のリストを入力して、出力を生成するエンドポイント
 @router.post("/request_stream")
 async def request_content(
     files: list[str],
     db: AsyncSession = db_dependency,
 ) -> StreamingResponse:
+    """
+    ファイル名のリストを入力して、出力を生成するエンドポイントです。
+
+    :param files: ファイル名のリスト
+    :type files: list[str]
+    :param db: 非同期セッション
+    :type db: AsyncSession
+    :return: ストリーミングレスポンス
+    :rtype: StreamingResponse
+    :raises HTTPException 404: 指定されたファイルが見つからない場合
+    :raises HTTPException 400: ファイル名の形式が無効な場合
+    :raises HTTPException 500: コンテンツの生成中にエラーが発生した場合、
+                               またはGoogle APIからエラーが返された場合、
+                               またはコンテンツのストリーミング中にエラーが発生した場合
+    """
     # ロギング
     logging.info(f"Requesting content generation for files: {files}")
 
@@ -73,8 +87,14 @@ async def request_content(
             + "システム管理者に連絡してください。",
         ) from e
 
-    # コンテンツをストリーミングする非同期関数
     async def content_streamer() -> AsyncGenerator[str, None]:
+        """
+        コンテンツをストリーミングする非同期関数です。
+
+        :return: コンテンツのストリーム
+        :rtype: AsyncGenerator[str, None]
+        :raises HTTPException 500: コンテンツのストリーミング中にエラーが発生した場合
+        """
         # コンテンツを蓄積するリスト
         accumulated_content = []
         try:

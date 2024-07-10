@@ -8,7 +8,6 @@ from sqlalchemy.orm import declarative_base
 # .envファイルから環境変数を読み込む
 load_dotenv()
 
-
 # 環境変数からデータベースのユーザー名、パスワード、ホスト、ポートを取得する
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
@@ -27,12 +26,17 @@ async_session = async_sessionmaker(
     autoflush=False, bind=async_engine, class_=AsyncSession
 )
 
-
 # ベースモデルを作成
 Base = declarative_base()
 
 
 # データベースのセッションを取得
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    データベースセッションを非同期ジェネレータとして取得する。
+
+    :return: データベースセッションの非同期ジェネレータ
+    :rtype: AsyncGenerator[AsyncSession, None]
+    """
     async with async_session() as session:
         yield session

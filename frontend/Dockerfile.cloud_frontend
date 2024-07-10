@@ -1,0 +1,26 @@
+# python3.11のイメージをダウンロード
+FROM python:3.11-bullseye
+
+# 環境変数の設定
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/frontend
+
+# 作業ディレクトリの設定
+WORKDIR /frontend
+
+# poetryのインストール
+RUN pip install --no-cache-dir poetry==1.8.3
+
+# 依存ファイルをコピーして依存関係をインストール
+COPY pyproject.toml poetry.lock ./
+
+# poetryの設定と依存関係のインストール
+RUN poetry config virtualenvs.in-project true && poetry install --no-root --no-dev
+
+# デプロイに必要なファイルをコピー
+COPY app ./app
+COPY .streamlit ./.streamlit
+COPY entrypoint.sh ./entrypoint.sh
+
+# エントリーポイントの設定
+ENTRYPOINT ["bash", "entrypoint.sh"]

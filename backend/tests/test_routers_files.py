@@ -1,3 +1,4 @@
+from distutils import filelist
 from typing import AsyncGenerator
 
 import pytest
@@ -100,9 +101,9 @@ async def test_get_file_by_id(session: AsyncSession) -> None:
         assert data["file_name"] == "test_file.pdf"
 
 
-# ファイル削除のテスト
+# ファイル名のリストとユーザーIDによるファイルの削除のテスト
 @pytest.mark.asyncio
-async def test_delete_file(session: AsyncSession) -> None:
+async def test_delete_files(session: AsyncSession) -> None:
     user_id = await get_user_id(session)
 
     async with AsyncClient(
@@ -111,15 +112,23 @@ async def test_delete_file(session: AsyncSession) -> None:
     ) as client:
         file_content = b"test file content"
         files = [
-            ("files", ("test_file.pdf", file_content, "application/pdf")),
+            ("files", ("test_file1.pdf", file_content, "application/pdf")),
+            ("files", ("test_file2.pdf", file_content, "application/pdf")),
         ]
         await client.post(f"/files/upload?user_id={user_id}", files=files)
 
-        response = await client.delete("/files/1")
+        delete_files = ["test_file1.pdf", "test_file2.pdf"]
+        response = await client.request(
+            method="DELETE",
+            url=f"/files/delete_files?user_id={user_id}",
+            json=delete_files,
+        )
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()
-        assert data["detail"] == "ファイルが削除されました"
+        assert data["success"] is True
+        assert len(data["success_files"]) == 2
+        assert len(data["failed_files"]) == 0
 
 
 # 存在しないファイルIDによるファイル取得のテスト
@@ -130,20 +139,6 @@ async def test_get_file_by_id_not_found(session: AsyncSession) -> None:
         base_url="http://test",
     ) as client:
         response = await client.get("/files/9999")
-        print(response.text)  # デバッグ用出力
-        assert response.status_code == 404
-        data = response.json()
-        assert data["detail"] == "ファイルが見つかりません"
-
-
-# 存在しないファイルIDによるファイル削除のテスト
-@pytest.mark.asyncio
-async def test_delete_file_not_found(session: AsyncSession) -> None:
-    async with AsyncClient(
-        transport=ASGITransport(app),  # type: ignore
-        base_url="http://test",
-    ) as client:
-        response = await client.delete("/files/9999")
         print(response.text)  # デバッグ用出力
         assert response.status_code == 404
         data = response.json()

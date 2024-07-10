@@ -10,7 +10,16 @@ import app.schemas.files as files_schemas
 async def create_file(
     db: AsyncSession, file_create: files_schemas.FileCreate
 ) -> files_models.File:
-    # ファイルのインスタンスを作成
+    """
+    新しいファイルを作成する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_create: 作成するファイルの情報
+    :type file_create: files_schemas.FileCreate
+    :return: 作成されたファイルのインスタンス
+    :rtype: files_models.File
+    """
     file = files_models.File(**file_create.model_dump())
     db.add(file)  # ファイルをデータベースに追加
     await db.commit()  # 変更をコミット
@@ -20,7 +29,14 @@ async def create_file(
 
 # 全ファイルを取得する関数
 async def get_files(db: AsyncSession) -> list[files_schemas.File]:
-    # ファイル情報を選択
+    """
+    全ファイルを取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: ファイルのリスト
+    :rtype: list[files_schemas.File]
+    """
     result: Result = await db.execute(
         select(
             files_models.File.id,
@@ -46,15 +62,48 @@ async def get_files(db: AsyncSession) -> list[files_schemas.File]:
 
 # ファイルIDから特定のファイルを取得する関数
 async def get_file_by_id(db: AsyncSession, file_id: int) -> files_models.File | None:
-    # 指定されたファイルIDのファイル情報を選択
+    """
+    ファイルIDから特定のファイルを取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_id: 取得するファイルのID
+    :type file_id: int
+    :return: 取得されたファイルのインスタンス、存在しない場合はNone
+    :rtype: files_models.File | None
+    """
     result: Result = await db.execute(
         select(files_models.File).filter(files_models.File.id == file_id)
     )
     return result.scalars().first()  # 結果の最初のファイルを返す
 
 
-# ファイルIDから特定のファイルを削除する関数
-async def delete_file(db: AsyncSession, original_file: files_models.File) -> None:
-    await db.delete(original_file)  # ファイルを削除
-    await db.commit()  # 変更をコミット
-    return
+
+# ファイル名とユーザーIDから特定のファイルを削除する関数
+async def delete_file_by_name_and_userid(
+    db: AsyncSession, file_name: str, user_id: int
+) -> None:
+    """
+    指定されたファイル名とユーザーIDに基づいてファイルを削除します。
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_name: 削除するファイルの名前
+    :type file_name: str
+    :param user_id: ファイルを所有するユーザーのID
+    :type user_id: int
+    :return: None
+    :rtype: None
+    """
+    try:
+        result: Result = await db.execute(
+            select(files_models.File)
+            .filter(files_models.File.file_name == file_name)
+            .filter(files_models.File.user_id == user_id)
+        )
+        for file in result.scalars():
+            await db.delete(file)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e

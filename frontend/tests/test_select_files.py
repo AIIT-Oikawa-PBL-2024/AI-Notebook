@@ -11,8 +11,11 @@ from app.pages.select_files import (
 )
 import streamlit as st
 import pandas as pd
-import logging
+
+
 import httpx
+import logging
+
 from streamlit.testing.v1 import AppTest
 
 # ストリームリットのエラーメッセージをモック
@@ -30,6 +33,11 @@ BACKEND_DEV_API_URL = "http://localhost:8000/files/"
 # get_files_list 関数のテスト
 @pytest.mark.asyncio
 async def test_get_files_list_success(mocker: MagicMock) -> None:
+    """
+    get_files_list関数の成功ケースをテストします。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # モックされたレスポンスを設定
     mock_response = MagicMock()
     mock_response.json.return_value = [
@@ -75,6 +83,11 @@ async def test_get_files_list_success(mocker: MagicMock) -> None:
 # get_files_list 関数のテスト（HTTP Status Error）
 @pytest.mark.asyncio
 async def test_get_files_list_http_status_error(mocker: MagicMock) -> None:
+    """
+    get_files_list関数のHTTPステータスエラーケースをテストします。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # httpx.HTTPStatusError を発生させるモック
     request = httpx.Request("GET", BACKEND_DEV_API_URL)
     response = httpx.Response(status_code=500, request=request)
@@ -101,6 +114,11 @@ async def test_get_files_list_http_status_error(mocker: MagicMock) -> None:
 # get_files_list 関数のテスト（Request Error）
 @pytest.mark.asyncio
 async def test_get_files_list_request_error(mocker: MagicMock) -> None:
+    """
+    get_files_list関数のリクエストエラーケースをテストします。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # httpx.RequestError を発生させるモック
     mocker.patch(
         "httpx.AsyncClient.get",
@@ -119,6 +137,11 @@ async def test_get_files_list_request_error(mocker: MagicMock) -> None:
 # get_files_list 関数のテスト（その他の例外）
 @pytest.mark.asyncio
 async def test_get_files_list_general_exception(mocker: MagicMock) -> None:
+    """
+    get_files_list関数の一般的な例外ケースをテストします。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # その他の例外を発生させるモック
     mocker.patch("httpx.AsyncClient.get", side_effect=Exception("General error"))
 
@@ -134,6 +157,11 @@ async def test_get_files_list_general_exception(mocker: MagicMock) -> None:
 # show_files_list_df 関数のテスト
 @pytest.mark.asyncio
 async def test_show_files_list_df(mocker: MagicMock) -> None:
+    """
+    show_files_list_df関数のテストを行います。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # streamlit のセッション状態をモック
     mock_session_state = MagicMock()
     mock_session_state.df = None
@@ -171,6 +199,9 @@ async def test_show_files_list_df(mocker: MagicMock) -> None:
 
 # 時刻フォーマットを変換する関数のテスト
 def test_time_format() -> None:
+    """
+    時刻フォーマットを変換する関数のテストを行います。
+    """
     jst_str = "2023-06-21T00:00:00Z"
     jst_time = time_format(jst_str)
     assert jst_time == "2023-06-21 00:00:00"
@@ -178,6 +209,11 @@ def test_time_format() -> None:
 
 # update 関数のテスト
 def test_update(mocker: MagicMock) -> None:
+    """
+    update関数のテストを行います。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # 実際のデータフレームを使用
     df = pd.DataFrame(
         {
@@ -213,6 +249,11 @@ def test_update(mocker: MagicMock) -> None:
 
 # get_selected_files 関数のテスト
 def test_get_selected_files(mocker: MagicMock) -> None:
+    """
+    get_selected_files関数のテストを行います。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # 実際のデータフレームを使用
     df = pd.DataFrame(
         {
@@ -235,6 +276,11 @@ def test_get_selected_files(mocker: MagicMock) -> None:
 
 # get_selected_files 関数のテスト（データフレームが空の場合）
 def test_get_selected_files_empty_df(mocker: MagicMock) -> None:
+    """
+    get_selected_files関数のテストを行います（データフレームが空の場合）。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # モックされたセッション状態を辞書として設定
     mock_session_state = {"df": None}
 
@@ -249,6 +295,11 @@ def test_get_selected_files_empty_df(mocker: MagicMock) -> None:
 
 # update_note_name 関数のテスト
 def test_update_note_name(mocker: MagicMock) -> None:
+    """
+    update_note_name関数のテストを行います。
+
+    :param mocker: MagicMockオブジェクト
+    """
     # モックされたセッション状態を設定
     mock_session_state = {"note_input": "New Note Title"}
 
@@ -264,8 +315,21 @@ def test_update_note_name(mocker: MagicMock) -> None:
 # show_select_files_page 関数のテスト
 @pytest.mark.asyncio
 async def test_show_select_files_page() -> None:
+    """
+    :概要: show_select_files_page関数のテストを行います。
+
+    :詳細:
+        - 初期状態の確認
+        - "ファイル一覧を取得"ボタンのクリック
+        - セッション状態の更新
+        - テキスト入力フィールドの確認
+        - "AIノートを作成"ボタンの表示確認
+        - テキスト入力フィールドに値を入力
+        - ページ遷移の確認
+    """
     # テスト用のAppTestインスタンスを作成
-    at = AppTest.from_file("app/pages/select_files.py")
+    at = AppTest.from_file("app/main.py").run()
+    at.switch_page("pages/select_files.py").run()
 
     # アプリを実行
     at.run()
@@ -359,8 +423,20 @@ async def test_show_select_files_page() -> None:
 # リセットボタンのテスト
 @pytest.mark.asyncio
 async def test_reset_button() -> None:
+    """
+    :概要: リセットボタンのテストを行います。
+
+    :詳細:
+        - 初期状態の確認
+        - "ファイル一覧を取得"ボタンのクリック
+        - セッション状態の更新
+        - リセットボタンのクリック
+        - 入力がリセットされたことを確認
+    """
     # テスト用のAppTestインスタンスを作成
-    at = AppTest.from_file("app/pages/select_files.py")
+    at = AppTest.from_file("app/main.py").run()
+    at.switch_page("pages/select_files.py").run()
+    # at = AppTest.from_file("app/pages/select_files.py")
 
     # アプリを実行
     at.run()

@@ -13,12 +13,12 @@ from app.utils.output import (
 
 load_dotenv()
 
-BACKEND_HOST = os.getenv("BACKEND_DEV_HOST")
+BACKEND_HOST = os.getenv("BACKEND_HOST")
 
 
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
     filenames = ["test.pdf"]
     httpx_mock.add_response(
@@ -38,7 +38,7 @@ async def test_fetch_gemini_stream_data(httpx_mock: HTTPXMock) -> None:
 
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_success(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_response(
@@ -59,7 +59,7 @@ async def test_fetch_gemini_stream_data_success(httpx_mock: HTTPXMock) -> None:
 
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_http_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -88,7 +88,7 @@ async def test_fetch_gemini_stream_data_http_error(httpx_mock: HTTPXMock) -> Non
 async def test_fetch_gemini_stream_data_remote_protocol_error(
     httpx_mock: HTTPXMock,
 ) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -114,7 +114,7 @@ async def test_fetch_gemini_stream_data_remote_protocol_error(
 
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_request_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -140,7 +140,7 @@ async def test_fetch_gemini_stream_data_request_error(httpx_mock: HTTPXMock) -> 
 
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_timeout_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -166,7 +166,7 @@ async def test_fetch_gemini_stream_data_timeout_error(httpx_mock: HTTPXMock) -> 
 
 @pytest.mark.asyncio
 async def test_fetch_gemini_stream_data_exception_error(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_exception(
@@ -183,7 +183,7 @@ async def test_fetch_gemini_stream_data_exception_error(httpx_mock: HTTPXMock) -
 
 @pytest.mark.asyncio
 async def test_create_pdf_to_markdown_summary(httpx_mock: HTTPXMock) -> None:
-    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream/"
+    BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
     filenames = ["test.pdf"]
 
     httpx_mock.add_response(
