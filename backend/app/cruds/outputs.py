@@ -6,21 +6,35 @@ import app.models.outputs as outputs_models
 import app.schemas.outputs as outputs_schemas
 
 
-# 新しい学習帳を作成する関数
 async def create_output(
     db: AsyncSession, output_create: outputs_schemas.OutputCreate
 ) -> outputs_models.Output:
-    # 学習帳のインスタンスを作成
+    """
+    新しい学習帳を作成する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param output_create: 作成する学習帳の情報
+    :type output_create: outputs_schemas.OutputCreate
+    :return: 作成された学習帳の情報
+    :rtype: outputs_models.Output
+    """
     output = outputs_models.Output(**output_create.model_dump())
-    db.add(output)  # 学習帳をデータベースに追加
-    await db.commit()  # 変更をコミット
-    await db.refresh(output)  # 学習帳の情報をリフレッシュ
+    db.add(output)
+    await db.commit()
+    await db.refresh(output)
     return output
 
 
-# 全学習帳を取得する関数
 async def get_outputs(db: AsyncSession) -> list[outputs_schemas.Output]:
-    # 学習帳情報を選択
+    """
+    全学習帳を取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: 学習帳のリスト
+    :rtype: list[outputs_schemas.Output]
+    """
     result: Result = await db.execute(
         select(
             outputs_models.Output.id,
@@ -29,8 +43,7 @@ async def get_outputs(db: AsyncSession) -> list[outputs_schemas.Output]:
             outputs_models.Output.created_at,
         )
     )
-    outputs = result.all()  # 結果を取得
-    # 学習帳情報をスキーマに変換して返す
+    outputs = result.all()
     return [
         outputs_schemas.Output(
             id=output.id,
@@ -42,21 +55,38 @@ async def get_outputs(db: AsyncSession) -> list[outputs_schemas.Output]:
     ]
 
 
-# 学習帳IDから特定の学習帳を取得する関数
 async def get_output_by_id(
     db: AsyncSession, output_id: int
 ) -> outputs_models.Output | None:
-    # 指定された学習帳IDの学習帳情報を選択
+    """
+    学習帳IDから特定の学習帳を取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param output_id: 取得する学習帳のID
+    :type output_id: int
+    :return: 学習帳の情報またはNone
+    :rtype: outputs_models.Output | None
+    """
     result: Result = await db.execute(
         select(outputs_models.Output).filter(outputs_models.Output.id == output_id)
     )
-    return result.scalars().first()  # 結果の最初の学習帳を返す
+    return result.scalars().first()
 
 
-# 学習帳IDから特定の学習帳を削除する関数
 async def delete_output(
     db: AsyncSession, original_output: outputs_models.Output
 ) -> None:
-    await db.delete(original_output)  # 学習帳を削除
-    await db.commit()  # 変更をコミット
+    """
+    学習帳IDから特定の学習帳を削除する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param original_output: 削除する学習帳の情報
+    :type original_output: outputs_models.Output
+    :return: None
+    :rtype: None
+    """
+    await db.delete(original_output)
+    await db.commit()
     return
