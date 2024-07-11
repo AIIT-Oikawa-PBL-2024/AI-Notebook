@@ -7,7 +7,6 @@ import httpx
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
-from utils.output import create_pdf_to_markdown_summary
 
 load_dotenv()
 
@@ -25,9 +24,6 @@ def init_session_state() -> None:
         "current_note_id": None,
         "notes_df": None,
         "note_titles": [],
-        "selected_files": [],
-        "processing_summary": False,
-        "summary_result": "",
         "user_id": 1,
         "unsaved_changes": {},
         "last_saved_note": None,
@@ -220,18 +216,6 @@ async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
             exc_info=True
         )
 
-async def process_summary() -> None:
-    try:
-        result = await create_pdf_to_markdown_summary(
-            st.session_state.selected_files
-        )
-        st.session_state.summary_result = result
-        st.session_state.processing_summary = False
-    except Exception as e:
-        logger.error(f"問題が発生しました: {e}")
-        st.session_state.summary_result = f"エラーが発生しました: {e}"
-        st.session_state.processing_summary = False
-
 def update_unsaved_changes(title: str, content: str)->None:
     key = (
         str(st.session_state.current_note_id)
@@ -278,15 +262,6 @@ async def display_note_content() -> None:
             st.session_state.show_preview = True
         if edit_button:
             st.session_state.show_preview = False
-
-        if st.session_state.processing_summary:
-            with st.spinner("処理中です。お待ちください..."):
-                await process_summary()
-
-        if st.session_state.summary_result:
-            st.session_state.markdown_text = st.session_state.summary_result
-            st.session_state.summary_result = ""
-            update_unsaved_changes(note_title, st.session_state.markdown_text)
 
         if not st.session_state.show_preview:
             markdown_text: str = st.text_area(
