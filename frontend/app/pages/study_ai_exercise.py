@@ -48,7 +48,9 @@ def show_output_page() -> None:
 
         if selected_files:
             with st.spinner("処理中です。お待ちください..."):
-                study_ai_exercise = create_study_ai_exercise(selected_files)
+                study_ai_exercise = create_study_ai_exercise(
+                    selected_files, BACKEND_DEV_API_URL
+                )
             st.session_state.study_ai_exercise = study_ai_exercise
             st.success("処理が完了しました")
     else:
@@ -56,8 +58,13 @@ def show_output_page() -> None:
 
 
 # キャッシュを使用して、選択されたファイルからAI練習問題を生成する関数
+# Streamlitのキャッシュは関数のインプットとアウトアップをkeyとvalueとして保存するので
+# 全く同じインプットの関数があるとキャッシュが競合してしまうので、注意が必要
+# ここではエンドポイントのURLをインプットに追加することで競合を避けた
 @st.cache_resource(show_spinner=False)
-def create_study_ai_exercise(selected_files: list) -> str | None:
+def create_study_ai_exercise(
+    selected_files: list, BACKEND_DEV_API_URL: str
+) -> str | None:
     """
     選択されたファイルからAI練習問題を生成する関数。
 

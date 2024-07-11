@@ -25,7 +25,9 @@ def test_create_study_ai_exercise_success(
     mock_create_pdf_to_markdown_summary: MagicMock, mock_session_state: Generator
 ) -> None:
     mock_create_pdf_to_markdown_summary.return_value = "Mocked AI Exercise"
-    result = create_study_ai_exercise(st.session_state.selected_files)
+    result = create_study_ai_exercise(
+        st.session_state.selected_files, BACKEND_DEV_API_URL
+    )
     assert result == "Mocked AI Exercise"
     mock_create_pdf_to_markdown_summary.assert_called_once_with(
         st.session_state.selected_files, BACKEND_DEV_API_URL
@@ -44,7 +46,7 @@ def test_create_study_ai_exercise_exception(
 ) -> None:
     mock_create_pdf_to_markdown_summary.side_effect = Exception("Test Exception")
     result = create_study_ai_exercise(
-        st.session_state.selected_files,
+        st.session_state.selected_files, BACKEND_DEV_API_URL
     )
     assert result is None
     mock_logging.error.assert_called_once_with(
@@ -85,7 +87,7 @@ def test_show_output_page_success(
     mock_text.assert_called_once_with(st.session_state.selected_files)
     mock_spinner.assert_called_once_with("処理中です。お待ちください...")
     mock_create_study_ai_exercise.assert_called_once_with(
-        st.session_state.selected_files
+        st.session_state.selected_files, BACKEND_DEV_API_URL
     )
     mock_success.assert_called_once_with("処理が完了しました")
     mock_error.assert_not_called()
