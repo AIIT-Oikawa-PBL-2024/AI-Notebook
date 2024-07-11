@@ -312,11 +312,11 @@ def test_update_title_name(mocker: MagicMock) -> None:
         assert st.session_state.title_name == "New Note Title"
 
 
-# show_select_files_page 関数のテスト
+# show_select_files_page 関数のテスト（ノート）
 @pytest.mark.asyncio
-async def test_show_select_files_page() -> None:
+async def test_show_select_files_page_note() -> None:
     """
-    :概要: show_select_files_page関数のテストを行います。
+    :概要: show_select_files_page関数のテストを行います（ノート）。
 
     :詳細:
         - 初期状態の確認
@@ -324,7 +324,6 @@ async def test_show_select_files_page() -> None:
         - セッション状態の更新
         - テキスト入力フィールドの確認
         - "AIノートを作成"ボタンの表示確認
-        - "AI練習問題を作成"ボタンの表示確認
         - テキスト入力フィールドに値を入力
         - ページ遷移の確認
     """
@@ -342,7 +341,7 @@ async def test_show_select_files_page() -> None:
     print(f"Text inputs: {len(at.text_input)}")
     print(f"Session state: {at.session_state}")
 
-    assert at.header[0].value == "AIノートを作成"
+    assert at.header[0].value == "AIノート/練習問題を作成"
     assert "ファイル一覧を取得" in [button.label for button in at.button]
     assert "リセット" in [button.label for button in at.button]
 
@@ -386,13 +385,6 @@ async def test_show_select_files_page() -> None:
         "AIノートを作成" not in button_labels
     ), "AIノートを作成'ボタンが表示されていますが、テキストが入力されていません"
 
-    # "AI練習問題を作成"ボタンが表示されないことを確認（テキストが入力されていない場合）
-    button_labels = [button.label for button in at.button]
-    print(f"Button labels: {button_labels}")
-    assert (
-        "AI練習問題を作成" not in button_labels
-    ), "AI練習問題を作成'ボタンが表示されていますが、テキストが入力されていません"
-
     # テキスト入力フィールドに値を入力
     at.session_state["title_input"] = "タイトル"
     at.session_state["title_name"] = "タイトル"
@@ -417,13 +409,6 @@ async def test_show_select_files_page() -> None:
         "AIノートを作成" in button_labels
     ), "'AIノートを作成'ボタンが表示されていません"
 
-    # "AI練習問題を作成"ボタンが表示されることを確認（テキストが入力された場合）
-    button_labels = [button.label for button in at.button]
-    print(f"Button labels: {button_labels}")
-    assert (
-        "AI練習問題を作成" in button_labels
-    ), "'AI練習問題を作成'ボタンが表示されていません"
-
     # "AIノートを作成"ボタンをクリック
     create_note_button = next(
         button for button in at.button if button.label == "AIノートを作成"
@@ -434,7 +419,113 @@ async def test_show_select_files_page() -> None:
     # ページが遷移したことを確認
     assert at.session_state["page"] == "pages/study_ai_note.py"
 
-    # Todo : pages/study_ai_exercise.pyを作成したらAI練習問題を作成ボタンのテストを追加する
+
+# show_select_files_page 関数のテスト（練習問題）
+@pytest.mark.asyncio
+async def test_show_select_files_page_exercise() -> None:
+    """
+    :概要: show_select_files_page関数のテストを行います（練習問題）。
+
+    :詳細:
+        - 初期状態の確認
+        - "ファイル一覧を取得"ボタンのクリック
+        - セッション状態の更新
+        - テキスト入力フィールドの確認
+        - "AI練習問題を作成"ボタンの表示確認
+        - テキスト入力フィールドに値を入力
+        - ページ遷移の確認
+    """
+    # テスト用のAppTestインスタンスを作成
+    at = AppTest.from_file("app/main.py").run()
+    at.switch_page("pages/select_files.py").run()
+
+    # アプリを実行
+    at.run()
+
+    # 初期状態の確認
+    print("Initial state:")
+    print(f"Headers: {[header.value for header in at.header]}")
+    print(f"Buttons: {[button.label for button in at.button]}")
+    print(f"Text inputs: {len(at.text_input)}")
+    print(f"Session state: {at.session_state}")
+
+    assert at.header[0].value == "AIノート/練習問題を作成"
+    assert "ファイル一覧を取得" in [button.label for button in at.button]
+    assert "リセット" in [button.label for button in at.button]
+
+    # "ファイル一覧を取得"ボタンをクリック
+    file_list_button = next(
+        button for button in at.button if button.label == "ファイル一覧を取得"
+    )
+    file_list_button.click()
+    at.run()
+
+    # セッション状態を更新（ファイルが選択された状態をシミュレート）
+    at.session_state["df"] = pd.DataFrame(
+        {"file_name": ["file1.txt", "file2.txt"], "select": [True, True]}
+    )
+    at.session_state["df_updated"] = True
+
+    # アプリを再実行
+    at.run()
+
+    # 更新後の状態確認
+    print("\nUpdated state:")
+    print(f"Headers: {[header.value for header in at.header]}")
+    print(f"Buttons: {[button.label for button in at.button]}")
+    print(f"Text inputs: {len(at.text_input)}")
+    print(f"Session state: {at.session_state}")
+
+    # テキスト入力フィールドの存在を確認
+    assert len(at.text_input) > 0, "テキスト入力フィールドが見つかりません"
+
+    if len(at.text_input) > 0:
+        print(f"Text input label: {at.text_input[0].label}")
+        assert (
+            "AIで作成するノートや練習問題のタイトルを100文字以内で入力してEnterキーを押して下さい"
+            in at.text_input[0].label
+        )
+
+    # "AI練習問題を作成"ボタンが表示されないことを確認（テキストが入力されていない場合）
+    button_labels = [button.label for button in at.button]
+    print(f"Button labels: {button_labels}")
+    assert (
+        "AI練習問題を作成" not in button_labels
+    ), "AI練習問題を作成'ボタンが表示されていますが、テキストが入力されていません"
+
+    # テキスト入力フィールドに値を入力
+    at.session_state["title_input"] = "タイトル"
+    at.session_state["title_name"] = "タイトル"
+    at.run()
+
+    # 再度状態を確認
+    print("\nState after text input:")
+    print(f"Headers: {[header.value for header in at.header]}")
+    print(f"Buttons: {[button.label for button in at.button]}")
+    print(f"Text inputs: {len(at.text_input)}")
+    print(f"Session state: {at.session_state}")
+
+    # テキスト入力フィールドの値を確認
+    assert (
+        at.session_state["title_input"] == "タイトル"
+    ), f"Expected 'タイトル', but got {at.session_state['title_input']}"
+
+    # "AI練習問題を作成"ボタンが表示されることを確認（テキストが入力された場合）
+    button_labels = [button.label for button in at.button]
+    print(f"Button labels: {button_labels}")
+    assert (
+        "AI練習問題を作成" in button_labels
+    ), "'AI練習問題を作成'ボタンが表示されていません"
+
+    # "AI練習問題を作成"ボタンをクリック
+    create_exercise_button = next(
+        button for button in at.button if button.label == "AI練習問題を作成"
+    )
+    create_exercise_button.click()
+    at.run()
+
+    # ページが遷移したことを確認
+    assert at.session_state["page"] == "pages/study_ai_exercise.py"
 
 
 # リセットボタンのテスト

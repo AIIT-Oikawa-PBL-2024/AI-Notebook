@@ -156,7 +156,7 @@ async def show_select_files_page() -> None:
     """
     # st.set_page_config(layout="wide")
     st.session_state.page = "pages/select_files.py"
-    st.header("AIノートを作成", divider="blue")
+    st.header("AIノート/練習問題を作成", divider="blue")
 
     # ボタンの配置
     col1, col2, _, _ = st.columns([1.5, 1, 1, 1])
