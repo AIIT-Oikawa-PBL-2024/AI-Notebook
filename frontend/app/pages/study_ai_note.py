@@ -73,7 +73,9 @@ def create_study_ai_note(selected_files: list) -> str | None:
     from app.utils.output import create_pdf_to_markdown_summary
 
     try:
-        study_ai_note = asyncio.run(create_pdf_to_markdown_summary(selected_files))
+        study_ai_note = asyncio.run(
+            create_pdf_to_markdown_summary(selected_files, BACKEND_DEV_API_URL)
+        )
         return study_ai_note
     except Exception as e:
         logging.error(f"AIノートの生成中にエラーが発生しました: {e}")

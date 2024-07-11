@@ -1,3 +1,4 @@
+import os
 import pytest
 from unittest.mock import patch, MagicMock
 import streamlit as st
@@ -14,6 +15,11 @@ def mock_session_state() -> Generator:
     st.session_state.clear()
 
 
+# バックエンドAPIのURL
+BACKEND_HOST = os.getenv("BACKEND_HOST")
+BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
+
+
 # AIノートの生成が成功する場合のテスト
 @patch("app.utils.output.create_pdf_to_markdown_summary")
 def test_create_study_ai_note_success(
@@ -23,7 +29,7 @@ def test_create_study_ai_note_success(
     result = create_study_ai_note(st.session_state.selected_files)
     assert result == "Mocked AI Note"
     mock_create_pdf_to_markdown_summary.assert_called_once_with(
-        st.session_state.selected_files
+        st.session_state.selected_files, BACKEND_DEV_API_URL
     )
 
 

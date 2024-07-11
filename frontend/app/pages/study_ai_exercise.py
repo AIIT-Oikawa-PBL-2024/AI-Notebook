@@ -71,7 +71,9 @@ def create_study_ai_exercise(selected_files: list) -> str | None:
     from app.utils.output import create_pdf_to_markdown_summary
 
     try:
-        study_ai_exercise = asyncio.run(create_pdf_to_markdown_summary(selected_files))
+        study_ai_exercise = asyncio.run(
+            create_pdf_to_markdown_summary(selected_files, BACKEND_DEV_API_URL)
+        )
         return study_ai_exercise
     except Exception as e:
         logging.error(f"AI練習問題の生成中にエラーが発生しました: {e}")

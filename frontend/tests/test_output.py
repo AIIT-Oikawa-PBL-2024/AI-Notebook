@@ -51,7 +51,7 @@ async def test_fetch_gemini_stream_data_success(httpx_mock: HTTPXMock) -> None:
     )
 
     data = []
-    async for chunk in fetch_gemini_stream_data(filenames):
+    async for chunk in fetch_gemini_stream_data(filenames, BACKEND_DEV_API_URL):
         data.append(chunk)
 
     assert data == ["chunk1", "chunk2"]
@@ -199,7 +199,7 @@ async def test_create_pdf_to_markdown_summary(httpx_mock: HTTPXMock) -> None:
         empty_mock.return_value = output = MagicMock()
         output.markdown = MagicMock()
 
-        await create_pdf_to_markdown_summary(filenames)
+        await create_pdf_to_markdown_summary(filenames, BACKEND_DEV_API_URL)
 
         empty_mock.assert_called_once()
         output.markdown.assert_called_once_with("chunk1")

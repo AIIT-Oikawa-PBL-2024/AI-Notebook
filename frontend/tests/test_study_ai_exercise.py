@@ -1,8 +1,13 @@
+import os
 import pytest
 from unittest.mock import patch, MagicMock
 import streamlit as st
 from app.pages.study_ai_exercise import create_study_ai_exercise, show_output_page
 from typing import Generator
+
+# バックエンドAPIのURL
+BACKEND_HOST = os.getenv("BACKEND_HOST")
+BACKEND_DEV_API_URL = f"{BACKEND_HOST}/exercises/request_stream"
 
 
 # テスト用のフィクスチャ
@@ -23,7 +28,7 @@ def test_create_study_ai_exercise_success(
     result = create_study_ai_exercise(st.session_state.selected_files)
     assert result == "Mocked AI Exercise"
     mock_create_pdf_to_markdown_summary.assert_called_once_with(
-        st.session_state.selected_files
+        st.session_state.selected_files, BACKEND_DEV_API_URL
     )
 
 
@@ -38,7 +43,9 @@ def test_create_study_ai_exercise_exception(
     mock_session_state: Generator,
 ) -> None:
     mock_create_pdf_to_markdown_summary.side_effect = Exception("Test Exception")
-    result = create_study_ai_exercise(st.session_state.selected_files)
+    result = create_study_ai_exercise(
+        st.session_state.selected_files,
+    )
     assert result is None
     mock_logging.error.assert_called_once_with(
         "AI練習問題の生成中にエラーが発生しました: Test Exception"

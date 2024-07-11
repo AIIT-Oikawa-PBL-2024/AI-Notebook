@@ -12,10 +12,11 @@ load_dotenv(find_dotenv())
 logging.basicConfig(level=logging.INFO)
 
 BACKEND_HOST = os.getenv("BACKEND_HOST")
-BACKEND_DEV_API_URL = f"{BACKEND_HOST}/outputs/request_stream"
 
 
-async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, None]:
+async def fetch_gemini_stream_data(
+    filenames: List[str], BACKEND_DEV_API_URL: str
+) -> AsyncGenerator[str, None]:
     CLIENT_TIMEOUT_SEC = 100.0
     headers = {"accept": "text/event-stream"}
     try:
@@ -42,11 +43,13 @@ async def fetch_gemini_stream_data(filenames: List[str]) -> AsyncGenerator[str, 
         st.error(f"問題が発生しました: {e}")
 
 
-async def create_pdf_to_markdown_summary(filenames: List[str]) -> None:
+async def create_pdf_to_markdown_summary(
+    filenames: List[str], BACKEND_DEV_API_URL: str
+) -> None:
     output = st.empty()
 
     stream_content = ""
-    async for line in fetch_gemini_stream_data(filenames):
+    async for line in fetch_gemini_stream_data(filenames, BACKEND_DEV_API_URL):
         stream_content += line
         output.markdown(stream_content)
     # await fetch_gemini_stream_data(filenames)
@@ -59,4 +62,8 @@ if __name__ == "__main__":
     temp_uploaded_filenames = ["5_アジャイルⅡ.pdf"]
 
     if st.button("要約する"):
-        asyncio.run(create_pdf_to_markdown_summary(temp_uploaded_filenames))
+        asyncio.run(
+            create_pdf_to_markdown_summary(
+                temp_uploaded_filenames, f"{BACKEND_HOST}/exercises/request_stream"
+            )
+        )
