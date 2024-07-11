@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import files, notes, outputs_stream, users
+from app.routers import exercises_stream, files, notes, outputs_stream, users
 
 # FastAPIのインスタンスを作成
 app = FastAPI()
@@ -11,6 +11,8 @@ app.include_router(users.router)
 app.include_router(files.router)
 app.include_router(outputs_stream.router)
 app.include_router(notes.router)
+app.include_router(exercises_stream.router)
+
 
 # CORSの設定
 app.add_middleware(
