@@ -6,7 +6,7 @@ from app.pages.select_files import (
     time_format,
     update,
     get_selected_files,
-    update_note_name,
+    update_title_name,
     show_select_files_page,
 )
 import streamlit as st
@@ -293,23 +293,23 @@ def test_get_selected_files_empty_df(mocker: MagicMock) -> None:
         assert selected_files == []
 
 
-# update_note_name 関数のテスト
-def test_update_note_name(mocker: MagicMock) -> None:
+# update_title_name 関数のテスト
+def test_update_title_name(mocker: MagicMock) -> None:
     """
-    update_note_name関数のテストを行います。
+    update_title_name関数のテストを行います。
 
     :param mocker: MagicMockオブジェクト
     """
     # モックされたセッション状態を設定
-    mock_session_state = {"note_input": "New Note Title"}
+    mock_session_state = {"title_input": "New Note Title"}
 
     # session_state を辞書としてモック
     with patch.dict("streamlit.session_state", mock_session_state):
         # 関数を呼び出して結果を検証
-        update_note_name()
+        update_title_name()
 
-        # note_nameが正しく更新されているかを検証
-        assert st.session_state.note_name == "New Note Title"
+        # title_nameが正しく更新されているかを検証
+        assert st.session_state.title_name == "New Note Title"
 
 
 # show_select_files_page 関数のテスト
@@ -324,6 +324,7 @@ async def test_show_select_files_page() -> None:
         - セッション状態の更新
         - テキスト入力フィールドの確認
         - "AIノートを作成"ボタンの表示確認
+        - "AI練習問題を作成"ボタンの表示確認
         - テキスト入力フィールドに値を入力
         - ページ遷移の確認
     """
@@ -374,7 +375,7 @@ async def test_show_select_files_page() -> None:
     if len(at.text_input) > 0:
         print(f"Text input label: {at.text_input[0].label}")
         assert (
-            "AIで作成するノートのタイトルを100文字以内で入力してEnterキーを押して下さい"
+            "AIで作成するノートや練習問題のタイトルを100文字以内で入力してEnterキーを押して下さい"
             in at.text_input[0].label
         )
 
@@ -385,9 +386,16 @@ async def test_show_select_files_page() -> None:
         "AIノートを作成" not in button_labels
     ), "AIノートを作成'ボタンが表示されていますが、テキストが入力されていません"
 
+    # "AI練習問題を作成"ボタンが表示されないことを確認（テキストが入力されていない場合）
+    button_labels = [button.label for button in at.button]
+    print(f"Button labels: {button_labels}")
+    assert (
+        "AI練習問題を作成" not in button_labels
+    ), "AI練習問題を作成'ボタンが表示されていますが、テキストが入力されていません"
+
     # テキスト入力フィールドに値を入力
-    at.session_state["note_input"] = "ノートのタイトル"
-    at.session_state["note_name"] = "ノートのタイトル"
+    at.session_state["title_input"] = "タイトル"
+    at.session_state["title_name"] = "タイトル"
     at.run()
 
     # 再度状態を確認
@@ -399,8 +407,8 @@ async def test_show_select_files_page() -> None:
 
     # テキスト入力フィールドの値を確認
     assert (
-        at.session_state["note_input"] == "ノートのタイトル"
-    ), f"Expected 'ノートのタイトル', but got {at.session_state['note_input']}"
+        at.session_state["title_input"] == "タイトル"
+    ), f"Expected 'タイトル', but got {at.session_state['title_input']}"
 
     # "AIノートを作成"ボタンが表示されることを確認（テキストが入力された場合）
     button_labels = [button.label for button in at.button]
@@ -408,6 +416,13 @@ async def test_show_select_files_page() -> None:
     assert (
         "AIノートを作成" in button_labels
     ), "'AIノートを作成'ボタンが表示されていません"
+
+    # "AI練習問題を作成"ボタンが表示されることを確認（テキストが入力された場合）
+    button_labels = [button.label for button in at.button]
+    print(f"Button labels: {button_labels}")
+    assert (
+        "AI練習問題を作成" in button_labels
+    ), "'AI練習問題を作成'ボタンが表示されていません"
 
     # "AIノートを作成"ボタンをクリック
     create_note_button = next(
@@ -418,6 +433,8 @@ async def test_show_select_files_page() -> None:
 
     # ページが遷移したことを確認
     assert at.session_state["page"] == "pages/study_ai_note.py"
+
+    # Todo : pages/study_ai_exercise.pyを作成したらAI練習問題を作成ボタンのテストを追加する
 
 
 # リセットボタンのテスト
@@ -463,5 +480,5 @@ async def test_reset_button() -> None:
     at.run()
 
     # 入力がリセットされたことを確認
-    assert at.session_state["note_name"] == ""
+    assert at.session_state["title_name"] == ""
     assert at.session_state["selected_files"] == []
