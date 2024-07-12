@@ -14,15 +14,6 @@ load_dotenv()
 
 # ファイルを読み込む関数
 async def post_files(files: list[UploadFile]) -> dict:
-    """
-    アップロードされたファイルを処理し、Google Cloud Storageにアップロードするエンドポイント
-
-    :param files: アップロードされたファイルのリスト
-    :type files: list[UploadFile]
-    :return: アップロード結果を含む辞書
-    :rtype: dict
-    :raises HTTPException: ファイルの拡張子が無効な場合や、アップロードに失敗した場合
-    """
     allowed_extensions = [".png", ".pdf", ".jpeg", ".jpg"]
     ext_correct_files, ext_error_files = [], []
 
@@ -53,14 +44,6 @@ async def post_files(files: list[UploadFile]) -> dict:
 
 
 async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
-    """
-    ファイルをGoogle Cloud Storageにアップロードする
-
-    :param ext_correct_files: アップロードする正しい拡張子を持つファイルのリスト
-    :type ext_correct_files: list[UploadFile]
-    :return: アップロード結果を含む辞書
-    :rtype: dict
-    """
     success_files, failed_files = [], []  # アップロードに失敗したファイル
 
     # 環境変数から認証情報を取得
