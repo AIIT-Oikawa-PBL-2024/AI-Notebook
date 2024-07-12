@@ -107,7 +107,7 @@ async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
 
 async def delete_files_from_gcs(files: list[str]) -> dict:
     """
-    Google Cloud Storageからファイルを削除する
+    Google Cloud Storageからファイルを削除します。
 
     :param files: 削除するファイルのリスト
     :type files: list[str]
