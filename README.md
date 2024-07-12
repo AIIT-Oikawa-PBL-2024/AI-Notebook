@@ -142,6 +142,7 @@ AI-Notebook
   - 開発用 DB
     - `$ cd app/db/alembic_dev`
     - `$ alembic upgrade head`
+    - alimbicコマンドがうまく実行されない場合は'poetry run alembic upgrade head'を実行
     - [エラーが出る場合はドキュメント確認](https://alembic.sqlalchemy.org/en/latest/tutorial.html#running-our-first-migration)
   - テスト用 DB
 
