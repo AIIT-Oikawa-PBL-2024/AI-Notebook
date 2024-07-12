@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import re
+import sys
 
 import httpx
 import pandas as pd
@@ -9,12 +10,20 @@ import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
+# プロジェクトルートのパスを取得
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+# プロジェクトルートをPythonパスに追加
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+st.set_page_config(layout="wide")
 
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_API_URL = f"{BACKEND_HOST}/notes/"
+
 
 def init_session_state() -> None:
     default_values = {
@@ -34,7 +43,9 @@ def init_session_state() -> None:
         if key not in st.session_state:
             st.session_state[key] = value
 
+
 init_session_state()
+
 
 def preprocess_markdown(text: str) -> str:
     lines = text.split("\n")
@@ -55,6 +66,7 @@ def preprocess_markdown(text: str) -> str:
 
     return text
 
+
 def validate_title(title: str) -> tuple[bool, str]:
     if not title.strip():
         return False, "タイトルは必須です。"
@@ -63,6 +75,7 @@ def validate_title(title: str) -> tuple[bool, str]:
     if title.isspace():
         return False, "タイトルにスペースのみの入力は無効です。"
     return True, ""
+
 
 async def get_notes() -> None:
     try:
@@ -80,7 +93,7 @@ async def get_notes() -> None:
                     "content": note["content"],
                     "user_id": note.get("user_id", "Unknown"),
                     "created_at": note.get("created_at"),
-                    "updated_at": note.get("updated_at")
+                    "updated_at": note.get("updated_at"),
                 }
                 for field in ["created_at", "updated_at"]:
                     if processed_note[field]:
@@ -107,28 +120,24 @@ async def get_notes() -> None:
         st.error(f"予期せぬエラーが発生しました: {e}")
         logger.error(f"Error in get_notes: {e}", exc_info=True)
 
+
 def create_new_note() -> None:
     st.session_state.current_note_id = None
     if "新規ノート" in st.session_state.unsaved_changes:
-        st.session_state.note_title = (
-            st.session_state.unsaved_changes["新規ノート"]["title"]
-        )
-        st.session_state.markdown_text = (
-            st.session_state.unsaved_changes["新規ノート"]["content"]
-        )
+        st.session_state.note_title = st.session_state.unsaved_changes["新規ノート"][
+            "title"
+        ]
+        st.session_state.markdown_text = st.session_state.unsaved_changes["新規ノート"][
+            "content"
+        ]
     else:
         st.session_state.note_title = ""
         st.session_state.markdown_text = ""
     st.session_state.show_preview = False
 
-async def save_note(
-    client: httpx.AsyncClient, title: str, content: str
-) -> None:
-    payload = {
-        "title": title,
-        "content": content,
-        "user_id": st.session_state.user_id
-    }
+
+async def save_note(client: httpx.AsyncClient, title: str, content: str) -> None:
+    payload = {"title": title, "content": content, "user_id": st.session_state.user_id}
     try:
         existing_note = st.session_state.notes_df[
             st.session_state.notes_df["title"] == title
@@ -157,7 +166,7 @@ async def save_note(
 
         st.session_state.last_saved_note = {
             "id": st.session_state.current_note_id,
-            "title": title
+            "title": title,
         }
 
         st.success("ノートを保存しました。")
@@ -173,6 +182,7 @@ async def save_note(
     except Exception as e:
         st.error(f"予期せぬエラーが発生しました: {e}")
 
+
 async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
     title = "新規ノート"
     content = ""
@@ -180,7 +190,7 @@ async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
         payload = {
             "title": title,
             "content": content,
-            "user_id": st.session_state.user_id
+            "user_id": st.session_state.user_id,
         }
         response = await client.post(BACKEND_API_URL, json=payload)
         response.raise_for_status()
@@ -194,7 +204,7 @@ async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
 
         st.session_state.last_saved_note = {
             "id": st.session_state.current_note_id,
-            "title": st.session_state.note_title
+            "title": st.session_state.note_title,
         }
 
         await get_notes()
@@ -203,29 +213,23 @@ async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
 
     except httpx.HTTPStatusError as e:
         error_detail = e.response.text
-        st.sidebar.error(
-            f"新しいノートの作成に失敗しました: {e}\n詳細: {error_detail}"
-        )
-        logger.error(
-            f"Failed to create new note: {e}\nDetail: {error_detail}"
-        )
+        st.sidebar.error(f"新しいノートの作成に失敗しました: {e}\n詳細: {error_detail}")
+        logger.error(f"Failed to create new note: {e}\nDetail: {error_detail}")
     except Exception as e:
         st.sidebar.error(f"予期せぬエラーが発生しました: {e}")
         logger.error(
-            f"Unexpected error in create_and_post_new_note: {e}",
-            exc_info=True
+            f"Unexpected error in create_and_post_new_note: {e}", exc_info=True
         )
 
-def update_unsaved_changes(title: str, content: str)->None:
+
+def update_unsaved_changes(title: str, content: str) -> None:
     key = (
         str(st.session_state.current_note_id)
         if st.session_state.current_note_id
         else "新規ノート"
     )
-    st.session_state.unsaved_changes[key] = {
-        "title": title,
-        "content": content
-    }
+    st.session_state.unsaved_changes[key] = {"title": title, "content": content}
+
 
 async def display_note_content() -> None:
     if st.session_state.notes_df is None:
@@ -235,7 +239,7 @@ async def display_note_content() -> None:
         note_title: str = st.text_input(
             "ノートのタイトル",
             value=st.session_state.note_title,
-            key="note_title_input"
+            key="note_title_input",
         )
 
         if note_title != st.session_state.note_title:
@@ -277,29 +281,25 @@ async def display_note_content() -> None:
 
             st.write(f"本文文字数: {len(markdown_text)}/15000")
         else:
-            processed_text: str = preprocess_markdown(
-                st.session_state.markdown_text
-            )
+            processed_text: str = preprocess_markdown(st.session_state.markdown_text)
             st.markdown(processed_text)
 
         if save_button:
             if is_valid:
-                await save_note(
-                    client, note_title, st.session_state.markdown_text
-                )
+                await save_note(client, note_title, st.session_state.markdown_text)
             else:
                 st.error("タイトルが無効です。保存できません。")
 
+
 async def main() -> None:
     try:
-        st.set_page_config(layout="wide")
         st.title("AIサポート学習帳")
 
-        if 'notes_df' not in st.session_state or st.session_state.notes_df is None:
+        if "notes_df" not in st.session_state or st.session_state.notes_df is None:
             await get_notes()
 
         with st.sidebar:
-            if 'note_titles' in st.session_state and st.session_state.note_titles:
+            if "note_titles" in st.session_state and st.session_state.note_titles:
                 options = st.session_state.note_titles.copy()
                 if st.session_state.get("show_new_note", False):
                     options = ["新規ノート"] + options
@@ -309,11 +309,12 @@ async def main() -> None:
                     options,
                     key="note_selector",
                     index=(
-                        0 if st.session_state.get("show_new_note", False)
+                        0
+                        if st.session_state.get("show_new_note", False)
                         else options.index(st.session_state.selected_note)
                         if st.session_state.selected_note in options
                         else 0
-                    )
+                    ),
                 )
 
                 if selected_note != st.session_state.selected_note:
@@ -331,12 +332,10 @@ async def main() -> None:
                             st.session_state.note_title = unsaved["title"]
                             st.session_state.markdown_text = unsaved["content"]
                         else:
-                            st.session_state.note_title = (
-                                selected_note_data["title"]
-                            )
-                            st.session_state.markdown_text = (
-                                selected_note_data["content"]
-                            )
+                            st.session_state.note_title = selected_note_data["title"]
+                            st.session_state.markdown_text = selected_note_data[
+                                "content"
+                            ]
                     else:
                         create_new_note()
                     st.rerun()
@@ -351,9 +350,7 @@ async def main() -> None:
         await display_note_content()
 
         if st.session_state.last_saved_note:
-            st.session_state.selected_note = (
-                st.session_state.last_saved_note["title"]
-            )
+            st.session_state.selected_note = st.session_state.last_saved_note["title"]
             st.session_state.last_saved_note = None
             st.session_state.show_new_note = False
             st.rerun()
@@ -362,8 +359,13 @@ async def main() -> None:
         st.error(f"アプリケーションエラー: {e}")
         logger.error(f"Unhandled error in main: {e}", exc_info=True)
 
+
 def run() -> None:
     asyncio.run(main())
 
+
 if __name__ == "__main__":
+    from utils.sidebar import show_sidebar
+
+    show_sidebar()
     run()
