@@ -26,6 +26,11 @@ BACKEND_API_URL = f"{BACKEND_HOST}/notes/"
 
 
 def init_session_state() -> None:
+    """
+    セッション状態を初期化する。
+
+    デフォルト値が設定されていない場合、各キーにデフォルト値を設定する。
+    """
     default_values = {
         "note_title": "",
         "markdown_text": "",
@@ -48,6 +53,14 @@ init_session_state()
 
 
 def preprocess_markdown(text: str) -> str:
+    """
+    マークダウンテキストを前処理する。
+
+    :param text: 前処理するマークダウンテキスト
+    :type text: str
+    :return: 前処理されたマークダウンテキスト
+    :rtype: str
+    """
     lines = text.split("\n")
     lines = [line.rstrip() + "  " for line in lines]
     text = "\n".join(lines)
@@ -68,6 +81,14 @@ def preprocess_markdown(text: str) -> str:
 
 
 def validate_title(title: str) -> tuple[bool, str]:
+    """
+    ノートのタイトルを検証する。
+
+    :param title: 検証するタイトル
+    :type title: str
+    :return: 検証結果（有効かどうか）とエラーメッセージ（ある場合）
+    :rtype: tuple[bool, str]
+    """
     if not title.strip():
         return False, "タイトルは必須です。"
     if len(title) > 200:
@@ -78,6 +99,12 @@ def validate_title(title: str) -> tuple[bool, str]:
 
 
 async def get_notes() -> None:
+    """
+    バックエンドからノート情報を取得し、セッション状態を更新する。
+
+    非同期関数。HTTPリクエストを行い、取得したデータを処理してDataFrameに変換する。
+    エラーが発生した場合はエラーメッセージを表示する。
+    """
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(BACKEND_API_URL)
@@ -122,6 +149,11 @@ async def get_notes() -> None:
 
 
 def create_new_note() -> None:
+    """
+    新しいノートを作成するための初期化を行う。
+
+    現在のノートIDをリセットし、タイトルと本文をクリアする。
+    """
     st.session_state.current_note_id = None
     if "新規ノート" in st.session_state.unsaved_changes:
         st.session_state.note_title = st.session_state.unsaved_changes["新規ノート"][
@@ -137,6 +169,16 @@ def create_new_note() -> None:
 
 
 async def save_note(client: httpx.AsyncClient, title: str, content: str) -> None:
+    """
+    ノートを保存する。
+
+    :param client: 非同期HTTPクライアント
+    :type client: httpx.AsyncClient
+    :param title: ノートのタイトル
+    :type title: str
+    :param content: ノートの本文
+    :type content: str
+    """
     payload = {"title": title, "content": content, "user_id": st.session_state.user_id}
     try:
         existing_note = st.session_state.notes_df[
@@ -184,6 +226,12 @@ async def save_note(client: httpx.AsyncClient, title: str, content: str) -> None
 
 
 async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
+    """
+    新しいノートを作成して保存する。
+
+    :param client: 非同期HTTPクライアント
+    :type client: httpx.AsyncClient
+    """
     title = "新規ノート"
     content = ""
     try:
@@ -223,6 +271,14 @@ async def create_and_post_new_note(client: httpx.AsyncClient) -> None:
 
 
 def update_unsaved_changes(title: str, content: str) -> None:
+    """
+    未保存の変更を更新する。
+
+    :param title: ノートのタイトル
+    :type title: str
+    :param content: ノートの本文
+    :type content: str
+    """
     key = (
         str(st.session_state.current_note_id)
         if st.session_state.current_note_id
@@ -232,6 +288,11 @@ def update_unsaved_changes(title: str, content: str) -> None:
 
 
 async def display_note_content() -> None:
+    """
+    ノートの内容を表示する。
+
+    非同期関数。現在のノートのタイトルと本文を表示し、編集や保存を行うことができる。
+    """
     if st.session_state.notes_df is None:
         await get_notes()
 
@@ -292,6 +353,11 @@ async def display_note_content() -> None:
 
 
 async def main() -> None:
+    """
+    メイン関数。
+
+    非同期関数。ノートの選択、表示、編集、保存を行うインターフェースを提供する。
+    """
     try:
         st.title("AIサポート学習帳")
 
@@ -361,6 +427,9 @@ async def main() -> None:
 
 
 def run() -> None:
+    """
+    非同期メイン関数を実行する。
+    """
     asyncio.run(main())
 
 
