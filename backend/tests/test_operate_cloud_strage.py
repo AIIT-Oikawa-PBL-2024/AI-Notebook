@@ -22,6 +22,13 @@ client = TestClient(app)
 
 @pytest.mark.asyncio
 async def test_post_files_with_valid_extension() -> None:
+    """
+    有効な拡張子を持つファイルのアップロードをテストする関数
+
+    :param None: この関数にはパラメータがありません。
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     # アップロードするダミーファイル名
     file_paths = [
         "5_アジャイルⅡ.pdf",
@@ -43,6 +50,13 @@ async def test_post_files_with_valid_extension() -> None:
 
 @pytest.mark.asyncio
 async def test_upload_files_with_invalid_extension() -> None:
+    """
+    無効な拡張子を持つファイルのアップロード時のエラー処理をテストする関数
+
+    :param None: この関数にはパラメータがありません。
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     # 無効な拡張子のファイル名
     invalid_file_names = ["test001.txt", "test002.txt"]
 
@@ -65,6 +79,13 @@ async def test_upload_files_with_invalid_extension() -> None:
 
 @pytest.mark.asyncio
 async def test_upload_files() -> None:
+    """
+    ファイルのアップロード機能をテストする関数
+
+    :param None: この関数にはパラメータがありません。
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     # アップロードするダミーファイル名
     file_paths = [
         "5_アジャイルⅡ.pdf",
@@ -86,6 +107,13 @@ async def test_upload_files() -> None:
 
 @pytest.mark.asyncio
 async def test_upload_files_with_failure() -> None:
+    """
+    ファイルアップロード失敗時のエラー処理をテストする関数
+
+    :param None: この関数にはパラメータがありません。
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     # アップロードするダミーファイル名
     file_paths = [
         "5_アジャイルⅡ.pdf",
@@ -117,6 +145,13 @@ async def test_upload_files_with_failure() -> None:
 # NFD形式の日本語ファイル名のブロブ名がNFC形式に正規化されていることを確認するテスト
 @pytest.mark.asyncio
 async def test_upload_files_nfc_normalization() -> None:
+    """
+    日本語ファイル名のNFC正規化をテストする関数
+
+    :param None: この関数にはパラメータがありません。
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     # NFD形式（濁点が分離された形式）の日本語ファイル名
     nfd_filename = (
         "テスト" + "\u3099" + "ファイル.pdf"
@@ -160,6 +195,13 @@ async def test_upload_files_nfc_normalization() -> None:
 
 @pytest.mark.asyncio
 async def test_delete_files_from_gcs() -> None:
+    """
+    Google Cloud Storageからのファイル削除機能をテストする関数
+
+    :param None: この関数にはパラメータがありません。
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     # アップロードするダミーファイル名
     file_paths = [
         "5_アジャイルⅡ.pdf",
