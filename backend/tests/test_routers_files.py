@@ -37,6 +37,14 @@ async def get_user_id(session: AsyncSession) -> int:
 # ファイルアップロードのテスト
 @pytest.mark.asyncio
 async def test_upload_files(session: AsyncSession) -> None:
+    """
+    ファイルアップロードのエンドポイントをテストする関数
+
+    :param session: テスト用のデータベースセッション
+    :type session: AsyncSession
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
     user_id = await get_user_id(session)
 
     file_content = b"test file content"

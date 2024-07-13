@@ -35,6 +35,14 @@ async def request_content(
     files: list[str],
     db: AsyncSession = db_dependency,
 ) -> StreamingResponse:
+    """
+    複数のファイル名のリストを入力して、ストリーミングレスポンスを生成する
+
+    :param files: ファイル名のリスト
+    :param db: AsyncSession - データベースセッション
+    :return: StreamingResponse - ストリーミングレスポンス
+    """
+
     # ロギング
     logging.info(f"Requesting content generation for files: {files}")
 
@@ -74,6 +82,12 @@ async def request_content(
 
     # コンテンツをストリーミングする非同期関数
     async def content_streamer() -> AsyncGenerator[str, None]:
+        """
+        コンテンツをストリーミングする非同期ジェネレータ関数
+
+        :return: AsyncGenerator[str, None]
+        """
+
         # コンテンツを蓄積するリスト
         accumulated_content = []
         try:
