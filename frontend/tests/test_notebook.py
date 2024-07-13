@@ -21,15 +21,43 @@ from app.pages.notebook import (
 
 
 class MockSessionState(dict):
+    """
+    セッション状態をモックするためのクラス。
+
+    :inherits: dict
+    """
+
     def __getattr__(self, key: str) -> Any:
+        """
+        キーに対応する値を取得する。
+
+        :param key: 取得したい値のキー
+        :type key: str
+        :return: キーに対応する値
+        :rtype: Any
+        """
         return self[key]
 
     def __setattr__(self, key: str, value: Any) -> None:
+        """
+        キーと値のペアを設定する。
+
+        :param key: 設定するキー
+        :type key: str
+        :param value: 設定する値
+        :type value: Any
+        """
         self[key] = value
 
 
 @pytest.fixture
 def mock_session_state() -> Generator[MockSessionState, None, None]:
+    """
+    モックセッション状態を提供するフィクスチャ。
+
+    :return: モックセッション状態のジェネレータ
+    :rtype: Generator[MockSessionState, None, None]
+    """
     session_state = MockSessionState(
         {
             "note_title": "",
@@ -50,9 +78,14 @@ def mock_session_state() -> Generator[MockSessionState, None, None]:
 
 
 def test_init_session_state(mock_session_state: MockSessionState) -> None:
-    # 目的：init_session_state 関数が正しくセッション状態を初期化することを確認する
-    # 1. init_session_state 関数を呼び出す
-    # 2. 期待されるすべてのキーがセッション状態に存在することを確認する
+    """
+    init_session_state関数のテスト。
+
+    セッション状態が正しく初期化されることを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     init_session_state()
     expected_keys: List[str] = [
         "note_title",
@@ -72,19 +105,22 @@ def test_init_session_state(mock_session_state: MockSessionState) -> None:
 
 
 def test_preprocess_markdown() -> None:
-    # 目的: preprocess_markdown 関数が正しくマークダウンテキストを処理することを確認する
-    # 1. サンプルの入力テキストを用意する
-    # 2. preprocess_markdown 関数を呼び出す
-    # 3. 関数の出力が期待される結果と一致することを確認する
+    """
+    preprocess_markdown関数のテスト。
+
+    マークダウンテキストが正しく処理されることを確認する。
+    """
     input_text: str = "##Header\n-List item\n1.Numbered item\n>Quote"
     expected_output: str = "## Header  \n- List item  \n1. Numbered item  \n> Quote  "
     assert preprocess_markdown(input_text) == expected_output
 
 
 def test_validate_title() -> None:
-    # 目的: validate_title 関数が様々な入力に対して正しく動作することを確認する
-    # 1. 空文字列、スペースのみ、長すぎるタイトル、有効なタイトルをテストする
-    # 2. 各ケースで validate_title 関数を呼び出し、期待される結果を確認する
+    """
+    validate_title関数のテスト。
+
+    様々な入力に対して正しく動作することを確認する。
+    """
     assert validate_title("") == (False, "タイトルは必須です。")
     assert validate_title("   ") == (False, "タイトルは必須です。")
     assert validate_title("a" * 201) == (
@@ -96,11 +132,14 @@ def test_validate_title() -> None:
 
 @pytest.mark.asyncio
 async def test_get_notes(mock_session_state: MockSessionState) -> None:
-    # 目的: get_notes 関数が正しくノート情報を取得し、セッション状態を更新することを確認する
-    # 1. APIレスポンスをモックする
-    # 2. get_notes 関数を呼び出す
-    # 3. セッション状態の notes_df が正しく更新されていることを確認する
-    # 4. note_titles が正しく設定されていることを確認する
+    """
+    get_notes関数のテスト。
+
+    正しくノート情報を取得し、セッション状態を更新することを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_response = MagicMock()
     mock_response.json.return_value = [
         {
@@ -125,10 +164,14 @@ async def test_get_notes(mock_session_state: MockSessionState) -> None:
 
 
 def test_create_new_note(mock_session_state: MockSessionState) -> None:
-    # 目的: create_new_note 関数が新しいノートを正しく作成することを確認する
-    # 1. モックセッション状態に unsaved_changes を設定する
-    # 2. create_new_note 関数を呼び出す
-    # 3. セッション状態が正しく更新されていることを確認する
+    """
+    create_new_note関数のテスト。
+
+    新しいノートを正しく作成することを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_session_state.unsaved_changes = {
         "新規ノート": {"title": "New Title", "content": "New Content"}
     }
@@ -141,10 +184,14 @@ def test_create_new_note(mock_session_state: MockSessionState) -> None:
 
 @pytest.mark.asyncio
 async def test_save_note(mock_session_state: MockSessionState) -> None:
-    # 目的: save_note 関数が正しく動作することを確認する
-    # 1. APIクライアントとレスポンスをモックする
-    # 2. セッション状態を設定する
-    # 3. save_note 関数を呼び出す
+    """
+    save_note関数のテスト。
+
+    正しく動作することを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_client = AsyncMock(spec=httpx.AsyncClient)
     mock_response = MagicMock()
     mock_response.json.return_value = {"id": 1, "title": "Test Note"}
@@ -163,11 +210,14 @@ async def test_save_note(mock_session_state: MockSessionState) -> None:
 
 @pytest.mark.asyncio
 async def test_create_and_post_new_note(mock_session_state: MockSessionState) -> None:
-    # 目的: create_and_post_new_note 関数が新しいノートを作成し、正しくポストすることを確認する
-    # 1. APIクライアントとレスポンスをモックする
-    # 2. セッション状態を設定する
-    # 3. create_and_post_new_note 関数を呼び出す
-    # 注意: このテストでは関数の実行のみを確認し、結果の検証は行っていない
+    """
+    create_and_post_new_note関数のテスト。
+
+    新しいノートを作成し、正しくポストすることを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_client = AsyncMock(spec=httpx.AsyncClient)
     mock_response = MagicMock()
     mock_response.json.return_value = {"id": 1, "title": "新規ノート", "content": ""}
@@ -182,10 +232,14 @@ async def test_create_and_post_new_note(mock_session_state: MockSessionState) ->
 
 
 def test_update_unsaved_changes(mock_session_state: MockSessionState) -> None:
-    # 目的: update_unsaved_changes 関数が未保存の変更を正しく更新することを確認する
-    # 1. セッション状態に current_note_id を設定する
-    # 2. update_unsaved_changes 関数を呼び出す
-    # 3. unsaved_changes が正しく更新されていることを確認する
+    """
+    update_unsaved_changes関数のテスト。
+
+    未保存の変更を正しく更新することを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_session_state.current_note_id = 1
     update_unsaved_changes("Test Title", "Test Content")
     assert mock_session_state.unsaved_changes == {
@@ -195,11 +249,14 @@ def test_update_unsaved_changes(mock_session_state: MockSessionState) -> None:
 
 @pytest.mark.asyncio
 async def test_display_note_content(mock_session_state: MockSessionState) -> None:
-    # 目的: display_note_content 関数が正しくノート内容を表示することを確認する
-    # 1. セッション状態を設定する
-    # 2. Streamlitの各コンポーネントをモックする
-    # 3. display_note_content 関数を呼び出す
-    # 4. セッション状態が正しく更新されていることを確認する
+    """
+    display_note_content関数のテスト。
+
+    正しくノート内容を表示することを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_session_state.notes_df = pd.DataFrame(
         {"title": ["Test Note"], "content": ["Test Content"]}
     )
@@ -224,11 +281,14 @@ async def test_display_note_content(mock_session_state: MockSessionState) -> Non
 
 @pytest.mark.asyncio
 async def test_main(mock_session_state: MockSessionState) -> None:
-    # 目的: main 関数が正しく動作することを確認する
-    # 1. セッション状態を設定する
-    # 2. Streamlitの各コンポーネントと主要な関数をモックする
-    # 3. main 関数を呼び出す
-    # 4. display_note_content が呼び出されたことを確認する
+    """
+    main関数のテスト。
+
+    正しく動作することを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
     mock_session_state.notes_df = None
     mock_session_state.note_titles = ["Test Note"]
     mock_session_state.selected_note = "Test Note"
