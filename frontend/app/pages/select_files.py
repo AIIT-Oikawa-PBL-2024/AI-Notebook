@@ -148,7 +148,7 @@ def get_selected_files() -> list[str]:
         return selected_files
     return []
 
-# ファイルを削除する非同期関数
+# ファイルを削除する非同期関数 -> 現在修正中
 async def delete_selected_files(files: list[str]) -> None:
     """
     選択されたファイルを削除する。
@@ -213,8 +213,8 @@ async def show_select_files_page() -> None:
 
     if reset_button:
         st.session_state.clear()
-        st.rerun()
-
+        st.rerun()  
+    # ファイル削除ボタンが押された場合の処理を追記しております（若林）
     if delete_button:
         selected_files = get_selected_files()
         if selected_files:
