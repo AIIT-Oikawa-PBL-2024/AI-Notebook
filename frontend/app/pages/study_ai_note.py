@@ -48,7 +48,9 @@ def show_output_page() -> None:
 
         if selected_files:
             with st.spinner("処理中です。お待ちください..."):
-                study_ai_note = create_study_ai_note(selected_files)
+                study_ai_note = create_study_ai_note(
+                    selected_files, BACKEND_DEV_API_URL
+                )
             st.session_state.study_ai_note = study_ai_note
             st.success("処理が完了しました")
             # st.session_state.page = "pages/quill_sample.py"  # ページを指定
@@ -58,8 +60,11 @@ def show_output_page() -> None:
 
 
 # キャッシュを使用して、選択されたファイルからAIノートを生成する関数
+# Streamlitのキャッシュは関数のインプットとアウトアップをkeyとvalueとして保存するので
+# 全く同じインプットの関数があるとキャッシュが競合してしまうので、注意が必要。
+# ここではエンドポイントのURLをインプットに追加することで競合を避けた
 @st.cache_resource(show_spinner=False)
-def create_study_ai_note(selected_files: list) -> str | None:
+def create_study_ai_note(selected_files: list, BACKEND_DEV_API_URL: str) -> str | None:
     """
     選択されたファイルからAIノートを生成する関数。
 
@@ -73,7 +78,9 @@ def create_study_ai_note(selected_files: list) -> str | None:
     from app.utils.output import create_pdf_to_markdown_summary
 
     try:
-        study_ai_note = asyncio.run(create_pdf_to_markdown_summary(selected_files))
+        study_ai_note = asyncio.run(
+            create_pdf_to_markdown_summary(selected_files, BACKEND_DEV_API_URL)
+        )
         return study_ai_note
     except Exception as e:
         logging.error(f"AIノートの生成中にエラーが発生しました: {e}")
