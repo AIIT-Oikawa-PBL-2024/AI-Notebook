@@ -8,11 +8,12 @@ from app.pages.select_files import (
     get_selected_files,
     update_title_name,
     show_select_files_page,
+    delete_selected_files,
 )
 import streamlit as st
 import pandas as pd
 
-
+import json
 import httpx
 import logging
 
@@ -28,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 # バックエンドAPIのURL
 BACKEND_DEV_API_URL = "http://localhost:8000/files/"
+BACKEND_DELETE_API_URL = "http://backend:8000/files/delete_files"
 
 
 # get_files_list 関数のテスト
@@ -482,3 +484,82 @@ async def test_reset_button() -> None:
     # 入力がリセットされたことを確認
     assert at.session_state["title_name"] == ""
     assert at.session_state["selected_files"] == []
+
+
+# delete_selected_files 関数のテスト
+@pytest.mark.asyncio
+async def test_delete_selected_files(mocker):
+    # モックセッション状態の設定
+    mock_session_state = {
+        "df": pd.DataFrame(
+            {
+                "file_name": ["file1.txt", "file2.txt", "file3.txt"],
+                "select": [True, False, True],
+                "id": [1, 2, 3],
+            }
+        )
+    }
+
+    # httpx.AsyncClient.requestのモック
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"success": True, "failed_files": []}
+    mock_request = AsyncMock(return_value=mock_response)
+    mocker.patch("httpx.AsyncClient.request", mock_request)
+
+    # st.successのモック
+    mock_success = mocker.patch("streamlit.success")
+
+    with patch.dict(st.session_state, mock_session_state):
+        await delete_selected_files(["file1.txt", "file2.txt", "file3.txt"])
+
+        # APIが正しく呼び出されたことを確認
+        mock_request.assert_called_once_with(
+            "DELETE",
+            f"{BACKEND_DELETE_API_URL}?user_id=1",
+            content=json.dumps(["file1.txt", "file3.txt"]),
+            headers={
+                "accept": "application/json",
+                "Content-Type": "application/json",
+            },
+        )
+
+        # 成功メッセージが表示されたことを確認
+        mock_success.assert_called_once_with("選択したファイルを削除しました。")
+
+        # データフレームがリセットされたことを確認
+        assert st.session_state.df is None
+
+    # 警告メッセージが表示されていないことを確認
+    mock_warning = mocker.patch("streamlit.warning")
+    mock_warning.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_delete_selected_files_http_status_error(mocker):
+    # モックセッション状態の設定
+    mock_session_state = {
+        "df": pd.DataFrame(
+            {
+                "file_name": ["file1.txt", "file2.txt"],
+                "select": [True, True],
+                "id": [1, 2],
+            }
+        )
+    }
+
+    # httpx.AsyncClient.requestのモック（エラーを発生させる）
+    mock_request = AsyncMock(side_effect=httpx.RequestError("Connection Error"))
+    mocker.patch("httpx.AsyncClient.request", mock_request)
+
+    # st.errorのモック
+    mock_error = mocker.patch("streamlit.error")
+
+    with patch.dict(st.session_state, mock_session_state):
+        await delete_selected_files(["file1.txt", "file2.txt"])
+
+        # エラーメッセージが表示されたことを確認
+        mock_error.assert_called_once()
+
+        # データフレームが変更されていないことを確認
+        assert st.session_state.df is not None

@@ -1,11 +1,11 @@
 import asyncio
+import json
 import logging
 import os
 import sys
 from datetime import datetime
 
 import httpx
-import json
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
@@ -148,26 +148,45 @@ def get_selected_files() -> list[str]:
         return selected_files
     return []
 
-# ファイルを削除する非同期関数 -> 現在修正中
+
+#  ファイルを削除する非同期関数
 async def delete_selected_files(files: list[str]) -> None:
     """
     選択されたファイルを削除する。
 
-    :param files: 削除するファイルのリスト
+    :param files: 削除するファイル名のリスト
     :type files: list[str]
     :return: None
     """
     try:
         user_id = 1  # ユーザーIDを固定値（1）で設定
-        request_data = {
-            "files": files,
-            "user_id": user_id
-        }
-        
+
+        # チェックされたファイル名のみをリクエストデータに含める
+        checked_files = [
+            file
+            for file in files
+            if st.session_state.df.loc[
+                st.session_state.df["file_name"] == file, "select"
+            ].iloc[0]
+        ]
+
+        if not checked_files:
+            st.warning("削除するファイルが選択されていません。")
+            return
+
+        request_data = json.dumps(
+            checked_files
+        )  # チェックされたファイル名のリストをJSON文字列に変換
+
         async with httpx.AsyncClient() as client:
-            response = await client.delete(
-                BACKEND_DELETE_API_URL,
-                json=request_data  # httpxはjsonパラメータを使用できます
+            response = await client.request(
+                "DELETE",
+                f"{BACKEND_DELETE_API_URL}?user_id={user_id}",
+                content=request_data,
+                headers={
+                    "accept": "application/json",
+                    "Content-Type": "application/json",
+                },
             )
             response.raise_for_status()
             result = response.json()
@@ -175,7 +194,10 @@ async def delete_selected_files(files: list[str]) -> None:
                 st.success("選択したファイルを削除しました。")
                 st.session_state.df = None  # データフレームをリセット
                 if result.get("failed_files"):
-                    st.warning(f"一部のファイルの削除に失敗しました: {', '.join(result['failed_files'])}")
+                    st.warning(
+                        f"一部のファイルの削除に失敗しました: "
+                        f"{', '.join(result['failed_files'])}"
+                    )
             else:
                 st.error("ファイルの削除に失敗しました。")
                 if "detail" in result:
@@ -185,7 +207,8 @@ async def delete_selected_files(files: list[str]) -> None:
     except httpx.RequestError as e:
         st.error(f"Request Error: {e}")
     except Exception as e:
-        st.error(f"Error: {str(e)}")
+        st.error(f"エラー: {str(e)}")
+
 
 # ファイル選択ページの処理
 async def show_select_files_page() -> None:
@@ -199,13 +222,15 @@ async def show_select_files_page() -> None:
     st.header("AIノートを作成", divider="blue")
 
     # ボタンの配置
-    col1, col2, col3, _ = st.columns([1.5, 1, 1.5, 1])
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         get_files_button = st.button("ファイル一覧を取得", use_container_width=True)
     with col2:
         reset_button = st.button("リセット", use_container_width=True)
     with col3:
-        delete_button = st.button("選択したファイルを削除", use_container_width=True, type="secondary")
+        delete_button = st.button(
+            "選択したファイルを削除", use_container_width=True, type="secondary"
+        )
 
     # ボタンが押された場合の処理
     if get_files_button:
@@ -213,12 +238,14 @@ async def show_select_files_page() -> None:
 
     if reset_button:
         st.session_state.clear()
-        st.rerun()  
+        st.rerun()
     # ファイル削除ボタンが押された場合の処理を追記しております（若林）
     if delete_button:
         selected_files = get_selected_files()
         if selected_files:
-            await delete_selected_files(selected_files)
+            await delete_selected_files(
+                selected_files
+            )  # 選択されたファイル名のリストを直接渡す
             # ファイル一覧を再取得
             await show_files_list_df()
         else:
@@ -271,7 +298,7 @@ async def show_select_files_page() -> None:
                 ):
                     st.session_state.exercise_name = st.session_state.title_name
                     st.session_state.selected_files = (
-                        selected_files  # 選択されたファイルをセッション状態に保存
+                        selected_files  # 選択されたァイルをセッション状態に保存
                     )
                     st.session_state.page = "pages/study_ai_exercise.py"  # ページを指定
                     st.switch_page("pages/study_ai_exercise.py")  # ページに遷移
