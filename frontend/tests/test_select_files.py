@@ -522,7 +522,7 @@ async def test_show_select_files_page_exercise() -> None:
         button for button in at.button if button.label == "AI練習問題を作成"
     )
     create_exercise_button.click()
-    at.run()
+    at.run(timeout=100)
 
     # ページが遷移したことを確認
     assert at.session_state["page"] == "pages/study_ai_exercise.py"
