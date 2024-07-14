@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 
 import httpx
+import json
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 # バックエンドAPIのURL
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/"
+BACKEND_DELETE_API_URL = f"{BACKEND_HOST}/files/delete_files"
 
 # セッション状態の初期化
 if "title_name" not in st.session_state:
@@ -146,6 +148,44 @@ def get_selected_files() -> list[str]:
         return selected_files
     return []
 
+# ファイルを削除する非同期関数
+async def delete_selected_files(files: list[str]) -> None:
+    """
+    選択されたファイルを削除する。
+
+    :param files: 削除するファイルのリスト
+    :type files: list[str]
+    :return: None
+    """
+    try:
+        user_id = 1  # ユーザーIDを固定値（1）で設定
+        request_data = {
+            "files": files,
+            "user_id": user_id
+        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.delete(
+                BACKEND_DELETE_API_URL,
+                json=request_data  # httpxはjsonパラメータを使用できます
+            )
+            response.raise_for_status()
+            result = response.json()
+            if result.get("success", False):
+                st.success("選択したファイルを削除しました。")
+                st.session_state.df = None  # データフレームをリセット
+                if result.get("failed_files"):
+                    st.warning(f"一部のファイルの削除に失敗しました: {', '.join(result['failed_files'])}")
+            else:
+                st.error("ファイルの削除に失敗しました。")
+                if "detail" in result:
+                    st.error(f"エラー詳細: {result['detail']}")
+    except httpx.HTTPStatusError as e:
+        st.error(f"HTTP Status Error: {e.response.status_code} - {e.response.text}")
+    except httpx.RequestError as e:
+        st.error(f"Request Error: {e}")
+    except Exception as e:
+        st.error(f"Error: {str(e)}")
 
 # ファイル選択ページの処理
 async def show_select_files_page() -> None:
@@ -159,11 +199,13 @@ async def show_select_files_page() -> None:
     st.header("AIノートを作成", divider="blue")
 
     # ボタンの配置
-    col1, col2, _, _ = st.columns([1.5, 1, 1, 1])
+    col1, col2, col3, _ = st.columns([1.5, 1, 1.5, 1])
     with col1:
         get_files_button = st.button("ファイル一覧を取得", use_container_width=True)
     with col2:
         reset_button = st.button("リセット", use_container_width=True)
+    with col3:
+        delete_button = st.button("選択したファイルを削除", use_container_width=True, type="secondary")
 
     # ボタンが押された場合の処理
     if get_files_button:
@@ -172,6 +214,15 @@ async def show_select_files_page() -> None:
     if reset_button:
         st.session_state.clear()
         st.rerun()
+
+    if delete_button:
+        selected_files = get_selected_files()
+        if selected_files:
+            await delete_selected_files(selected_files)
+            # ファイル一覧を再取得
+            await show_files_list_df()
+        else:
+            st.warning("削除するファイルを選択してください。")
 
     # データフレームがセッション状態にある場合、表示
     if st.session_state.df is not None:
@@ -226,7 +277,7 @@ async def show_select_files_page() -> None:
                     st.switch_page("pages/study_ai_exercise.py")  # ページに遷移
 
 
-# タイトル名を更新する関数
+# タイトル名を更新する数
 def update_title_name() -> None:
     """
     タイトル名をセッション状態に反映する。
