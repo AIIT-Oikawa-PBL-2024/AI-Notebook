@@ -94,33 +94,23 @@ AI-Notebook
   DB の設定は変更せず、password はブランクのままにしてください。
 
   - `GOOGLE_APPLICATION_CREDENTIALS`に GCP サービスアカウントキーのファイルのパスを入力
+  - `PROJECT_ID`にGCPのプロジェクトIDを入力
   - `BUCKET_NAME`に GCP のバケット名を入力
 
 - `$ docker compose build --no-cache`で Docker イメージをビルド
-- `$ cd backend`
-- `$ docker compose run --entrypoint "poetry install --no-root" backend`
-- `$ cd ../frontend`
-- `$ docker compose run --entrypoint "poetry install --no-root" frontend`
-- `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
-- .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
-  - `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
-  - `PROJECT_ID=<PROJECT_ID>`
-  - `REGION="asia-northeast1"`
-  - `BUCKET_NAME=<BUCKET_NAME>`
-- backend のコンテナ内で`gcloud auth login --cred-file=<サービスアカウントキーのファイルのパス>`
+
 - パッケージ管理は poetry を使用
 
   　 backend と frontend のそれぞれの定義ファイルからインストール
 
-  `$ cd backend`
-
-  `$ docker compose run --entrypoint "poetry install --no-root" backend`
-
-  `$ cd ../frontend`
-
-  `$ docker compose run --entrypoint "poetry install --no-root" frontend`
+- `$ cd backend`
+- `$ docker compose run --entrypoint "poetry install --no-root" backend`
+- `$ cd ../frontend`
+- `$ docker compose run --entrypoint "poetry install --no-root" frontend`
 
 - `pyproject.toml`ファイルをもとに`.venv`ディレクトリにパッケージがインストールされる。
+
+- `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
 
 - ルートディレクトリから`$ docker compose up`でコンテナを立ち上げ
 - エラーが出る場合は、`$ docker compose build --no-cache`で Docker イメージを再度ビルドしてみる。
@@ -130,6 +120,10 @@ AI-Notebook
 - Dev Container の起動確認 VSCode 左下の「><」マークから「コンテナで再度開く」を選択
 
   backend, frontend のコンテナ内で操作できる。
+
+  - Dev Containerを使用せず、ターミナルからコンテナ内に入る場合
+    - `docker compose exec backend bash` または `docker compose exec frontend bash`  
+    - `CTRL + D` で終了
 
 - DB の起動確認
 
@@ -168,7 +162,7 @@ AI-Notebook
   - `./backend/.env/`ディレクトリを作成して、ディレクトリ内にサービスアカウントキーを格納
     - **重要**　**ファイル名がグレーアウトされていて、GitHub に上がらないことを確認**
   
-  - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加
+  - .env.sample ファイルを参考にして、.env ファイルに環境変数を追加したことを確認
     - `GOOGLE_APPLICATION_CREDENTIALS=<サービスアカウントキーのファイルのパス>`
     - `PROJECT_ID=<PROJECT_ID>`
     - `REGION="asia-northeast1"`
