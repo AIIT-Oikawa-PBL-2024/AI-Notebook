@@ -579,7 +579,15 @@ async def test_reset_button() -> None:
 
 # delete_selected_files 関数のテスト
 @pytest.mark.asyncio
-async def test_delete_selected_files(mocker):
+async def test_delete_selected_files(mocker: MagicMock) -> None:
+    """
+    delete_selected_files関数の正常系テスト。
+
+    :param mocker: pytestのモッカーオブジェクト
+    :type mocker: MagicMock
+
+    :raises AssertionError: テストの検証に失敗した場合
+    """
     # モックセッション状態の設定
     mock_session_state = {
         "df": pd.DataFrame(
@@ -627,7 +635,15 @@ async def test_delete_selected_files(mocker):
 
 
 @pytest.mark.asyncio
-async def test_delete_selected_files_http_status_error(mocker):
+async def test_delete_selected_files_http_status_error(mocker: MagicMock) -> None:
+    """
+    delete_selected_files関数のHTTPステータスエラー時のテスト。
+
+    :param mocker: pytestのモッカーオブジェクト
+    :type mocker: MagicMock
+
+    :raises AssertionError: テストの検証に失敗した場合
+    """
     # モックセッション状態の設定
     mock_session_state = {
         "df": pd.DataFrame(
