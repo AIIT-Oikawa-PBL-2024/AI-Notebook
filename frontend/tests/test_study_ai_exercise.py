@@ -13,7 +13,7 @@ BACKEND_DEV_API_URL = f"{BACKEND_HOST}/exercises/request_stream"
 # テスト用のフィクスチャ
 @pytest.fixture
 def mock_session_state() -> Generator:
-    st.session_state.selected_files = ["file1.pdf", "file2.pdf"]
+    st.session_state.selected_files_exercise = ["file1.pdf", "file2.pdf"]
     st.session_state.exercise_name = "Test Xxercise"
     yield
     st.session_state.clear()
@@ -26,11 +26,11 @@ def test_create_study_ai_exercise_success(
 ) -> None:
     mock_create_pdf_to_markdown_summary.return_value = "Mocked AI Exercise"
     result = create_study_ai_exercise(
-        st.session_state.selected_files, BACKEND_DEV_API_URL
+        st.session_state.selected_files_exercise, BACKEND_DEV_API_URL
     )
     assert result == "Mocked AI Exercise"
     mock_create_pdf_to_markdown_summary.assert_called_once_with(
-        st.session_state.selected_files, BACKEND_DEV_API_URL
+        st.session_state.selected_files_exercise, BACKEND_DEV_API_URL
     )
 
 
@@ -46,7 +46,7 @@ def test_create_study_ai_exercise_exception(
 ) -> None:
     mock_create_pdf_to_markdown_summary.side_effect = Exception("Test Exception")
     result = create_study_ai_exercise(
-        st.session_state.selected_files, BACKEND_DEV_API_URL
+        st.session_state.selected_files_exercise, BACKEND_DEV_API_URL
     )
     assert result is None
     mock_logging.error.assert_called_once_with(
@@ -84,10 +84,10 @@ def test_show_output_page_success(
         f"Exercise Title: {st.session_state.exercise_name}"
     )
     mock_write.assert_called_once_with("選択されたファイル:")
-    mock_text.assert_called_once_with(st.session_state.selected_files)
+    mock_text.assert_called_once_with(st.session_state.selected_files_exercise)
     mock_spinner.assert_called_once_with("処理中です。お待ちください...")
     mock_create_study_ai_exercise.assert_called_once_with(
-        st.session_state.selected_files, BACKEND_DEV_API_URL
+        st.session_state.selected_files_exercise, BACKEND_DEV_API_URL
     )
     mock_success.assert_called_once_with("処理が完了しました")
     mock_error.assert_not_called()

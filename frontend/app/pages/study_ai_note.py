@@ -39,12 +39,15 @@ def show_output_page() -> None:
     """
     st.header("AIノート", divider="blue")
 
-    if "selected_files" in st.session_state and st.session_state.selected_files:
+    if (
+        "selected_files_note" in st.session_state
+        and st.session_state.selected_files_note
+    ):
         note_name = st.session_state["note_name"]
         st.subheader(f"Note Title: {note_name}")
         st.write("選択されたファイル:")
-        st.text(st.session_state.selected_files)
-        selected_files = st.session_state.get("selected_files", [])
+        st.text(st.session_state.selected_files_note)
+        selected_files = st.session_state.get("selected_files_note", [])
 
         if selected_files:
             with st.spinner("処理中です。お待ちください..."):
