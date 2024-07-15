@@ -34,7 +34,7 @@
 ### Dockerイメージの作成
 - `cd frontend`
 - `docker build -t gcr.io/<PJNAME>/<APPNAME>:latest --platform linux/amd64 \`
-    `-f frontend/Dockerfile.cloud_frontend .`
+    `-f Dockerfile.cloud_frontend .`
 
 ### Artifact RegistryへのPUSH
 - `docker push gcr.io/<PJNAME>/<APPNAME>:latest`
