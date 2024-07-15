@@ -39,12 +39,15 @@ def show_output_page() -> None:
     """
     st.header("AI練習問題", divider="blue")
 
-    if "selected_files" in st.session_state and st.session_state.selected_files:
+    if (
+        "selected_files_exercise" in st.session_state
+        and st.session_state.selected_files_exercise
+    ):
         exercise_name = st.session_state["exercise_name"]
         st.subheader(f"Exercise Title: {exercise_name}")
         st.write("選択されたファイル:")
-        st.text(st.session_state.selected_files)
-        selected_files = st.session_state.get("selected_files", [])
+        st.text(st.session_state.selected_files_exercise)
+        selected_files = st.session_state.get("selected_files_exercise", [])
 
         if selected_files:
             with st.spinner("処理中です。お待ちください..."):

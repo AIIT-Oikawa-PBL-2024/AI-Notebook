@@ -40,8 +40,10 @@ if "df" not in st.session_state:
     st.session_state.df = None
 if "df_updated" not in st.session_state:
     st.session_state.df_updated = False
-if "selected_files" not in st.session_state:
-    st.session_state.selected_files = []
+if "selected_files_note" not in st.session_state:
+    st.session_state.selected_files_note = []
+if "selected_files_exercise" not in st.session_state:
+    st.session_state.selected_files_exercise = []
 
 
 # 時刻フォーマットを変換する関数
@@ -285,7 +287,7 @@ async def show_select_files_page() -> None:
                     "AIノートを作成", use_container_width=True, type="primary"
                 ):
                     st.session_state.note_name = st.session_state.title_name
-                    st.session_state.selected_files = (
+                    st.session_state.selected_files_note = (
                         selected_files  # 選択されたファイルをセッション状態に保存
                     )
                     st.session_state.page = "pages/study_ai_note.py"  # ページを指定
@@ -298,7 +300,7 @@ async def show_select_files_page() -> None:
                     "AI練習問題を作成", use_container_width=True, type="primary"
                 ):
                     st.session_state.exercise_name = st.session_state.title_name
-                    st.session_state.selected_files = (
+                    st.session_state.selected_files_exercise = (
                         selected_files  # 選択されたァイルをセッション状態に保存
                     )
                     st.session_state.page = "pages/study_ai_exercise.py"  # ページを指定

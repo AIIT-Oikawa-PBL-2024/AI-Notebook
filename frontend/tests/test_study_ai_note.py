@@ -9,7 +9,7 @@ from typing import Generator
 # テスト用のフィクスチャ
 @pytest.fixture
 def mock_session_state() -> Generator:
-    st.session_state.selected_files = ["file1.pdf", "file2.pdf"]
+    st.session_state.selected_files_note = ["file1.pdf", "file2.pdf"]
     st.session_state.note_name = "Test Note"
     yield
     st.session_state.clear()
@@ -26,10 +26,12 @@ def test_create_study_ai_note_success(
     mock_create_pdf_to_markdown_summary: MagicMock, mock_session_state: Generator
 ) -> None:
     mock_create_pdf_to_markdown_summary.return_value = "Mocked AI Note"
-    result = create_study_ai_note(st.session_state.selected_files, BACKEND_DEV_API_URL)
+    result = create_study_ai_note(
+        st.session_state.selected_files_note, BACKEND_DEV_API_URL
+    )
     assert result == "Mocked AI Note"
     mock_create_pdf_to_markdown_summary.assert_called_once_with(
-        st.session_state.selected_files, BACKEND_DEV_API_URL
+        st.session_state.selected_files_note, BACKEND_DEV_API_URL
     )
 
 
@@ -44,7 +46,9 @@ def test_create_study_ai_note_exception(
     mock_session_state: Generator,
 ) -> None:
     mock_create_pdf_to_markdown_summary.side_effect = Exception("Test Exception")
-    result = create_study_ai_note(st.session_state.selected_files, BACKEND_DEV_API_URL)
+    result = create_study_ai_note(
+        st.session_state.selected_files_note, BACKEND_DEV_API_URL
+    )
     assert result is None
     mock_logging.error.assert_called_once_with(
         "AIノートの生成中にエラーが発生しました: Test Exception"
@@ -79,10 +83,10 @@ def test_show_output_page_success(
     mock_header.assert_called_once_with("AIノート", divider="blue")
     mock_subheader.assert_called_once_with(f"Note Title: {st.session_state.note_name}")
     mock_write.assert_called_once_with("選択されたファイル:")
-    mock_text.assert_called_once_with(st.session_state.selected_files)
+    mock_text.assert_called_once_with(st.session_state.selected_files_note)
     mock_spinner.assert_called_once_with("処理中です。お待ちください...")
     mock_create_study_ai_note.assert_called_once_with(
-        st.session_state.selected_files, BACKEND_DEV_API_URL
+        st.session_state.selected_files_note, BACKEND_DEV_API_URL
     )
     mock_success.assert_called_once_with("処理が完了しました")
     mock_error.assert_not_called()
