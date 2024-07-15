@@ -574,7 +574,8 @@ async def test_reset_button() -> None:
 
     # 入力がリセットされたことを確認
     assert at.session_state["title_name"] == ""
-    assert at.session_state["selected_files"] == []
+    assert at.session_state["selected_files_note"] == []
+    assert at.session_state["selected_files_exercise"] == []
 
 
 # delete_selected_files 関数のテスト
