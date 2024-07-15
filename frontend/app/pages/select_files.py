@@ -157,6 +157,7 @@ async def delete_selected_files(files: list[str]) -> None:
     :param files: 削除するファイル名のリスト
     :type files: list[str]
     :return: None
+    :rtype: None
     """
     try:
         user_id = 1  # ユーザーIDを固定値（1）で設定
