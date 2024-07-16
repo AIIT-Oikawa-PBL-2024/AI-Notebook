@@ -1,12 +1,10 @@
 import os
 from typing import Any
-import logging
 import httpx
 import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO)
 
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/upload"
