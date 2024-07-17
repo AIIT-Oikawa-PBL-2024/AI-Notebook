@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.pages.select_files &mdash; AI-Notebook-frontend 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=144c8c96"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/translations.js?v=91613774"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            AI-Notebook-frontend
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">AI-Notebook-frontend</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">app.pages.select_files</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>app.pages.select_files のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">httpx</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="c1"># プロジェクトルートのパスを取得</span>
+<span class="n">project_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">))</span>
+
+<span class="c1"># プロジェクトルートをPythonパスに追加</span>
+<span class="k">if</span> <span class="n">project_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">project_root</span><span class="p">)</span>
+
+<span class="c1"># 環境変数を読み込む</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># ログの設定</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># バックエンドAPIのURL</span>
+<span class="n">BACKEND_HOST</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;BACKEND_HOST&quot;</span><span class="p">)</span>
+<span class="n">BACKEND_DEV_API_URL</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BACKEND_HOST</span><span class="si">}</span><span class="s2">/files/&quot;</span>
+<span class="n">BACKEND_DELETE_API_URL</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BACKEND_HOST</span><span class="si">}</span><span class="s2">/files/delete_files&quot;</span>
+
+<span class="c1"># セッション状態の初期化</span>
+<span class="k">if</span> <span class="s2">&quot;title_name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;exercise_name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">exercise_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;note_name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">note_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">if</span> <span class="s2">&quot;df&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">if</span> <span class="s2">&quot;df_updated&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df_updated</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">if</span> <span class="s2">&quot;selected_files_note&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">selected_files_note</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">if</span> <span class="s2">&quot;selected_files_exercise&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">selected_files_exercise</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="c1"># 時刻フォーマットを変換する関数</span>
+<div class="viewcode-block" id="time_format">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.time_format">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">time_format</span><span class="p">(</span><span class="n">jst_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    JST形式の文字列を指定のフォーマットに変換する。</span>
+
+<span class="sd">    :param jst_str: JST形式の日時文字列</span>
+<span class="sd">    :type jst_str: str</span>
+<span class="sd">    :return: 変換後の日時文字列</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">jst_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">jst_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;+00:00&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">jst_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># 非同期でファイル一覧を取得する関数</span>
+<div class="viewcode-block" id="get_files_list">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.get_files_list">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_files_list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    バックエンドAPIからファイル一覧を非同期で取得する。</span>
+
+<span class="sd">    :return: ファイル一覧</span>
+<span class="sd">    :rtype: list[str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">BACKEND_DEV_API_URL</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">files</span>
+    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HTTP Status Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ファイル一覧の取得に失敗しました(HTTP Status Error)&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">RequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ファイル一覧の取得に失敗しました(Request Error)&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ファイル一覧の取得に失敗しました(Error)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[]</span></div>
+
+
+
+<span class="c1"># 非同期でファイル一覧を作成して表示する関数</span>
+<div class="viewcode-block" id="show_files_list_df">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.show_files_list_df">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">show_files_list_df</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイル一覧をデータフレーム形式で表示する。</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_files_list</span><span class="p">()</span>
+        <span class="n">file_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="c1"># id列, user_id列を削除</span>
+        <span class="n">file_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># created_at列の時刻フォーマットを変換</span>
+        <span class="n">file_df</span><span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_df</span><span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">time_format</span><span class="p">)</span>
+        <span class="c1"># 新しい boolean 型の列を一番左に追加</span>
+        <span class="n">file_df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;select&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">file_df</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">data_editor</span><span class="p">(</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">key</span><span class="o">=</span><span class="s2">&quot;changes&quot;</span><span class="p">,</span>
+        <span class="n">on_change</span><span class="o">=</span><span class="n">update</span><span class="p">,</span>
+        <span class="n">hide_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;file_name&quot;</span><span class="p">,</span> <span class="s2">&quot;file_size&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">),</span>
+        <span class="n">column_config</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;file_name&quot;</span><span class="p">:</span> <span class="n">st</span><span class="o">.</span><span class="n">column_config</span><span class="o">.</span><span class="n">TextColumn</span><span class="p">(</span>
+                <span class="s2">&quot;file_name&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+        <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># データを更新する関数</span>
+<div class="viewcode-block" id="update">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.update">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">update</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    データフレームの変更をセッション状態に反映する。</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;changes&quot;</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+        <span class="n">changes</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">changes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edited_rows&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">changes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">change</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df_updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<span class="c1"># 選択されたファイル名をリスト形式で取得する関数</span>
+<div class="viewcode-block" id="get_selected_files">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.get_selected_files">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">get_selected_files</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    選択されたファイル名をリスト形式で取得する。</span>
+
+<span class="sd">    :return: 選択されたファイル名のリスト</span>
+<span class="sd">    :rtype: list[str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">selected_files</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;select&quot;</span><span class="p">]][</span>
+            <span class="s2">&quot;file_name&quot;</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">selected_files</span>
+    <span class="k">return</span> <span class="p">[]</span></div>
+
+
+
+<span class="c1">#  ファイルを削除する非同期関数</span>
+<div class="viewcode-block" id="delete_selected_files">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.delete_selected_files">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">delete_selected_files</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    選択されたファイルを削除する。</span>
+
+<span class="sd">    :param files: 削除するファイル名のリスト</span>
+<span class="sd">    :type files: list[str]</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># ユーザーIDを固定値（1）で設定</span>
+
+        <span class="c1"># チェックされたファイル名のみをリクエストデータに含める</span>
+        <span class="n">checked_files</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">file</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">file</span><span class="p">,</span> <span class="s2">&quot;select&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">checked_files</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;削除するファイルが選択されていません。&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">request_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+            <span class="n">checked_files</span>
+        <span class="p">)</span>  <span class="c1"># チェックされたファイル名のリストをJSON文字列に変換</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BACKEND_DELETE_API_URL</span><span class="si">}</span><span class="s2">?user_id=</span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="n">request_data</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;選択したファイルを削除しました。&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># データフレームをリセット</span>
+                <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;failed_files&quot;</span><span class="p">):</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;一部のファイルの削除に失敗しました: &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;failed_files&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ファイルの削除に失敗しました。&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;detail&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー詳細: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;detail&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HTTP Status Error: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">RequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ファイル選択ページの処理</span>
+<div class="viewcode-block" id="show_select_files_page">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.show_select_files_page">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">show_select_files_page</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイル選択ページを表示する。</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># st.set_page_config(layout=&quot;wide&quot;)</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="s2">&quot;pages/select_files.py&quot;</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s2">&quot;AIノート/練習問題を作成&quot;</span><span class="p">,</span> <span class="n">divider</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ボタンの配置</span>
+    <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">,</span> <span class="n">col3</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">with</span> <span class="n">col1</span><span class="p">:</span>
+        <span class="n">get_files_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;ファイル一覧を取得&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">col2</span><span class="p">:</span>
+        <span class="n">reset_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;リセット&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">col3</span><span class="p">:</span>
+        <span class="n">delete_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span>
+            <span class="s2">&quot;選択したファイルを削除&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;secondary&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ボタンが押された場合の処理</span>
+    <span class="k">if</span> <span class="n">get_files_button</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">show_files_list_df</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">reset_button</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>
+    <span class="c1"># ファイル削除ボタンが押された場合の処理を追記しております（若林）</span>
+    <span class="k">if</span> <span class="n">delete_button</span><span class="p">:</span>
+        <span class="n">selected_files</span> <span class="o">=</span> <span class="n">get_selected_files</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">selected_files</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">delete_selected_files</span><span class="p">(</span>
+                <span class="n">selected_files</span>
+            <span class="p">)</span>  <span class="c1"># 選択されたファイル名のリストを直接渡す</span>
+            <span class="c1"># ファイル一覧を再取得</span>
+            <span class="k">await</span> <span class="n">show_files_list_df</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;削除するファイルを選択してください。&quot;</span><span class="p">)</span>
+
+    <span class="c1"># データフレームがセッション状態にある場合、表示</span>
+    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df_updated</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">show_files_list_df</span><span class="p">()</span>  <span class="c1"># フィルター機能を含む表示関数を呼び出す</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># 選択されたファイルを表示</span>
+        <span class="n">selected_files</span> <span class="o">=</span> <span class="n">get_selected_files</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">selected_files</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:blue-background[選択されたファイル]&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">selected_files</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+
+            <span class="c1"># タイトルを入力</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;:blue-background[タイトル]&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span>
+                <span class="s2">&quot;AIで作成するノートや練習問題のタイトルを100文字以内で入力してEnterキーを押して下さい&quot;</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="s2">&quot;title_input&quot;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span><span class="p">,</span>
+                <span class="n">on_change</span><span class="o">=</span><span class="n">update_title_name</span><span class="p">,</span>
+                <span class="n">max_chars</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># 現在のタイトルを表示</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Title:  </span><span class="si">{</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># AIノート作成ボタン</span>
+            <span class="k">if</span> <span class="n">selected_files</span> <span class="ow">and</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span>
+                    <span class="s2">&quot;AIノートを作成&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span>
+                <span class="p">):</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">note_name</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">selected_files_note</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">selected_files</span>  <span class="c1"># 選択されたファイルをセッション状態に保存</span>
+                    <span class="p">)</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="s2">&quot;pages/study_ai_note.py&quot;</span>  <span class="c1"># ページを指定</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">switch_page</span><span class="p">(</span><span class="s2">&quot;pages/study_ai_note.py&quot;</span><span class="p">)</span>  <span class="c1"># ページに遷移</span>
+
+            <span class="c1"># AI練習問題作成ボタン</span>
+            <span class="k">if</span> <span class="n">selected_files</span> <span class="ow">and</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">divider</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span>
+                    <span class="s2">&quot;AI練習問題を作成&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span>
+                <span class="p">):</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">exercise_name</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">selected_files_exercise</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">selected_files</span>  <span class="c1"># 選択されたァイルをセッション状態に保存</span>
+                    <span class="p">)</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="s2">&quot;pages/study_ai_exercise.py&quot;</span>  <span class="c1"># ページを指定</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">switch_page</span><span class="p">(</span><span class="s2">&quot;pages/study_ai_exercise.py&quot;</span><span class="p">)</span>  <span class="c1"># ページに遷移</span></div>
+
+
+
+<span class="c1"># タイトル名を更新する数</span>
+<div class="viewcode-block" id="update_title_name">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.select_files.update_title_name">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">update_title_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    タイトル名をセッション状態に反映する。</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_input</span></div>
+
+
+
+<span class="c1"># ファイル選択ページの処理を実行</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">app.utils.sidebar</span> <span class="kn">import</span> <span class="n">show_sidebar</span>
+
+    <span class="n">show_sidebar</span><span class="p">()</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">show_select_files_page</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

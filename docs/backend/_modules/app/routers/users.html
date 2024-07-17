@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.routers.users &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=144c8c96"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/translations.js?v=91613774"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            AI-Notebook-backend
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">AI-Notebook-backend</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">app.routers.users</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>app.routers.users のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.asyncio</span> <span class="kn">import</span> <span class="n">AsyncSession</span>
+<span class="kn">from</span> <span class="nn">starlette</span> <span class="kn">import</span> <span class="n">status</span>
+
+<span class="kn">import</span> <span class="nn">app.cruds.users</span> <span class="k">as</span> <span class="nn">users_cruds</span>
+<span class="kn">import</span> <span class="nn">app.schemas.users</span> <span class="k">as</span> <span class="nn">users_schemas</span>
+<span class="kn">from</span> <span class="nn">app.database</span> <span class="kn">import</span> <span class="n">get_db</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+
+<span class="n">db_dependency</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)</span>
+
+
+<span class="c1"># ルーターの設定</span>
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;/users&quot;</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;users&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="c1"># ユーザーの一覧を取得するエンドポイント</span>
+<div class="viewcode-block" id="list_users">
+<a class="viewcode-back" href="../../../app.routers.html#app.routers.users.list_users">[ドキュメント]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">list</span><span class="p">[</span><span class="n">users_schemas</span><span class="o">.</span><span class="n">User</span><span class="p">])</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">list_users</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span> <span class="o">=</span> <span class="n">db_dependency</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">users_schemas</span><span class="o">.</span><span class="n">User</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーの一覧を取得する</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :return: ユーザーのリスト</span>
+<span class="sd">    :rtype: list[users_schemas.User]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">users_cruds</span><span class="o">.</span><span class="n">get_users</span><span class="p">(</span><span class="n">db</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># 新しいユーザーを作成するエンドポイント</span>
+<div class="viewcode-block" id="create_user">
+<a class="viewcode-back" href="../../../app.routers.html#app.routers.users.create_user">[ドキュメント]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">users_schemas</span><span class="o">.</span><span class="n">UserCreateResponse</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">create_user</span><span class="p">(</span>
+    <span class="n">user_body</span><span class="p">:</span> <span class="n">users_schemas</span><span class="o">.</span><span class="n">UserCreate</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span> <span class="o">=</span> <span class="n">db_dependency</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">users_schemas</span><span class="o">.</span><span class="n">UserCreateResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    新しいユーザーを作成する</span>
+
+<span class="sd">    :param user_body: ユーザー作成のためのデータ</span>
+<span class="sd">    :type user_body: users_schemas.UserCreate</span>
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :return: 作成されたユーザーの情報</span>
+<span class="sd">    :rtype: users_schemas.UserCreateResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">users_cruds</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">user_body</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ユーザーIDから特定のユーザーを取得するエンドポイント</span>
+<div class="viewcode-block" id="get_user">
+<a class="viewcode-back" href="../../../app.routers.html#app.routers.users.get_user">[ドキュメント]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{user_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">users_schemas</span><span class="o">.</span><span class="n">User</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span> <span class="o">=</span> <span class="n">db_dependency</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">users_schemas</span><span class="o">.</span><span class="n">User</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーIDから特定のユーザーを取得する</span>
+
+<span class="sd">    :param user_id: ユーザーID</span>
+<span class="sd">    :type user_id: int</span>
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :return: ユーザーの情報</span>
+<span class="sd">    :rtype: users_schemas.User</span>
+<span class="sd">    :raises HTTPException: ユーザーが見つからない場合に404エラーを返す</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">users_cruds</span><span class="o">.</span><span class="n">get_user_by_id</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;ユーザーが見つかりません&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">user</span></div>
+
+
+
+<span class="c1"># ユーザーIDから特定のユーザーを削除するエンドポイント</span>
+<div class="viewcode-block" id="delete_user">
+<a class="viewcode-back" href="../../../app.routers.html#app.routers.users.delete_user">[ドキュメント]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{user_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span> <span class="o">=</span> <span class="n">db_dependency</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーIDから特定のユーザーを削除する</span>
+
+<span class="sd">    :param user_id: ユーザーID</span>
+<span class="sd">    :type user_id: int</span>
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :return: 削除結果のメッセージ</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    :raises HTTPException: ユーザーが見つからない場合に404エラーを返す</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">users_cruds</span><span class="o">.</span><span class="n">get_user_by_id</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;ユーザーが見つかりません&quot;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">users_cruds</span><span class="o">.</span><span class="n">delete_user</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;ユーザーが削除されました&quot;</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

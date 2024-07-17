@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.pages package &mdash; AI-Notebook-frontend 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=144c8c96"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=91613774"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AI-Notebook-frontend
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">app.pages package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#app-pages-auth-test-module">app.pages.auth_test module</a></li>
+<li><a class="reference internal" href="#module-app.pages.notebook">app.pages.notebook module</a><ul>
+<li><a class="reference internal" href="#app.pages.notebook.create_and_post_new_note"><code class="docutils literal notranslate"><span class="pre">create_and_post_new_note()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.create_new_note"><code class="docutils literal notranslate"><span class="pre">create_new_note()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.display_note_content"><code class="docutils literal notranslate"><span class="pre">display_note_content()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.get_notes"><code class="docutils literal notranslate"><span class="pre">get_notes()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.init_session_state"><code class="docutils literal notranslate"><span class="pre">init_session_state()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.preprocess_markdown"><code class="docutils literal notranslate"><span class="pre">preprocess_markdown()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.save_note"><code class="docutils literal notranslate"><span class="pre">save_note()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.update_unsaved_changes"><code class="docutils literal notranslate"><span class="pre">update_unsaved_changes()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.notebook.validate_title"><code class="docutils literal notranslate"><span class="pre">validate_title()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.pages.select_files">app.pages.select_files module</a><ul>
+<li><a class="reference internal" href="#app.pages.select_files.delete_selected_files"><code class="docutils literal notranslate"><span class="pre">delete_selected_files()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.get_files_list"><code class="docutils literal notranslate"><span class="pre">get_files_list()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.get_selected_files"><code class="docutils literal notranslate"><span class="pre">get_selected_files()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.show_files_list_df"><code class="docutils literal notranslate"><span class="pre">show_files_list_df()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.show_select_files_page"><code class="docutils literal notranslate"><span class="pre">show_select_files_page()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.time_format"><code class="docutils literal notranslate"><span class="pre">time_format()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.update"><code class="docutils literal notranslate"><span class="pre">update()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.select_files.update_title_name"><code class="docutils literal notranslate"><span class="pre">update_title_name()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.pages.study_ai_exercise">app.pages.study_ai_exercise module</a><ul>
+<li><a class="reference internal" href="#app.pages.study_ai_exercise.create_study_ai_exercise"><code class="docutils literal notranslate"><span class="pre">create_study_ai_exercise()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.study_ai_exercise.show_output_page"><code class="docutils literal notranslate"><span class="pre">show_output_page()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.pages.study_ai_note">app.pages.study_ai_note module</a><ul>
+<li><a class="reference internal" href="#app.pages.study_ai_note.create_study_ai_note"><code class="docutils literal notranslate"><span class="pre">create_study_ai_note()</span></code></a></li>
+<li><a class="reference internal" href="#app.pages.study_ai_note.show_output_page"><code class="docutils literal notranslate"><span class="pre">show_output_page()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.pages">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AI-Notebook-frontend</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">app.pages package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/app.pages.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="app-pages-package">
+<h1>app.pages package<a class="headerlink" href="#app-pages-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="app-pages-auth-test-module">
+<h2>app.pages.auth_test module<a class="headerlink" href="#app-pages-auth-test-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-app.pages.notebook">
+<span id="app-pages-notebook-module"></span><h2>app.pages.notebook module<a class="headerlink" href="#module-app.pages.notebook" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.create_and_post_new_note">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">create_and_post_new_note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncClient</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#create_and_post_new_note"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.create_and_post_new_note" title="Link to this definition"></a></dt>
+<dd><p>新しいノートを作成して保存する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>client</strong> (<em>httpx.AsyncClient</em>) -- 非同期HTTPクライアント</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.create_new_note">
+<span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">create_new_note</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#create_new_note"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.create_new_note" title="Link to this definition"></a></dt>
+<dd><p>新しいノートを作成するための初期化を行う。</p>
+<p>現在のノートIDをリセットし、タイトルと本文をクリアする。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.display_note_content">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">display_note_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#display_note_content"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.display_note_content" title="Link to this definition"></a></dt>
+<dd><p>ノートの内容を表示する。</p>
+<p>非同期関数。現在のノートのタイトルと本文を表示し、編集や保存を行うことができる。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.get_notes">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">get_notes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#get_notes"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.get_notes" title="Link to this definition"></a></dt>
+<dd><p>バックエンドからノート情報を取得し、セッション状態を更新する。</p>
+<p>非同期関数。HTTPリクエストを行い、取得したデータを処理してDataFrameに変換する。
+エラーが発生した場合はエラーメッセージを表示する。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.init_session_state">
+<span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">init_session_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#init_session_state"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.init_session_state" title="Link to this definition"></a></dt>
+<dd><p>セッション状態を初期化する。</p>
+<p>デフォルト値が設定されていない場合、各キーにデフォルト値を設定する。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.main">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#main"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.main" title="Link to this definition"></a></dt>
+<dd><p>メイン関数。</p>
+<p>非同期関数。ノートの選択、表示、編集、保存を行うインターフェースを提供する。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.preprocess_markdown">
+<span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">preprocess_markdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#preprocess_markdown"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.preprocess_markdown" title="Link to this definition"></a></dt>
+<dd><p>マークダウンテキストを前処理する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) -- 前処理するマークダウンテキスト</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>前処理されたマークダウンテキスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.run">
+<span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#run"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.run" title="Link to this definition"></a></dt>
+<dd><p>非同期メイン関数を実行する。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.save_note">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">save_note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#save_note"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.save_note" title="Link to this definition"></a></dt>
+<dd><p>ノートを保存する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> (<em>httpx.AsyncClient</em>) -- 非同期HTTPクライアント</p></li>
+<li><p><strong>title</strong> (<em>str</em>) -- ノートのタイトル</p></li>
+<li><p><strong>content</strong> (<em>str</em>) -- ノートの本文</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.update_unsaved_changes">
+<span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">update_unsaved_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#update_unsaved_changes"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.update_unsaved_changes" title="Link to this definition"></a></dt>
+<dd><p>未保存の変更を更新する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- ノートのタイトル</p></li>
+<li><p><strong>content</strong> (<em>str</em>) -- ノートの本文</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.notebook.validate_title">
+<span class="sig-prename descclassname"><span class="pre">app.pages.notebook.</span></span><span class="sig-name descname"><span class="pre">validate_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/pages/notebook.html#validate_title"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.notebook.validate_title" title="Link to this definition"></a></dt>
+<dd><p>ノートのタイトルを検証する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) -- 検証するタイトル</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>検証結果（有効かどうか）とエラーメッセージ（ある場合）</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.pages.select_files">
+<span id="app-pages-select-files-module"></span><h2>app.pages.select_files module<a class="headerlink" href="#module-app.pages.select_files" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.delete_selected_files">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">delete_selected_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#delete_selected_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.delete_selected_files" title="Link to this definition"></a></dt>
+<dd><p>選択されたファイルを削除する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>files</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- 削除するファイル名のリスト</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.get_files_list">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">get_files_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#get_files_list"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.get_files_list" title="Link to this definition"></a></dt>
+<dd><p>バックエンドAPIからファイル一覧を非同期で取得する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ファイル一覧</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.get_selected_files">
+<span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">get_selected_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#get_selected_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.get_selected_files" title="Link to this definition"></a></dt>
+<dd><p>選択されたファイル名をリスト形式で取得する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>選択されたファイル名のリスト</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.show_files_list_df">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">show_files_list_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#show_files_list_df"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.show_files_list_df" title="Link to this definition"></a></dt>
+<dd><p>ファイル一覧をデータフレーム形式で表示する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.show_select_files_page">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">show_select_files_page</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#show_select_files_page"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.show_select_files_page" title="Link to this definition"></a></dt>
+<dd><p>ファイル選択ページを表示する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.time_format">
+<span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">time_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jst_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#time_format"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.time_format" title="Link to this definition"></a></dt>
+<dd><p>JST形式の文字列を指定のフォーマットに変換する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>jst_str</strong> (<em>str</em>) -- JST形式の日時文字列</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>変換後の日時文字列</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.update">
+<span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#update"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.update" title="Link to this definition"></a></dt>
+<dd><p>データフレームの変更をセッション状態に反映する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.select_files.update_title_name">
+<span class="sig-prename descclassname"><span class="pre">app.pages.select_files.</span></span><span class="sig-name descname"><span class="pre">update_title_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/select_files.html#update_title_name"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.select_files.update_title_name" title="Link to this definition"></a></dt>
+<dd><p>タイトル名をセッション状態に反映する。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.pages.study_ai_exercise">
+<span id="app-pages-study-ai-exercise-module"></span><h2>app.pages.study_ai_exercise module<a class="headerlink" href="#module-app.pages.study_ai_exercise" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.study_ai_exercise.create_study_ai_exercise">
+<span class="sig-prename descclassname"><span class="pre">app.pages.study_ai_exercise.</span></span><span class="sig-name descname"><span class="pre">create_study_ai_exercise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BACKEND_DEV_API_URL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/study_ai_exercise.html#create_study_ai_exercise"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.study_ai_exercise.create_study_ai_exercise" title="Link to this definition"></a></dt>
+<dd><p>選択されたファイルからAI練習問題を生成する関数。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>selected_files</strong> (<em>list</em>) -- AI練習問題を生成するための選択されたファイルのリスト</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成されたAI練習問題の文字列、エラー時はNone</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.study_ai_exercise.show_output_page">
+<span class="sig-prename descclassname"><span class="pre">app.pages.study_ai_exercise.</span></span><span class="sig-name descname"><span class="pre">show_output_page</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/study_ai_exercise.html#show_output_page"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.study_ai_exercise.show_output_page" title="Link to this definition"></a></dt>
+<dd><p>AI練習問題を表示する関数。</p>
+<ul class="simple">
+<li><p>ヘッダーを表示し、選択されたファイルを表示する。</p></li>
+<li><p>選択されたファイルがある場合、AI練習問題を生成し、セッション状態に保存する。</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.pages.study_ai_note">
+<span id="app-pages-study-ai-note-module"></span><h2>app.pages.study_ai_note module<a class="headerlink" href="#module-app.pages.study_ai_note" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.study_ai_note.create_study_ai_note">
+<span class="sig-prename descclassname"><span class="pre">app.pages.study_ai_note.</span></span><span class="sig-name descname"><span class="pre">create_study_ai_note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BACKEND_DEV_API_URL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/study_ai_note.html#create_study_ai_note"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.study_ai_note.create_study_ai_note" title="Link to this definition"></a></dt>
+<dd><p>選択されたファイルからAIノートを生成する関数。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>selected_files</strong> (<em>list</em>) -- AIノートを生成するための選択されたファイルのリスト</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成されたAIノートの文字列、エラー時はNone</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.pages.study_ai_note.show_output_page">
+<span class="sig-prename descclassname"><span class="pre">app.pages.study_ai_note.</span></span><span class="sig-name descname"><span class="pre">show_output_page</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/pages/study_ai_note.html#show_output_page"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.pages.study_ai_note.show_output_page" title="Link to this definition"></a></dt>
+<dd><p>AIノートページを表示する関数。</p>
+<ul class="simple">
+<li><p>ヘッダーを表示し、選択されたファイルを表示する。</p></li>
+<li><p>選択されたファイルがある場合、AIノートを生成し、セッション状態に保存する。</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.pages">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.pages" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

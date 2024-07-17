@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.utils.gemini_request_stream &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=144c8c96"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/translations.js?v=91613774"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            AI-Notebook-backend
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">AI-Notebook-backend</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">app.utils.gemini_request_stream</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>app.utils.gemini_request_stream のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span>
+
+<span class="kn">import</span> <span class="nn">vertexai</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">google.api_core.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GoogleAPIError</span><span class="p">,</span>
+    <span class="n">InternalServerError</span><span class="p">,</span>
+    <span class="n">InvalidArgument</span><span class="p">,</span>
+    <span class="n">NotFound</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">storage</span>
+<span class="kn">from</span> <span class="nn">vertexai.generative_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GenerationConfig</span><span class="p">,</span>
+    <span class="n">GenerationResponse</span><span class="p">,</span>
+    <span class="n">GenerativeModel</span><span class="p">,</span>
+    <span class="n">Part</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 環境変数を読み込む</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># プロジェクトIDとリージョンを環境変数から取得</span>
+<span class="n">PROJECT_ID</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PROJECT_ID&quot;</span><span class="p">)</span>
+<span class="n">REGION</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;REGION&quot;</span><span class="p">)</span>
+<span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;gemini-1.5-pro-001&quot;</span>
+<span class="n">BUCKET_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;BUCKET_NAME&quot;</span><span class="p">))</span>
+
+<span class="c1"># 生成モデルのパラメータを設定</span>
+<span class="n">GENERATION_CONFIG</span> <span class="o">=</span> <span class="n">GenerationConfig</span><span class="p">(</span><span class="n">max_output_tokens</span><span class="o">=</span><span class="mi">8192</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Vertex AIを初期化</span>
+<span class="n">vertexai</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">PROJECT_ID</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">REGION</span><span class="p">)</span>
+
+<span class="c1"># ロギングの設定</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+
+<span class="c1"># Google Cloud Storageでファイルが存在するかチェック</span>
+<div class="viewcode-block" id="check_file_exists">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_request_stream.check_file_exists">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">check_file_exists</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+    <span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">)</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">blob</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">blob</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+
+<span class="c1"># 複数のPDF, imageファイルを入力してコンテンツを生成</span>
+<div class="viewcode-block" id="generate_content_stream">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_request_stream.generate_content_stream">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_content_stream</span><span class="p">(</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL_NAME</span><span class="p">,</span>
+    <span class="n">generation_config</span><span class="p">:</span> <span class="n">GenerationConfig</span> <span class="o">=</span> <span class="n">GENERATION_CONFIG</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BUCKET_NAME</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">GenerationResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="n">pdf_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># プロンプト（指示文）</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
+<span class="s2">        - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。</span>
+<span class="s2">        - #instruction: 複数のpdf, imageファイルを読み解いて、親しみやすい解説がついて、</span>
+<span class="s2">            誰もが読みたくなるような、わかりやすい整理ノートを日本語で作成して下さい。</span>
+<span class="s2">            imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。</span>
+<span class="s2">        - #style: ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、</span>
+<span class="s2">            強調表示などのスタイルを追加してください。</span>
+<span class="s2">        - #condition1: &quot;絵文字&quot;を使って、視覚的にもわかりやすくしてください。</span>
+<span class="s2">        - #condition2: ”表形式”は禁止します。”箇条書き”を使用してください。</span>
+<span class="s2">        - #condition3: URLを含むリンクを表示することは禁止します。</span>
+<span class="s2">        - #condition4: 画像ファイルを挿入することは禁止します。</span>
+<span class="s2">        - #condition5: 興味深い&quot;コラム&quot;の欄を設けてください。</span>
+<span class="s2">        - #condition6: 最後に&quot;用語解説&quot;の一覧を箇条書き形式で表示してください。</span>
+<span class="s2">        - #format: タイトルを付けて、8000文字程度のMarkdownで出力してください。</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="c1"># ファイルがGCSに存在するかチェック</span>
+            <span class="k">if</span> <span class="n">check_file_exists</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
+                    <span class="c1"># PDFファイルのURI</span>
+                    <span class="n">pdf_file_uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="c1"># PDFファイルのパートを作成</span>
+                    <span class="n">pdf_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">pdf_file_uri</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;application/pdf&quot;</span><span class="p">)</span>
+                    <span class="n">pdf_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdf_file</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.jpg&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.jpeg&quot;</span><span class="p">):</span>
+                    <span class="c1"># imageファイルのURI</span>
+                    <span class="n">image_file_uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="c1"># imageファイルのパートを作成</span>
+                    <span class="n">image_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">image_file_uri</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;image/jpeg&quot;</span><span class="p">)</span>
+                    <span class="n">image_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">):</span>
+                    <span class="c1"># imageファイルのURI</span>
+                    <span class="n">image_file_uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="c1"># imageファイルのパートを作成</span>
+                    <span class="n">image_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">image_file_uri</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;image/png&quot;</span><span class="p">)</span>
+                    <span class="n">image_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid file format: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot;Only PDF and image files are supported.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid file format: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot;Only PDF and image files are supported.&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist in the bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="n">NotFound</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> does not exist in the bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Files: </span><span class="si">{</span><span class="n">pdf_files</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">image_files</span><span class="si">}</span><span class="s2"> are read.&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">InternalServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Internal server error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="n">GoogleAPIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Google API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error while reading files: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># モデルのインスタンスを作成</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">GenerativeModel</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+
+        <span class="c1"># コンテンツリストを作成</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="n">pdf_files</span> <span class="o">+</span> <span class="n">image_files</span> <span class="o">+</span> <span class="p">[</span><span class="n">prompt</span><span class="p">]</span>
+
+        <span class="c1"># 同期関数を非同期にラップする</span>
+        <span class="n">sync_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">,</span>
+            <span class="n">contents</span><span class="p">,</span>
+            <span class="n">generation_config</span><span class="o">=</span><span class="n">generation_config</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">sync_response</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">content</span>
+
+    <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model attribute error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Type error in model generation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="n">InternalServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Internal server error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="n">GoogleAPIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Google API error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error during content generation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+
+
+<span class="c1"># テスト用のコード</span>
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_request_stream.main">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">AsyncGenerator</span> <span class="o">=</span> <span class="n">generate_content_stream</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;kougi_sample.png&quot;</span><span class="p">,</span> <span class="s2">&quot;kougi_sample2.png&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+        <span class="c1"># まず辞書形式に変換</span>
+        <span class="n">content_dict</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+        <span class="c1"># 辞書をJSON文字列に変換</span>
+        <span class="n">json_string</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">content_dict</span><span class="p">)</span>
+
+        <span class="c1"># JSON文字列をパース</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+
+        <span class="c1"># textの値を出力</span>
+        <span class="n">text_value</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;candidates&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">][</span><span class="s2">&quot;parts&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text_value</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

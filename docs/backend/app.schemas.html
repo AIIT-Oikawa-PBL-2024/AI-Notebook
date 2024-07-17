@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.schemas package &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=144c8c96"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=91613774"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AI-Notebook-backend
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">app.schemas package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-app.schemas.files">app.schemas.files module</a><ul>
+<li><a class="reference internal" href="#app.schemas.files.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.files.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.File.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">File.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.File.model_config"><code class="docutils literal notranslate"><span class="pre">File.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.File.model_fields"><code class="docutils literal notranslate"><span class="pre">File.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.files.FileBase"><code class="docutils literal notranslate"><span class="pre">FileBase</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.files.FileBase.file_name"><code class="docutils literal notranslate"><span class="pre">FileBase.file_name</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileBase.file_size"><code class="docutils literal notranslate"><span class="pre">FileBase.file_size</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">FileBase.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileBase.model_config"><code class="docutils literal notranslate"><span class="pre">FileBase.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileBase.model_fields"><code class="docutils literal notranslate"><span class="pre">FileBase.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.files.FileCreate"><code class="docutils literal notranslate"><span class="pre">FileCreate</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.files.FileCreate.created_at"><code class="docutils literal notranslate"><span class="pre">FileCreate.created_at</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">FileCreate.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileCreate.model_config"><code class="docutils literal notranslate"><span class="pre">FileCreate.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">FileCreate.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.files.FileCreate.user_id"><code class="docutils literal notranslate"><span class="pre">FileCreate.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.schemas.notes">app.schemas.notes module</a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteBase"><code class="docutils literal notranslate"><span class="pre">NoteBase</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteBase.content"><code class="docutils literal notranslate"><span class="pre">NoteBase.content</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteBase.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteBase.model_config"><code class="docutils literal notranslate"><span class="pre">NoteBase.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteBase.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteBase.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteBase.title"><code class="docutils literal notranslate"><span class="pre">NoteBase.title</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteByCurrentUserResponse"><code class="docutils literal notranslate"><span class="pre">NoteByCurrentUserResponse</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteByCurrentUserResponse.id"><code class="docutils literal notranslate"><span class="pre">NoteByCurrentUserResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteByCurrentUserResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteByCurrentUserResponse.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteByCurrentUserResponse.model_config"><code class="docutils literal notranslate"><span class="pre">NoteByCurrentUserResponse.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteByCurrentUserResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteByCurrentUserResponse.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteByCurrentUserResponse.user_id"><code class="docutils literal notranslate"><span class="pre">NoteByCurrentUserResponse.user_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreate"><code class="docutils literal notranslate"><span class="pre">NoteCreate</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteCreate.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreate.model_config"><code class="docutils literal notranslate"><span class="pre">NoteCreate.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteCreate.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreate.user_id"><code class="docutils literal notranslate"><span class="pre">NoteCreate.user_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreateResponse"><code class="docutils literal notranslate"><span class="pre">NoteCreateResponse</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreateResponse.id"><code class="docutils literal notranslate"><span class="pre">NoteCreateResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreateResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteCreateResponse.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreateResponse.model_config"><code class="docutils literal notranslate"><span class="pre">NoteCreateResponse.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteCreateResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteCreateResponse.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteResponse"><code class="docutils literal notranslate"><span class="pre">NoteResponse</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteResponse.id"><code class="docutils literal notranslate"><span class="pre">NoteResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteResponse.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteResponse.model_config"><code class="docutils literal notranslate"><span class="pre">NoteResponse.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteResponse.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdate"><code class="docutils literal notranslate"><span class="pre">NoteUpdate</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteUpdate.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdate.model_config"><code class="docutils literal notranslate"><span class="pre">NoteUpdate.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdate.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteUpdate.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdateResponse"><code class="docutils literal notranslate"><span class="pre">NoteUpdateResponse</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdateResponse.id"><code class="docutils literal notranslate"><span class="pre">NoteUpdateResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdateResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">NoteUpdateResponse.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdateResponse.model_config"><code class="docutils literal notranslate"><span class="pre">NoteUpdateResponse.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdateResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">NoteUpdateResponse.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.notes.NoteUpdateResponse.user_id"><code class="docutils literal notranslate"><span class="pre">NoteUpdateResponse.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.schemas.outputs">app.schemas.outputs module</a><ul>
+<li><a class="reference internal" href="#app.schemas.outputs.Output"><code class="docutils literal notranslate"><span class="pre">Output</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.outputs.Output.id"><code class="docutils literal notranslate"><span class="pre">Output.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.Output.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Output.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.Output.model_config"><code class="docutils literal notranslate"><span class="pre">Output.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.Output.model_fields"><code class="docutils literal notranslate"><span class="pre">Output.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputBase"><code class="docutils literal notranslate"><span class="pre">OutputBase</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputBase.output"><code class="docutils literal notranslate"><span class="pre">OutputBase.output</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputBase.model_config"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputBase.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">OutputBase.output</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputCreate"><code class="docutils literal notranslate"><span class="pre">OutputCreate</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputCreate.created_at"><code class="docutils literal notranslate"><span class="pre">OutputCreate.created_at</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputCreate.model_config"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.outputs.OutputCreate.user_id"><code class="docutils literal notranslate"><span class="pre">OutputCreate.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.schemas.users">app.schemas.users module</a><ul>
+<li><a class="reference internal" href="#app.schemas.users.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.users.User.id"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.User.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">User.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.User.model_config"><code class="docutils literal notranslate"><span class="pre">User.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.User.model_fields"><code class="docutils literal notranslate"><span class="pre">User.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.users.UserBase"><code class="docutils literal notranslate"><span class="pre">UserBase</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.users.UserBase.username"><code class="docutils literal notranslate"><span class="pre">UserBase.username</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserBase.email"><code class="docutils literal notranslate"><span class="pre">UserBase.email</span></code></a></li>
+<li><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">UserBase.email</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">UserBase.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserBase.model_config"><code class="docutils literal notranslate"><span class="pre">UserBase.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserBase.model_fields"><code class="docutils literal notranslate"><span class="pre">UserBase.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">UserBase.username</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreate"><code class="docutils literal notranslate"><span class="pre">UserCreate</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.users.UserCreate.password"><code class="docutils literal notranslate"><span class="pre">UserCreate.password</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">UserCreate.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreate.model_config"><code class="docutils literal notranslate"><span class="pre">UserCreate.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">UserCreate.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">UserCreate.password</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreateResponse"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse</span></code></a><ul>
+<li><a class="reference internal" href="#app.schemas.users.UserCreateResponse.id"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.id</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreateResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreateResponse.model_config"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.model_config</span></code></a></li>
+<li><a class="reference internal" href="#app.schemas.users.UserCreateResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.model_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.schemas">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AI-Notebook-backend</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">app.schemas package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/app.schemas.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="app-schemas-package">
+<h1>app.schemas package<a class="headerlink" href="#app-schemas-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-app.schemas.files">
+<span id="app-schemas-files-module"></span><h2>app.schemas.files module<a class="headerlink" href="#module-app.schemas.files" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.files.File">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.files.</span></span><span class="sig-name descname"><span class="pre">File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/files.html#File"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.files.File" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.files.FileCreate" title="app.schemas.files.FileCreate"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileCreate</span></code></a></p>
+<p>作成されたファイルの情報を表すモデル。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><p>id (int): ファイルのID。</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.File.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.files.File.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.File.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.files.File.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.File.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.files.File.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.File.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True),</span> <span class="pre">'file_name':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'file_size':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.files.File.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.files.FileBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.files.</span></span><span class="sig-name descname"><span class="pre">FileBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/files.html#FileBase"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.files.FileBase" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>基本的なファイル情報を表すモデル。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><p>file_name (str): ファイルの名前。
+file_size (int): ファイルのサイズ。</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileBase.file_name">
+<span class="sig-name descname"><span class="pre">file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#app.schemas.files.FileBase.file_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileBase.file_size">
+<span class="sig-name descname"><span class="pre">file_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.files.FileBase.file_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileBase.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.files.FileBase.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileBase.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.files.FileBase.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileBase.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'file_name':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'file_size':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.files.FileBase.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.files.FileCreate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.files.</span></span><span class="sig-name descname"><span class="pre">FileCreate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/files.html#FileCreate"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.files.FileCreate" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.files.FileBase" title="app.schemas.files.FileBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileBase</span></code></a></p>
+<p>ファイル作成時の情報を表すモデル。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><p>user_id (int): ユーザーID。
+created_at (datetime): 作成日時。</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileCreate.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#app.schemas.files.FileCreate.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileCreate.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.files.FileCreate.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileCreate.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.files.FileCreate.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileCreate.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True),</span> <span class="pre">'file_name':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'file_size':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.files.FileCreate.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.files.FileCreate.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.files.FileCreate.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.schemas.notes">
+<span id="app-schemas-notes-module"></span><h2>app.schemas.notes module<a class="headerlink" href="#module-app.schemas.notes" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteBase"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteBase" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>ノートの基本クラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>BaseModel</strong> (<em>BaseModel</em>) -- ベースモデル</p>
+</dd>
+<dt class="field-even">変数<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- ノートのタイトル</p></li>
+<li><p><strong>content</strong> (<em>str</em>) -- ノートの内容</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteBase.content">
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#app.schemas.notes.NoteBase.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteBase.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteBase.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteBase.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteBase.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteBase.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteBase.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteBase.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#app.schemas.notes.NoteBase.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteByCurrentUserResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteByCurrentUserResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteByCurrentUserResponse"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteByCurrentUserResponse" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoteBase</span></code></a></p>
+<p>現在のユーザーによるノートのレスポンス用クラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NoteBase</strong> (<a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><em>NoteBase</em></a>) -- ノートの基本クラス</p>
+</dd>
+<dt class="field-even">変数<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- ノートのID</p></li>
+<li><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p></li>
+<li><p><strong>model_config</strong> (<em>ConfigDict</em>) -- モデルの設定</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteByCurrentUserResponse.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteByCurrentUserResponse.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteByCurrentUserResponse.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteByCurrentUserResponse.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteByCurrentUserResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.notes.NoteByCurrentUserResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteByCurrentUserResponse.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteByCurrentUserResponse.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteByCurrentUserResponse.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteByCurrentUserResponse.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteCreate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteCreate"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteCreate" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoteBase</span></code></a></p>
+<p>ノート作成用のクラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NoteBase</strong> (<a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><em>NoteBase</em></a>) -- ノートの基本クラス</p>
+</dd>
+<dt class="field-even">変数<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreate.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreate.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreate.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreate.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreate.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreate.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreate.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreate.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreateResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteCreateResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteCreateResponse"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteCreateResponse" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.notes.NoteCreate" title="app.schemas.notes.NoteCreate"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoteCreate</span></code></a></p>
+<p>ノート作成のレスポンス用クラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NoteCreate</strong> (<a class="reference internal" href="#app.schemas.notes.NoteCreate" title="app.schemas.notes.NoteCreate"><em>NoteCreate</em></a>) -- ノート作成用のクラス</p>
+</dd>
+<dt class="field-even">変数<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- ノートのID</p></li>
+<li><p><strong>model_config</strong> (<em>ConfigDict</em>) -- モデルの設定</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreateResponse.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreateResponse.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreateResponse.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreateResponse.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreateResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreateResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteCreateResponse.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteCreateResponse.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteResponse"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteResponse" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoteBase</span></code></a></p>
+<p>ノートのレスポンス用クラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NoteBase</strong> (<a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><em>NoteBase</em></a>) -- ノートの基本クラス</p>
+</dd>
+<dt class="field-even">変数<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- ノートのID</p></li>
+<li><p><strong>model_config</strong> (<em>ConfigDict</em>) -- モデルの設定</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteResponse.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteResponse.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteResponse.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteResponse.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.notes.NoteResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteResponse.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteResponse.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteUpdate"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteUpdate" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoteBase</span></code></a></p>
+<p>ノート更新用のクラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NoteBase</strong> (<a class="reference internal" href="#app.schemas.notes.NoteBase" title="app.schemas.notes.NoteBase"><em>NoteBase</em></a>) -- ノートの基本クラス</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdate.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdate.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdate.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdate.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdate.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdate.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdateResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.notes.</span></span><span class="sig-name descname"><span class="pre">NoteUpdateResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/notes.html#NoteUpdateResponse"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.notes.NoteUpdateResponse" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.notes.NoteUpdate" title="app.schemas.notes.NoteUpdate"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoteUpdate</span></code></a></p>
+<p>ノート更新のレスポンス用クラス</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NoteUpdate</strong> (<a class="reference internal" href="#app.schemas.notes.NoteUpdate" title="app.schemas.notes.NoteUpdate"><em>NoteUpdate</em></a>) -- ノート更新用のクラス</p>
+</dd>
+<dt class="field-even">変数<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- ノートのID</p></li>
+<li><p><strong>model_config</strong> (<em>ConfigDict</em>) -- モデルの設定</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdateResponse.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdateResponse.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdateResponse.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdateResponse.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdateResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdateResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdateResponse.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'content':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'title':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdateResponse.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.notes.NoteUpdateResponse.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.notes.NoteUpdateResponse.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.schemas.outputs">
+<span id="app-schemas-outputs-module"></span><h2>app.schemas.outputs module<a class="headerlink" href="#module-app.schemas.outputs" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.outputs.Output">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.outputs.</span></span><span class="sig-name descname"><span class="pre">Output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/outputs.html#Output"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.outputs.Output" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.outputs.OutputCreate" title="app.schemas.outputs.OutputCreate"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputCreate</span></code></a></p>
+<p>Output クラスは OutputCreate クラスを継承しています。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- 出力のID</p></li>
+<li><p><strong>model_config</strong> (<em>ConfigDict</em>) -- モデルの設定辞書</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.Output.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.outputs.Output.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.Output.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.outputs.Output.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.Output.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.outputs.Output.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.Output.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'output':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.outputs.Output.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.outputs.</span></span><span class="sig-name descname"><span class="pre">OutputBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/outputs.html#OutputBase"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.outputs.OutputBase" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>OutputBaseクラスは、出力のベースモデルです。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputBase.output">
+<span class="sig-name descname"><span class="pre">output</span></span><a class="headerlink" href="#app.schemas.outputs.OutputBase.output" title="Link to this definition"></a></dt>
+<dd><p>出力の文字列です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputBase.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.outputs.OutputBase.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputBase.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.outputs.OutputBase.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputBase.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'output':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.outputs.OutputBase.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputCreate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.outputs.</span></span><span class="sig-name descname"><span class="pre">OutputCreate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/outputs.html#OutputCreate"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.outputs.OutputCreate" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.outputs.OutputBase" title="app.schemas.outputs.OutputBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputBase</span></code></a></p>
+<p>OutputCreateクラスは、OutputBaseクラスを継承した出力データの作成を表します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p></li>
+<li><p><strong>created_at</strong> (<em>datetime</em>) -- 作成日時</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputCreate.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#app.schemas.outputs.OutputCreate.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputCreate.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.outputs.OutputCreate.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputCreate.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.outputs.OutputCreate.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputCreate.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True),</span> <span class="pre">'output':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'user_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.outputs.OutputCreate.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.outputs.OutputCreate.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#app.schemas.outputs.OutputCreate.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.schemas.users">
+<span id="app-schemas-users-module"></span><h2>app.schemas.users module<a class="headerlink" href="#module-app.schemas.users" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.users.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.users.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/users.html#User"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.users.User" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.users.UserBase" title="app.schemas.users.UserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserBase</span></code></a></p>
+<p>ユーザー情報を表すモデル。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.User.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.schemas.users.User.id" title="Link to this definition"></a></dt>
+<dd><p>ユーザーID。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.User.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.users.User.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.User.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.users.User.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.User.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'username':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.users.User.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.users.UserBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.users.</span></span><span class="sig-name descname"><span class="pre">UserBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/users.html#UserBase"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.users.UserBase" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>ユーザーの基本情報を表すモデル。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserBase.username">
+<span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#app.schemas.users.UserBase.username" title="Link to this definition"></a></dt>
+<dd><p>ユーザー名。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserBase.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#app.schemas.users.UserBase.email" title="Link to this definition"></a></dt>
+<dd><p>メールアドレス。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">email</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserBase.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.users.UserBase.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserBase.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.users.UserBase.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserBase.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'username':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.users.UserBase.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.users.</span></span><span class="sig-name descname"><span class="pre">UserCreate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/users.html#UserCreate"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.users.UserCreate" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.users.UserBase" title="app.schemas.users.UserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserBase</span></code></a></p>
+<p>新しいユーザーを作成するためのモデル。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreate.password">
+<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#app.schemas.users.UserCreate.password" title="Link to this definition"></a></dt>
+<dd><p>パスワード。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreate.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.users.UserCreate.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreate.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.users.UserCreate.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreate.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'password':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'username':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.users.UserCreate.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreateResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.schemas.users.</span></span><span class="sig-name descname"><span class="pre">UserCreateResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/schemas/users.html#UserCreateResponse"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.schemas.users.UserCreateResponse" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#app.schemas.users.UserCreate" title="app.schemas.users.UserCreate"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserCreate</span></code></a></p>
+<p>新しいユーザー作成のレスポンスモデル。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreateResponse.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.schemas.users.UserCreateResponse.id" title="Link to this definition"></a></dt>
+<dd><p>ユーザーID。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreateResponse.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#app.schemas.users.UserCreateResponse.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreateResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'from_attributes':</span> <span class="pre">True}</span></em><a class="headerlink" href="#app.schemas.users.UserCreateResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.schemas.users.UserCreateResponse.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True),</span> <span class="pre">'password':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True),</span> <span class="pre">'username':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True)}</span></em><a class="headerlink" href="#app.schemas.users.UserCreateResponse.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.schemas">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.schemas" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
