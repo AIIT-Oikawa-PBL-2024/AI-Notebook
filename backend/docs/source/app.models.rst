@@ -1,0 +1,45 @@
+app.models package
+==================
+
+Submodules
+----------
+
+app.models.files module
+-----------------------
+
+.. automodule:: app.models.files
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+app.models.notes module
+-----------------------
+
+.. automodule:: app.models.notes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+app.models.outputs module
+-------------------------
+
+.. automodule:: app.models.outputs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+app.models.users module
+-----------------------
+
+.. automodule:: app.models.users
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: app.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
