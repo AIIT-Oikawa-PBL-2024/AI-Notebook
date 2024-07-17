@@ -1,6 +1,5 @@
 import os
 from typing import Any
-import logging
 import httpx
 import streamlit as st
 from dotenv import load_dotenv
