@@ -13,6 +13,8 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # リポジトリの全履歴をフェッチするように設定します
       - run: pip install sphinx sphinx-rtd-theme myst-parser
       - name: Sphinx build frontend
         run: sphinx-apidoc -f -o frontend/docs/source/ frontend/app/
