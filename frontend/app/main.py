@@ -1,63 +1,94 @@
-## Issue No.2
-## Title Input:画像入力インターフェース機能
-##タスク1,3,4
-##https://github.com/orgs/AIIT-Oikawa-PBL-2024/projects/9/views/1?sortedBy%5Bdirection%5D=asc&sortedBy%5BcolumnId%5D=108570462
-
-## 概要
-##AIサポート学習帳の画像アップロード画面
-##ファイルタイプを'png', 'pdf', 'jpeg', 'jpg'に制限する
-##ファイルサイズは‘.streamlit/config.toml’で変更（デフォルト200MB）
-
+import logging
 import os
+from typing import Any
 
-import requests  # type: ignore
+import httpx
 import streamlit as st
-from dotenv import load_dotenv
-from PIL import Image
-from utils.sidebar import show_sidebar
 
-# 環境変数を読み込む
-load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 BACKEND_HOST = os.getenv("BACKEND_HOST")
+BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/upload"
 
-IMG_PATH = "imgs"
+with st.sidebar:
+    st.page_link("main.py", label="トップページ")
+    st.page_link("pages/study_ai_note.py", label="ノート・AIサポート学習帳")
+    st.page_link("pages/select_files.py", label="ファイル選択")
 
-
-def upload_files() -> None:
-    st.markdown("# AIサポート学習帳　ファイルアップロード")
-    files = st.file_uploader(
-        "講義テキストの画像をアップロードしてください.",
-        accept_multiple_files=True,
-        type=["png", "pdf", "jpeg", "jpg"],
-    )
-
-    if files:
-        for file in files:
-            st.markdown(f"{file.name} をアップロードしました.")
-            with open(os.path.join(IMG_PATH, file.name), "wb") as f:
-                f.write(file.getbuffer())
+ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
 
 
-def submit() -> None:
-    if st.button("Submit"):
-        try:
-            response = requests.get(BACKEND_HOST)
-            message = response.json()
-            st.text(message["message"])
-        except Exception as e:
-            st.text("An error occurred.")
-            st.text(e)
+def is_valid_file(file: Any) -> bool:
+    """
+    Check if the file has a valid extension.
+
+    Args:
+        file (Any): The file to be checked.
+
+    Returns:
+        bool: True if the file has a valid extension, False otherwise.
+    """
+    file_ext = os.path.splitext(file.name)[1][1:].lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        st.error(
+            f" {file.name}をアップロードできませんでした。PDF、JPG、JPEG、"
+            "またはPNGファイルをアップロードしてください"
+        )
+        return False
+
+    return True
 
 
 def main() -> None:
-    submit()
-    upload_files()
+    """
+    Main function for file upload.
 
-    img = Image.open("app/statics/PBLフライヤー1Q.jpg")
-    st.image(img, use_column_width=True)
+    This function displays a file uploader and handles the file upload process.
+    """
+    st.title("ファイルアップロード")
+    uploaded_files = st.file_uploader(
+        "", accept_multiple_files=True, label_visibility="collapsed"
+    )
+
+    if uploaded_files:
+        valid_files = []
+        file_names = set()
+
+        for file in uploaded_files:
+            if file.name in file_names:
+                st.error(
+                    f" {file.name}ファイルは既にアップロードされています。"
+                    "他のファイルをアップロードしてください。"
+                )
+                continue
+
+            if is_valid_file(file):
+                valid_files.append(file)
+                file_names.add(file.name)
+                st.success(
+                    f" {file.name}は正常にアップロードされました。 (Size: "
+                    + f"{file.size / 1024 / 1024:.2f} MB)"
+                )
+
+        if valid_files:
+            if st.button("アップロード"):
+                try:
+                    with httpx.Client() as client:
+                        files = {f.name: f.getvalue() for f in valid_files}
+                        response = client.post(
+                            BACKEND_DEV_API_URL, files=files
+                        )
+
+                        if response.status_code == 200:
+                            st.success("ファイルは正常に登録されました。")
+                        else:
+                            st.error(
+                                "ファイルは登録できませんでした。 Status code: "
+                                "{response.status_code}"
+                            )
+                except httpx.RequestError as e:
+                    st.error(f"リクエストでエラーが発生しました：{e}")
 
 
 if __name__ == "__main__":
-    show_sidebar()
     main()
