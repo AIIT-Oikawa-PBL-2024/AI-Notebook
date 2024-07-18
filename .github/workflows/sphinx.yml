@@ -20,11 +20,11 @@ jobs:
       - name: Sphinx build frontend
         run: sphinx-apidoc -f -o frontend/docs/source/ frontend/app/
       - name: Make HTML frontend
-        run: sphinx-build frontend/docs/source/ docs/frontend/ -a
+        run: sphinx-build frontend/docs/source/ build/docs/frontend/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages  
-          #publish_dir: docs/
-          #keep_files: true  # 既存のファイルを保持する
+          publish_dir: build
+          keep_files: true
