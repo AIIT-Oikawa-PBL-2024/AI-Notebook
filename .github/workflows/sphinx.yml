@@ -14,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          persist-credentials: false
           fetch-depth: 0  # リポジトリの全履歴をフェッチするように設定します
       - run: pip install sphinx sphinx-rtd-theme myst-parser
       - name: Sphinx build frontend
@@ -24,4 +25,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages  
           publish_dir: docs/
