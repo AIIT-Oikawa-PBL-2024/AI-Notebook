@@ -18,10 +18,6 @@ jobs:
         run: sphinx-apidoc -f -o frontend/docs/source/ frontend/app/
       - name: Make HTML frontend
         run: sphinx-build frontend/docs/source/ docs/frontend/ -a
-      - name: Sphinx build backend
-        run: sphinx-apidoc -f -o backend/docs/source/ backend/app/
-      - name: Make HTML backend
-        run: sphinx-build backend/docs/source/ docs/backend/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
