@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: pip install sphinx sphinx-rtd-theme myst-parser
       - name: Sphinx build frontend
-        run: sphinx-apidoc -f -o frontend/docs/source/ fronted/app/
+        run: sphinx-apidoc -f -o frontend/docs/source/ frontend/app/
       - name: Make HTML frontend
         run: sphinx-build frontend/docs/source/ docs/frontend/ -a
       - name: Sphinx build backend
