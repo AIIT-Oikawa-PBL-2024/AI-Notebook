@@ -1,0 +1,29 @@
+name: Sphinx
+
+on:
+  push:
+    branches:
+      - gh-pages
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install sphinx sphinx-rtd-theme myst-parser
+      - name: Sphinx build frontend
+        run: sphinx-apidoc -f -o frontend/docs/source/ fronted/app/
+      - name: Make HTML frontend
+        run: sphinx-build frontend/docs/source/ docs/frontend/ -a
+      - name: Sphinx build backend
+        run: sphinx-apidoc -f -o backend/docs/source/ backend/app/
+      - name: Make HTML backend
+        run: sphinx-build backend/docs/source/ docs/backend/ -a
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/
