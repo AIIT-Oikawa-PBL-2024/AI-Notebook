@@ -12,14 +12,6 @@ app.utils.output module
    :undoc-members:
    :show-inheritance:
 
-app.utils.sidebar module
-------------------------
-
-.. automodule:: app.utils.sidebar
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
