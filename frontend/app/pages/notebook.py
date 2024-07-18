@@ -287,6 +287,36 @@ def update_unsaved_changes(title: str, content: str) -> None:
     st.session_state.unsaved_changes[key] = {"title": title, "content": content}
 
 
+async def delete_note(client: httpx.AsyncClient, note_id: int) -> None:
+    """
+    ノートを削除する。
+
+    :param client: 非同期HTTPクライアント
+    :type client: httpx.AsyncClient
+    :param note_id: 削除するノートのID
+    :type note_id: int
+    """
+    try:
+        url = f"{BACKEND_API_URL}{note_id}"
+        response = await client.delete(url)
+        response.raise_for_status()
+
+        st.success("ノートを削除しました。")
+        await get_notes()
+
+        st.session_state.current_note_id = None
+        st.session_state.note_title = ""
+        st.session_state.markdown_text = ""
+        st.session_state.selected_note = None
+        st.session_state.show_new_note = False
+
+    except httpx.HTTPStatusError as e:
+        error_detail = e.response.text
+        st.error(f"ノートの削除に失敗しました: {e}\n詳細: {error_detail}")
+    except Exception as e:
+        st.error(f"予期せぬエラーが発生しました: {e}")
+
+
 async def display_note_content() -> None:
     """
     ノートの内容を表示する。
@@ -315,13 +345,31 @@ async def display_note_content() -> None:
 
         st.subheader("ノート")
 
-        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        st.markdown(
+            """
+            <style>
+            .stButton button[data-testid="delete-button"] {
+                color: red;
+                border-color: red;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
         with col1:
             edit_button = st.button("テキスト編集", use_container_width=True)
         with col2:
             preview_button = st.button("プレビュー表示", use_container_width=True)
         with col4:
             save_button = st.button("保存", key="save_button", use_container_width=True)
+        with col5:
+            delete_button = st.button(
+                "ノートを削除",
+                key="delete_button",
+                use_container_width=True,
+            )
 
         if preview_button:
             st.session_state.show_preview = True
@@ -350,6 +398,13 @@ async def display_note_content() -> None:
                 await save_note(client, note_title, st.session_state.markdown_text)
             else:
                 st.error("タイトルが無効です。保存できません。")
+
+        if delete_button:
+            if st.session_state.current_note_id:
+                await delete_note(client, st.session_state.current_note_id)
+                st.rerun()
+            else:
+                st.warning("削除するノートが選択されていません。")
 
 
 async def main() -> None:

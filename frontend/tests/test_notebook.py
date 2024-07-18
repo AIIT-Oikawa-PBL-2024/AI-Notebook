@@ -17,6 +17,7 @@ from app.pages.notebook import (
     update_unsaved_changes,
     display_note_content,
     main,
+    delete_note,
 )
 
 
@@ -303,6 +304,61 @@ async def test_main(mock_session_state: MockSessionState) -> None:
                         await main()
 
     mock_display_note_content.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_delete_note(mock_session_state: MockSessionState) -> None:
+    """
+    delete_note関数のテスト。
+
+    ノートが正しく削除されることを確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
+    mock_client = AsyncMock(spec=httpx.AsyncClient)
+    mock_response = MagicMock()
+    mock_response.status_code = 204
+    mock_response.raise_for_status.return_value = None
+    mock_client.delete.return_value = mock_response
+
+    note_id = 1
+
+    with patch("streamlit.success"):
+        with patch("app.pages.notebook.get_notes"):
+            await delete_note(mock_client, note_id)
+
+    mock_client.delete.assert_called_once_with(f"http://backend:8000/notes/{note_id}")
+
+
+@pytest.mark.asyncio
+async def test_delete_note_not_found(mock_session_state: MockSessionState) -> None:
+    """
+    delete_note関数のエラーケースのテスト。
+
+    ノートが見つからない場合（404エラー）の動作を確認する。
+
+    :param mock_session_state: モックセッション状態
+    :type mock_session_state: MockSessionState
+    """
+    mock_client = AsyncMock(spec=httpx.AsyncClient)
+    mock_response = MagicMock()
+    mock_response.status_code = 404
+    mock_response.text = "Not Found"
+    mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
+        "Not Found", request=MagicMock(), response=mock_response
+    )
+    mock_client.delete.return_value = mock_response
+
+    note_id = 999  # 存在しないノートID
+
+    with patch("streamlit.error") as mock_error:
+        await delete_note(mock_client, note_id)
+
+    mock_client.delete.assert_called_once_with(f"http://backend:8000/notes/{note_id}")
+    mock_error.assert_called_once_with(
+        f"ノートの削除に失敗しました: Not Found\n詳細: {mock_response.text}"
+    )
 
 
 if __name__ == "__main__":
