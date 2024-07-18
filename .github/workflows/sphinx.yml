@@ -3,7 +3,7 @@ name: Sphinx
 on:
   push:
     branches:
-      - SphinxTest
+      - main
   workflow_dispatch:
 
 jobs:
