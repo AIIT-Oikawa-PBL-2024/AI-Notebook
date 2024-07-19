@@ -1,32 +1,36 @@
+import asyncio
 import logging
 import os
-from typing import Any
+import sys
+from typing import Any, Dict
 
 import httpx
 import streamlit as st
+
+# プロジェクトルートのパスを取得
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+# プロジェクトルートをPythonパスに追加
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 logging.basicConfig(level=logging.INFO)
 
 BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/upload"
 
-with st.sidebar:
-    st.page_link("main.py", label="トップページ")
-    st.page_link("pages/study_ai_note.py", label="ノート・AIサポート学習帳")
-    st.page_link("pages/select_files.py", label="ファイル選択")
-
 ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
 
 
 def is_valid_file(file: Any) -> bool:
     """
-    Check if the file has a valid extension.
+    ファイルの拡張子が有効かどうかをチェックします。
 
     Args:
-        file (Any): The file to be checked.
+        file (Any): チェックするファイル。
 
     Returns:
-        bool: True if the file has a valid extension, False otherwise.
+        bool: ファイルの拡張子が有効な場合はTrue、それ以外の場合はFalse。
     """
     file_ext = os.path.splitext(file.name)[1][1:].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
@@ -39,15 +43,39 @@ def is_valid_file(file: Any) -> bool:
     return True
 
 
+async def upload_files_and_get_response(valid_files: list) -> Dict[str, Any]:
+    """
+    アップロードされたファイルをサーバーに送信し、レスポンスを取得する非同期関数です。
+
+    :param valid_files: アップロードするファイルのリスト
+    :type valid_files: list
+    :return: レスポンスのJSONデータ
+    :rtype: Dict[str, Any]
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            files = [("files", (file.name, file, file.type)) for file in valid_files]
+            headers = {"accept": "application/json"}
+            response = await client.post(
+                BACKEND_DEV_API_URL, files=files, headers=headers
+            )
+            return response.json()
+    except httpx.RequestError as e:
+        st.error(f"リクエストでエラーが発生しました：{e}")
+        return {"error": str(e)}
+
+
 def main() -> None:
     """
-    Main function for file upload.
+    ファイルアップロードのメイン関数です。
 
-    This function displays a file uploader and handles the file upload process.
+    この関数はファイルアップロードの画面を表示し、ファイルのアップロード処理を担当します。
     """
     st.title("ファイルアップロード")
     uploaded_files = st.file_uploader(
-        "", accept_multiple_files=True, label_visibility="collapsed"
+        "ファイルをアップロードしてください",
+        accept_multiple_files=True,
+        type=["png", "jpg", "jpeg", "pdf"],
     )
 
     if uploaded_files:
@@ -72,23 +100,38 @@ def main() -> None:
 
         if valid_files:
             if st.button("アップロード"):
-                try:
-                    with httpx.Client() as client:
-                        files = {f.name: f.getvalue() for f in valid_files}
-                        response = client.post(
-                            BACKEND_DEV_API_URL, files=files
-                        )
+                response = asyncio.run(upload_files_and_get_response(valid_files))
+                if "error" in response:
+                    st.error(
+                        f"ファイルのアップロードに失敗しました: {response['error']}"
+                    )
+                else:
+                    if response.get("success"):
+                        st.success("ファイルのアップロードが完了しました。")
 
-                        if response.status_code == 200:
-                            st.success("ファイルは正常に登録されました。")
+                        if response["success_files"]:
+                            st.write("成功したファイル:")
+                            for success_file in response["success_files"]:
+                                st.write(
+                                    f"- {success_file['filename']}: "
+                                    f"{success_file['message']}"
+                                )
+
+                        if response["failed_files"]:
+                            st.warning("一部のファイルのアップロードに失敗しました:")
+                            for failed_file in response["failed_files"]:
+                                st.write(
+                                    f"- {failed_file['filename']}: "
+                                    f"{failed_file['message']}"
+                                )
                         else:
-                            st.error(
-                                "ファイルは登録できませんでした。 Status code: "
-                                "{response.status_code}"
-                            )
-                except httpx.RequestError as e:
-                    st.error(f"リクエストでエラーが発生しました：{e}")
+                            st.info("すべてのファイルが正常にアップロードされました。")
+                    else:
+                        st.error("ファイルのアップロードに失敗しました。")
 
 
 if __name__ == "__main__":
+    from app.utils.sidebar import show_sidebar
+
+    show_sidebar()
     main()
