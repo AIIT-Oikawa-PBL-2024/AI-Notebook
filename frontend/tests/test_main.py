@@ -8,15 +8,15 @@ from streamlit.testing.v1 import AppTest
 from app.main import upload_files_and_get_response, is_valid_file
 
 
-def test_file_upload() -> None:
-    "Test the file upload function of the app."
+def test_file_uploader() -> None:
+    "Test the file uploader in the streamlit."
     at = AppTest.from_file("app/main.py").run()
     file_uploader = at.get("file_uploader")[0]
     assert file_uploader.multiple_files is True  # type: ignore
 
 
 def test_is_valid_file_success() -> None:
-    "Test the is_valid_file function of the app is success."
+    "Test the is_valid_file function is success."
     # Create a mock file
     mock_file = MagicMock()
     mock_file.name = "test.pdf"
@@ -27,7 +27,7 @@ def test_is_valid_file_success() -> None:
 
 
 def test_is_valid_file_failed() -> None:
-    "Test the is_valid_file function of the app is faled."
+    "Test the is_valid_file function is faled."
     # Create a mock file
     mock_file = MagicMock()
     mock_file.name = "test.txt"
