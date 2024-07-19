@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 import httpx
 import streamlit as st
+from PIL import Image
 
 # プロジェクトルートのパスを取得
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -20,17 +21,17 @@ BACKEND_HOST = os.getenv("BACKEND_HOST")
 BACKEND_DEV_API_URL = f"{BACKEND_HOST}/files/upload"
 
 ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"]
+IMG_PATH = "app/statics/PBLフライヤー1Q.jpg"
 
 
 def is_valid_file(file: Any) -> bool:
     """
     ファイルの拡張子が有効かどうかをチェックします。
 
-    Args:
-        file (Any): チェックするファイル。
-
-    Returns:
-        bool: ファイルの拡張子が有効な場合はTrue、それ以外の場合はFalse。
+    :param file: チェックするファイル。
+    :type file: Any
+    :returns: ファイルの拡張子が有効な場合はTrue、それ以外の場合はFalse。
+    :rtype: bool
     """
     file_ext = os.path.splitext(file.name)[1][1:].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
@@ -94,7 +95,7 @@ def main() -> None:
                 valid_files.append(file)
                 file_names.add(file.name)
                 st.success(
-                    f" {file.name}は正常にアップロードされました。 (Size: "
+                    f"アップロードボタンを押して下さい:  {file.name} (Size: "
                     + f"{file.size / 1024 / 1024:.2f} MB)"
                 )
 
@@ -128,6 +129,8 @@ def main() -> None:
                             st.info("すべてのファイルが正常にアップロードされました。")
                     else:
                         st.error("ファイルのアップロードに失敗しました。")
+    img = Image.open(IMG_PATH)
+    st.image(img)
 
 
 if __name__ == "__main__":
