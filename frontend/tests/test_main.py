@@ -9,14 +9,14 @@ from app.main import upload_files_and_get_response, is_valid_file
 
 
 def test_file_uploader() -> None:
-    "Test the file uploader in the streamlit."
+    "Streamlitのfile_uploaderが複数ファイルをアップロードできることをテストします。"
     at = AppTest.from_file("app/main.py").run()
     file_uploader = at.get("file_uploader")[0]
     assert file_uploader.multiple_files is True  # type: ignore
 
 
 def test_is_valid_file_success() -> None:
-    "Test the is_valid_file function is success."
+    "is_valid_file関数が失敗することをテストします。"
     # Create a mock file
     mock_file = MagicMock()
     mock_file.name = "test.pdf"
@@ -27,7 +27,7 @@ def test_is_valid_file_success() -> None:
 
 
 def test_is_valid_file_failed() -> None:
-    "Test the is_valid_file function is faled."
+    "is_valid_file関数が成功することをテストします。"
     # Create a mock file
     mock_file = MagicMock()
     mock_file.name = "test.txt"
@@ -39,6 +39,7 @@ def test_is_valid_file_failed() -> None:
 
 @pytest.mark.asyncio
 async def test_upload_files_and_get_response_success() -> None:
+    "upload_files_and_get_response関数が成功することをテストします。"
     mock_file = MagicMock()
     mock_file.name = "test.pdf"
     mock_file.type = "application/pdf"
@@ -65,6 +66,7 @@ async def test_upload_files_and_get_response_success() -> None:
 
 @pytest.mark.asyncio
 async def test_upload_files_and_get_response_failure() -> None:
+    "upload_files_and_get_response関数が失敗することをテストします。"
     # Create pdf mockfile
     mock_file = MagicMock()
     mock_file.name = "test.pdf"
