@@ -47,13 +47,14 @@ jobs:
       - name: Sphinx build backend
         run: poetry run sphinx-apidoc -f -o docs/source/ app/
       - name: Make HTML backend
-        run: poetry run sphinx-build docs/source/ docs/build/docs/backend/ -a
+        run: poetry run sphinx-build docs/source/ docs/build/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages  
           publish_dir: docs/build
+          destination_dir: docs/backend 
           keep_files: true
 
   sphinx-frontend:    
@@ -96,11 +97,12 @@ jobs:
       - name: Sphinx build frontend
         run: poetry run sphinx-apidoc -f -o docs/source/ app/
       - name: Make HTML frontend
-        run: poetry run sphinx-build docs/source/ docs/build/docs/frontend/ -a
+        run: poetry run sphinx-build docs/source/ docs/build/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages  
           publish_dir: docs/build
+          destination_dir: docs/frontend
           keep_files: true
