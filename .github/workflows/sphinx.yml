@@ -52,7 +52,7 @@ jobs:
       - name: Debug - List build directory contents
         run: |
           echo "Contents of docs/build/:"
-          ls -R docs/build/
+          cat docs/build/app.utils.html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
