@@ -47,7 +47,7 @@ jobs:
       - name: Sphinx build backend
         run: poetry run sphinx-apidoc -f -o docs/source/ app/
       - name: Make HTML backend
-        run: sphinx-build docs/source/ docs/build/docs/backend/ -a
+        run: poetry run sphinx-build docs/source/ docs/build/docs/backend/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -96,7 +96,7 @@ jobs:
       - name: Sphinx build frontend
         run: poetry run sphinx-apidoc -f -o docs/source/ app/
       - name: Make HTML frontend
-        run: sphinx-build docs/source/ docs/build/docs/frontend/ -a
+        run: poetry run sphinx-build docs/source/ docs/build/docs/frontend/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
