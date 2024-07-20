@@ -3,7 +3,7 @@ name: Sphinx
 on:
   push:
     branches:
-      - feature/sphinx-workflow2
+      - main
   workflow_dispatch:
 
 jobs:
