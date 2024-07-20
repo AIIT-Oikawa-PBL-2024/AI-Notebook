@@ -47,26 +47,9 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">app.utils package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-app.utils.claude_request_stream">app.utils.claude_request_stream module</a><ul>
-<li><a class="reference internal" href="#app.utils.claude_request_stream.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.claude_request_stream.extract_text_from_pdf"><code class="docutils literal notranslate"><span class="pre">extract_text_from_pdf()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.claude_request_stream.generate_content_stream"><code class="docutils literal notranslate"><span class="pre">generate_content_stream()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.claude_request_stream.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.claude_request_stream.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-app.utils.gemini_request_stream">app.utils.gemini_request_stream module</a><ul>
-<li><a class="reference internal" href="#app.utils.gemini_request_stream.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.gemini_request_stream.generate_content_stream"><code class="docutils literal notranslate"><span class="pre">generate_content_stream()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.gemini_request_stream.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-app.utils.operate_cloud_storage">app.utils.operate_cloud_storage module</a><ul>
-<li><a class="reference internal" href="#app.utils.operate_cloud_storage.delete_files_from_gcs"><code class="docutils literal notranslate"><span class="pre">delete_files_from_gcs()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.operate_cloud_storage.post_files"><code class="docutils literal notranslate"><span class="pre">post_files()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.operate_cloud_storage.upload_files"><code class="docutils literal notranslate"><span class="pre">upload_files()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#app-utils-claude-request-stream-module">app.utils.claude_request_stream module</a></li>
+<li><a class="reference internal" href="#app-utils-gemini-request-stream-module">app.utils.gemini_request_stream module</a></li>
+<li><a class="reference internal" href="#app-utils-operate-cloud-storage-module">app.utils.operate_cloud_storage module</a></li>
 <li><a class="reference internal" href="#module-app.utils">Module contents</a></li>
 </ul>
 </li>
@@ -101,146 +84,14 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-app.utils.claude_request_stream">
-<span id="app-utils-claude-request-stream-module"></span><h2>app.utils.claude_request_stream module<a class="headerlink" href="#module-app.utils.claude_request_stream" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.claude_request_stream.check_file_exists">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">check_file_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#check_file_exists"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.check_file_exists" title="Link to this definition"></a></dt>
-<dd><p>Google Cloud Storageで指定されたバケット内のファイルが存在するかどうかを確認</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket_name</strong> -- バケット名</p></li>
-<li><p><strong>file_name</strong> -- ファイル名</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ファイルの存在を示す真偽値</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.claude_request_stream.extract_text_from_pdf">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">extract_text_from_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#extract_text_from_pdf"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.extract_text_from_pdf" title="Link to this definition"></a></dt>
-<dd><p>指定されたPDFファイルからテキストを抽出して返す</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket_name</strong> -- バケット名</p></li>
-<li><p><strong>file_name</strong> -- PDFファイル名</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>抽出されたテキスト</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.claude_request_stream.generate_content_stream">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">generate_content_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-3-5-sonnet&#64;20240620'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ai-notebook-test001'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#generate_content_stream"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.generate_content_stream" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.claude_request_stream.main">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#main"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.main" title="Link to this definition"></a></dt>
-<dd><p>メイン関数。generate_content_stream関数をテストするためのコード</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.claude_request_stream.read_file">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">read_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#read_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.read_file" title="Link to this definition"></a></dt>
-<dd><p>Google Cloud Storageからファイルを読み込み、base64エンコードされた文字列として返す</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket_name</strong> -- バケット名</p></li>
-<li><p><strong>file_name</strong> -- ファイル名</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>base64エンコードされたファイル内容</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="app-utils-claude-request-stream-module">
+<h2>app.utils.claude_request_stream module<a class="headerlink" href="#app-utils-claude-request-stream-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-app.utils.gemini_request_stream">
-<span id="app-utils-gemini-request-stream-module"></span><h2>app.utils.gemini_request_stream module<a class="headerlink" href="#module-app.utils.gemini_request_stream" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.gemini_request_stream.check_file_exists">
-<span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">check_file_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#check_file_exists"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.check_file_exists" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.gemini_request_stream.generate_content_stream">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">generate_content_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">files:</span> <span class="pre">list[str],</span> <span class="pre">model_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'gemini-1.5-pro-001',</span> <span class="pre">generation_config:</span> <span class="pre">~vertexai.generative_models._generative_models.GenerationConfig</span> <span class="pre">=</span> <span class="pre">temperature:</span> <span class="pre">0</span> <span class="pre">max_output_tokens:</span> <span class="pre">8192</span> <span class="pre">,</span> <span class="pre">bucket_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'ai-notebook-test001'</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">GenerationResponse</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#generate_content_stream"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.generate_content_stream" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.gemini_request_stream.main">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#main"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.main" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="app-utils-gemini-request-stream-module">
+<h2>app.utils.gemini_request_stream module<a class="headerlink" href="#app-utils-gemini-request-stream-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-app.utils.operate_cloud_storage">
-<span id="app-utils-operate-cloud-storage-module"></span><h2>app.utils.operate_cloud_storage module<a class="headerlink" href="#module-app.utils.operate_cloud_storage" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.operate_cloud_storage.delete_files_from_gcs">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.operate_cloud_storage.</span></span><span class="sig-name descname"><span class="pre">delete_files_from_gcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/utils/operate_cloud_storage.html#delete_files_from_gcs"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.operate_cloud_storage.delete_files_from_gcs" title="Link to this definition"></a></dt>
-<dd><p>Google Cloud Storageからファイルを削除します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>files</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- 削除するファイルのリスト</p>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>削除の結果を示す辞書</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.operate_cloud_storage.post_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.operate_cloud_storage.</span></span><span class="sig-name descname"><span class="pre">post_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">UploadFile</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/utils/operate_cloud_storage.html#post_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.operate_cloud_storage.post_files" title="Link to this definition"></a></dt>
-<dd><p>アップロードされたファイルを処理し、
-Google Cloud Storageにアップロードするエンドポイント</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>files</strong> (<em>list</em><em>[</em><em>UploadFile</em><em>]</em>) -- アップロードされたファイルのリスト</p>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>アップロード結果を含む辞書</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>HTTPException</strong> -- ファイルの拡張子が無効な場合や、アップロードに失敗した場合</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.operate_cloud_storage.upload_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.operate_cloud_storage.</span></span><span class="sig-name descname"><span class="pre">upload_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext_correct_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">UploadFile</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/utils/operate_cloud_storage.html#upload_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.operate_cloud_storage.upload_files" title="Link to this definition"></a></dt>
-<dd><p>ファイルをGoogle Cloud Storageにアップロードする</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ext_correct_files</strong> (<em>list</em><em>[</em><em>UploadFile</em><em>]</em>) -- アップロードする正しい拡張子を持つファイルのリスト</p>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>アップロード結果を含む辞書</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="app-utils-operate-cloud-storage-module">
+<h2>app.utils.operate_cloud_storage module<a class="headerlink" href="#app-utils-operate-cloud-storage-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-app.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.utils" title="Link to this heading"></a></h2>
