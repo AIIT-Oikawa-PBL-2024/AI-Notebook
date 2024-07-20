@@ -7,28 +7,100 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  sphinx-backend:    
     runs-on: ubuntu-latest
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    defaults:
+      run:
+        working-directory: ./backend
+
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0  
-      - run: pip install sphinx sphinx-rtd-theme myst-parser
-      - name: Sphinx build frontend
-        run: sphinx-apidoc -f -o frontend/docs/source/ frontend/app/
-      - name: Make HTML frontend
-        run: sphinx-build frontend/docs/source/ build/docs/frontend/ -a
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./backend/.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install the project dependencies
+        run: |
+          poetry install --no-root
+
       - name: Sphinx build backend
-        run: sphinx-apidoc -f -o backend/docs/source/ backend/app/
+        run: poetry run sphinx-apidoc -f -o docs/source/ app/
       - name: Make HTML backend
-        run: sphinx-build backend/docs/source/ build/docs/backend/ -a
+        run: sphinx-build docs/source/ docs/build/docs/backend/ -a
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages  
-          publish_dir: build
+          publish_dir: docs/build
+          keep_files: true
+
+  sphinx-frontend:    
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0  
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./frontend/.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install the project dependencies
+        run: |
+          poetry install --no-root
+
+      - name: Sphinx build frontend
+        run: poetry run sphinx-apidoc -f -o docs/source/ app/
+      - name: Make HTML frontend
+        run: sphinx-build docs/source/ docs/build/docs/frontend/ -a
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages  
+          publish_dir: docs/build
           keep_files: true
