@@ -48,6 +48,12 @@ jobs:
         run: poetry run sphinx-apidoc -f -o docs/source/ app/
       - name: Make HTML backend
         run: poetry run sphinx-build docs/source/ docs/build/ -a
+  
+      - name: Debug - List build directory contents
+        run: |
+          echo "Contents of docs/build/:"
+          ls -R docs/build/
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
