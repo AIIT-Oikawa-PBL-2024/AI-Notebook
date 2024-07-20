@@ -382,6 +382,39 @@
 
 
 
+<div class="viewcode-block" id="delete_note">
+<a class="viewcode-back" href="../../../app.pages.html#app.pages.notebook.delete_note">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">delete_note</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">,</span> <span class="n">note_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ノートを削除する。</span>
+
+<span class="sd">    :param client: 非同期HTTPクライアント</span>
+<span class="sd">    :type client: httpx.AsyncClient</span>
+<span class="sd">    :param note_id: 削除するノートのID</span>
+<span class="sd">    :type note_id: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BACKEND_API_URL</span><span class="si">}{</span><span class="n">note_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;ノートを削除しました。&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">get_notes</span><span class="p">()</span>
+
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">current_note_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">note_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">markdown_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">selected_note</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">show_new_note</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">error_detail</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ノートの削除に失敗しました: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s2">詳細: </span><span class="si">{</span><span class="n">error_detail</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;予期せぬエラーが発生しました: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="display_note_content">
 <a class="viewcode-back" href="../../../app.pages.html#app.pages.notebook.display_note_content">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">display_note_content</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -412,13 +445,31 @@
 
         <span class="n">st</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s2">&quot;ノート&quot;</span><span class="p">)</span>
 
-        <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">,</span> <span class="n">col3</span><span class="p">,</span> <span class="n">col4</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            &lt;style&gt;</span>
+<span class="sd">            .stButton button[data-testid=&quot;delete-button&quot;] {</span>
+<span class="sd">                color: red;</span>
+<span class="sd">                border-color: red;</span>
+<span class="sd">            }</span>
+<span class="sd">            &lt;/style&gt;</span>
+<span class="sd">            &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">unsafe_allow_html</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">,</span> <span class="n">col3</span><span class="p">,</span> <span class="n">col4</span><span class="p">,</span> <span class="n">col5</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">columns</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="k">with</span> <span class="n">col1</span><span class="p">:</span>
             <span class="n">edit_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;テキスト編集&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">col2</span><span class="p">:</span>
             <span class="n">preview_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;プレビュー表示&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">col4</span><span class="p">:</span>
             <span class="n">save_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;保存&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;save_button&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">col5</span><span class="p">:</span>
+            <span class="n">delete_button</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span>
+                <span class="s2">&quot;ノートを削除&quot;</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="s2">&quot;delete_button&quot;</span><span class="p">,</span>
+                <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">preview_button</span><span class="p">:</span>
             <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">show_preview</span> <span class="o">=</span> <span class="kc">True</span>
@@ -446,7 +497,14 @@
             <span class="k">if</span> <span class="n">is_valid</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">save_note</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">note_title</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">markdown_text</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;タイトルが無効です。保存できません。&quot;</span><span class="p">)</span></div>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;タイトルが無効です。保存できません。&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">delete_button</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">current_note_id</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">delete_note</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">current_note_id</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;削除するノートが選択されていません。&quot;</span><span class="p">)</span></div>
 
 
 
