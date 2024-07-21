@@ -53,8 +53,9 @@ async def upload_files_and_get_response(valid_files: list) -> Dict[str, Any]:
     :return: レスポンスのJSONデータ
     :rtype: Dict[str, Any]
     """
+    CLIENT_TIMEOUT_SEC = 100.0
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=CLIENT_TIMEOUT_SEC) as client:
             files = [("files", (file.name, file, file.type)) for file in valid_files]
             headers = {"accept": "application/json"}
             response = await client.post(
