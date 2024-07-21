@@ -48,7 +48,12 @@
 <li><a class="reference internal" href="#">app package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#app-main-module">app.main module</a></li>
+<li><a class="reference internal" href="#module-app.main">app.main module</a><ul>
+<li><a class="reference internal" href="#app.main.is_valid_file"><code class="docutils literal notranslate"><span class="pre">is_valid_file()</span></code></a></li>
+<li><a class="reference internal" href="#app.main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#app.main.upload_files_and_get_response"><code class="docutils literal notranslate"><span class="pre">upload_files_and_get_response()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-app">Module contents</a></li>
 </ul>
 </li>
@@ -146,8 +151,49 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="app-main-module">
-<h2>app.main module<a class="headerlink" href="#app-main-module" title="Link to this heading"></a></h2>
+<section id="module-app.main">
+<span id="app-main-module"></span><h2>app.main module<a class="headerlink" href="#module-app.main" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.is_valid_file">
+<span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">is_valid_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/main.html#is_valid_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.main.is_valid_file" title="Link to this definition"></a></dt>
+<dd><p>ファイルの拡張子が有効かどうかをチェックします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<em>Any</em>) -- チェックするファイル。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>ファイルの拡張子が有効な場合はTrue、それ以外の場合はFalse。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.main">
+<span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/main.html#main"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.main.main" title="Link to this definition"></a></dt>
+<dd><p>ファイルアップロードのメイン関数です。</p>
+<p>この関数はファイルアップロードの画面を表示し、ファイルのアップロード処理を担当します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.upload_files_and_get_response">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">upload_files_and_get_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/main.html#upload_files_and_get_response"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.main.upload_files_and_get_response" title="Link to this definition"></a></dt>
+<dd><p>アップロードされたファイルをサーバーに送信し、レスポンスを取得する非同期関数です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>valid_files</strong> (<em>list</em>) -- アップロードするファイルのリスト</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>レスポンスのJSONデータ</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-app">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app" title="Link to this heading"></a></h2>
