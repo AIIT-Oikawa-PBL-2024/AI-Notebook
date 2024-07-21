@@ -52,6 +52,7 @@ select = [
     "E", # error
     "W", # warning
     "I", # isort
+  "D414", # pydocstyle
 ]
 ignore = []
 fixable = ["ALL"]
