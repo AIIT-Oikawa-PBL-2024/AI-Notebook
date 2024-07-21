@@ -1,0 +1,16 @@
+name: Static Analytics for GitHub Actions Workflow
+
+on:
+  pull_request:
+    paths: [".github/workflows/*.yml", ".github/workflows/*.yaml"]
+defaults:
+  run:
+    shell: bash
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          docker run --rm -v "$(pwd):$(pwd)" -w "$(pwd)" rhysd/actionlint:latest
