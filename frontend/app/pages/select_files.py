@@ -239,8 +239,11 @@ async def show_select_files_page() -> None:
     if get_files_button:
         await show_files_list_df()
 
+    # リセットボタンが押された場合の処理
     if reset_button:
-        st.session_state.clear()
+        st.session_state.df = None
+        st.session_state.df_updated = False
+        st.session_state.title_name = ""
         st.rerun()
     # ファイル削除ボタンが押された場合の処理を追記しております（若林）
     if delete_button:
