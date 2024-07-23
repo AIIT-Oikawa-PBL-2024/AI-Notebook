@@ -330,8 +330,11 @@
     <span class="k">if</span> <span class="n">get_files_button</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">show_files_list_df</span><span class="p">()</span>
 
+    <span class="c1"># リセットボタンが押された場合の処理</span>
     <span class="k">if</span> <span class="n">reset_button</span><span class="p">:</span>
-        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">df_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">title_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>
     <span class="c1"># ファイル削除ボタンが押された場合の処理を追記しております（若林）</span>
     <span class="k">if</span> <span class="n">delete_button</span><span class="p">:</span>
