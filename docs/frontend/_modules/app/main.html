@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
+<html class="writer-html5" lang="ja" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>app.main &mdash; Test 1.0.0 documentation</title>
+  <title>app.main &mdash; AI-Notebook-frontend 1.0.0 ドキュメント</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,12 +14,13 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/documentation_options.js?v=144c8c96"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/translations.js?v=91613774"></script>
     <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,7 +32,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            Test
+            AI-Notebook-frontend
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -49,7 +50,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Test</a>
+          <a href="../../index.html">AI-Notebook-frontend</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -57,7 +58,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
       <li class="breadcrumb-item active">app.main</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -67,103 +68,156 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for app.main</h1><div class="highlight"><pre>
-<span></span><span class="c1">## Issue No.2</span>
-<span class="c1">## Title Input:画像入力インターフェース機能</span>
-<span class="c1">##タスク1,3,4</span>
-<span class="c1">##https://github.com/orgs/AIIT-Oikawa-PBL-2024/projects/9/views/1?sortedBy%5Bdirection%5D=asc&amp;sortedBy%5BcolumnId%5D=108570462</span>
-
-<span class="c1">## 概要</span>
-<span class="c1">##AIサポート学習帳の画像アップロード画面</span>
-<span class="c1">##ファイルタイプを&#39;png&#39;, &#39;pdf&#39;, &#39;jpeg&#39;, &#39;jpg&#39;に制限する</span>
-<span class="c1">##ファイルサイズは‘.streamlit/config.toml’で変更（デフォルト200MB）</span>
-
+  <h1>app.main のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span> <span class="nn">requests</span>  <span class="c1"># type: ignore</span>
+<span class="kn">import</span> <span class="nn">httpx</span>
 <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
-<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
-<span class="c1"># 環境変数を読み込む</span>
-<span class="n">load_dotenv</span><span class="p">()</span>
+<span class="c1"># プロジェクトルートのパスを取得</span>
+<span class="n">project_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;..&quot;</span><span class="p">))</span>
+
+<span class="c1"># プロジェクトルートをPythonパスに追加</span>
+<span class="k">if</span> <span class="n">project_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">project_root</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 <span class="n">BACKEND_HOST</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;BACKEND_HOST&quot;</span><span class="p">)</span>
+<span class="n">BACKEND_DEV_API_URL</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BACKEND_HOST</span><span class="si">}</span><span class="s2">/files/upload&quot;</span>
 
-<span class="n">IMG_PATH</span> <span class="o">=</span> <span class="s2">&quot;imgs&quot;</span>
+<span class="n">ALLOWED_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">]</span>
+<span class="n">IMG_PATH</span> <span class="o">=</span> <span class="s2">&quot;app/statics/PBLフライヤー1Q.jpg&quot;</span>
 
 
-<div class="viewcode-block" id="upload_files">
-<a class="viewcode-back" href="../../app.html#app.main.upload_files">[docs]</a>
-<span class="k">def</span> <span class="nf">upload_files</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="is_valid_file">
+<a class="viewcode-back" href="../../app.html#app.main.is_valid_file">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">is_valid_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Uploads image files to the AI Support Learning Book.</span>
+<span class="sd">    ファイルの拡張子が有効かどうかをチェックします。</span>
 
-<span class="sd">    This function allows the user to upload image files (png, pdf, jpeg, jpg) to the AI Support Learning Book.</span>
-<span class="sd">    The uploaded files are saved in the &#39;imgs&#39; directory.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        None</span>
+<span class="sd">    :param file: チェックするファイル。</span>
+<span class="sd">    :type file: Any</span>
+<span class="sd">    :returns: ファイルの拡張子が有効な場合はTrue、それ以外の場合はFalse。</span>
+<span class="sd">    :rtype: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;# AIサポート学習帳　ファイルアップロード&quot;</span><span class="p">)</span>
-    <span class="n">files</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">file_uploader</span><span class="p">(</span>
-        <span class="s2">&quot;講義テキストの画像をアップロードしてください.&quot;</span><span class="p">,</span>
-        <span class="n">accept_multiple_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;jpg&quot;</span><span class="p">],</span>
-    <span class="p">)</span>
+    <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">file_ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ALLOWED_EXTENSIONS</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">をアップロードできませんでした。PDF、JPG、JPEG、&quot;</span>
+            <span class="s2">&quot;またはPNGファイルをアップロードしてください&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">if</span> <span class="n">files</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> をアップロードしました.&quot;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">getbuffer</span><span class="p">())</span></div>
+    <span class="k">return</span> <span class="kc">True</span></div>
 
 
 
-<div class="viewcode-block" id="submit">
-<a class="viewcode-back" href="../../app.html#app.main.submit">[docs]</a>
-<span class="k">def</span> <span class="nf">submit</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="upload_files_and_get_response">
+<a class="viewcode-back" href="../../app.html#app.main.upload_files_and_get_response">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">upload_files_and_get_response</span><span class="p">(</span><span class="n">valid_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Submits the uploaded files to the backend server.</span>
+<span class="sd">    アップロードされたファイルをサーバーに送信し、レスポンスを取得する非同期関数です。</span>
 
-<span class="sd">    This function sends a request to the backend server with the uploaded files.</span>
-<span class="sd">    If the submission is successful, the server&#39;s response message is displayed.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        None</span>
+<span class="sd">    :param valid_files: アップロードするファイルのリスト</span>
+<span class="sd">    :type valid_files: list</span>
+<span class="sd">    :return: レスポンスのJSONデータ</span>
+<span class="sd">    :rtype: Dict[str, Any]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Submit&quot;</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">BACKEND_HOST</span><span class="p">)</span>
-            <span class="n">message</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-            <span class="n">st</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">message</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">st</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;An error occurred.&quot;</span><span class="p">)</span>
-            <span class="n">st</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+    <span class="n">CLIENT_TIMEOUT_SEC</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">CLIENT_TIMEOUT_SEC</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;files&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">type</span><span class="p">))</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">valid_files</span><span class="p">]</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="n">BACKEND_DEV_API_URL</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">RequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;リクエストでエラーが発生しました：</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
 
 
 
 <div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../../app.html#app.main.main">[docs]</a>
+<a class="viewcode-back" href="../../app.html#app.main.main">[ドキュメント]</a>
 <span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main function of the AI Support Learning Book application.</span>
+<span class="sd">    ファイルアップロードのメイン関数です。</span>
 
-<span class="sd">    This function is the entry point of the application.</span>
-<span class="sd">    It calls the &#39;submit&#39; and &#39;upload_files&#39; functions and displays the uploaded image.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        None</span>
+<span class="sd">    この関数はファイルアップロードの画面を表示し、ファイルのアップロード処理を担当します。</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">submit</span><span class="p">()</span>
-    <span class="n">upload_files</span><span class="p">()</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;ファイルアップロード&quot;</span><span class="p">)</span>
+    <span class="n">uploaded_files</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">file_uploader</span><span class="p">(</span>
+        <span class="s2">&quot;ファイルをアップロードしてください&quot;</span><span class="p">,</span>
+        <span class="n">accept_multiple_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;pdf&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
 
-    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;AIサポート学習帳.jpg&quot;</span><span class="p">)</span>
-    <span class="n">st</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">use_column_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">uploaded_files</span><span class="p">:</span>
+        <span class="n">valid_files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">file_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">uploaded_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">ファイルは既にアップロードされています。&quot;</span>
+                    <span class="s2">&quot;他のファイルをアップロードしてください。&quot;</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">is_valid_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                <span class="n">valid_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="n">file_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;アップロードボタンを押して下さい:  </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (Size: &quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB)&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">valid_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;アップロード&quot;</span><span class="p">):</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">upload_files_and_get_response</span><span class="p">(</span><span class="n">valid_files</span><span class="p">))</span>
+                <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;ファイルのアップロードに失敗しました: </span><span class="si">{</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;success&quot;</span><span class="p">):</span>
+                        <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&quot;ファイルのアップロードが完了しました。&quot;</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;success_files&quot;</span><span class="p">]:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;成功したファイル:&quot;</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">success_file</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;success_files&quot;</span><span class="p">]:</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">success_file</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">success_file</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                                <span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;failed_files&quot;</span><span class="p">]:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;一部のファイルのアップロードに失敗しました:&quot;</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">failed_file</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;failed_files&quot;</span><span class="p">]:</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">failed_file</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">failed_file</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                                <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;すべてのファイルが正常にアップロードされました。&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ファイルのアップロードに失敗しました。&quot;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">IMG_PATH</span><span class="p">)</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span></div>
 
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">app.utils.sidebar</span> <span class="kn">import</span> <span class="n">show_sidebar</span>
+
+    <span class="n">show_sidebar</span><span class="p">()</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -174,7 +228,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Test.</p>
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
