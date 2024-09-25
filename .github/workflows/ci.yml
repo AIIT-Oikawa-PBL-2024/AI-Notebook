@@ -247,6 +247,10 @@ jobs:
         cache: 'pnpm'
         cache-dependency-path: ./frontend-nextjs/pnpm-lock.yaml
 
+    # pnpmのインストール
+    - name: Install pnpm
+      run: npm install -g pnpm
+
     # pnpmで依存関係をインストール
     - name: Install Dependencies
       run: pnpm install --frozen-lockfile
@@ -276,3 +280,4 @@ jobs:
       uses: davelosert/vitest-coverage-report-action@v2
       with:
         working-directory: frontend-nextjs
+
