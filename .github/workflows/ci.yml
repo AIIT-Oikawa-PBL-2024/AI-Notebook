@@ -244,8 +244,6 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-        cache-dependency-path: ./frontend-nextjs/pnpm-lock.yaml
 
     # pnpmのインストール
     - name: Install pnpm
