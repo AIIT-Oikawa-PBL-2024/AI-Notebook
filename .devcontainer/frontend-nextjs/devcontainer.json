@@ -1,0 +1,16 @@
+{
+    "name": "frontend-nextjs-dev-container",
+    "dockerComposeFile": "../../docker-compose.yml",
+    "service": "frontend-nextjs",
+    "workspaceFolder": "/frontend-nextjs",
+    "forwardPorts": [3000],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dsznajder.es7-react-js-snippets",
+                "biomejs.biome"
+            ]
+        }
+    },
+    "postCreateCommand": "pnpm install"
+}

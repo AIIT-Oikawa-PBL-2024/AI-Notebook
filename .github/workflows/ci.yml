@@ -1,6 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-name: Python application
+name: Python and TypeScript application
 
 on:
   push:
@@ -123,17 +121,6 @@ jobs:
       env:        
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
-    # - name: Create a dummy file
-    #   run: |
-    #     echo "This is a dummy file for testing." > dummy-file.txt
-
-    # - name: Upload dummy file to Google Cloud Storage
-    #   run: |
-    #     echo "Uploading dummy file to Google Cloud Storage..."
-    #     gsutil cp dummy-file.txt gs://$BUCKET_NAME/
-    #   env:
-    #     GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
     - name: Test with pytest         
       run: |
         set -euo pipefail
@@ -172,7 +159,6 @@ jobs:
       REGION: ${{ secrets.REGION }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
-      BACKEND_DEV_HOST: ${{ secrets.BACKEND_DEV_HOST }}
 
     steps:
     - uses: actions/checkout@v4
@@ -217,7 +203,6 @@ jobs:
         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
-        BACKEND_DEV_HOST: ${{ secrets.BACKEND_DEV_HOST }}
 
     - name: Pytest coverage comment
       uses: MishaKav/pytest-coverage-comment@main     
@@ -227,3 +212,67 @@ jobs:
           pytest-coverage-path: frontend/pytest-coverage.txt
           junitxml-path: frontend/pytest.xml   
  
+  ci-frontend-nextjs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.10.0]
+    timeout-minutes: 8
+    permissions:
+      pull-requests: write
+      contents: write
+      id-token: write
+    defaults:
+      run:
+        working-directory: ./frontend-nextjs
+
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      REGION: ${{ secrets.REGION }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
+
+    steps:
+    # リポジトリのチェックアウト
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # Node.jsとpnpmのセットアップ
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+        cache-dependency-path: ./frontend-nextjs/pnpm-lock.yaml
+
+    # pnpmで依存関係をインストール
+    - name: Install Dependencies
+      run: pnpm install --frozen-lockfile
+
+    # Biome Reviewdogの実行
+    - name: Run Biome Reviewdog
+      uses: mongolyy/reviewdog-action-biome@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        reporter: github-pr-review
+        fail_on_error: true
+        workdir: frontend-nextjs
+
+    # Vitestでテストを実行
+    - name: Run Vitest
+      run: | 
+        set -euo pipefail
+        pnpm vitest --coverage.enabled true
+      continue-on-error: false
+      env:
+        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
+
+    # カバレッジレポートの表示
+    - name: Show coverage
+      uses: davelosert/vitest-coverage-report-action@v2
+      with:
+        working-directory: frontend-nextjs
