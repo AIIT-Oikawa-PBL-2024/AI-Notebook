@@ -1,4 +1,4 @@
-name: Python and TypeScript application
+name: Python Backend and TypeScript Frontend CI
 
 on:
   push:
