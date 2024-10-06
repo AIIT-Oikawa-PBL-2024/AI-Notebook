@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
+  // Cloud Run へのデプロイのため
+  output: "standalone",
 };
 
 export default nextConfig;
