@@ -1,0 +1,23 @@
+# nodeのバージョン指定
+FROM node:20-bullseye
+
+# 作業ディレクトリの設定
+WORKDIR /frontend-nextjs
+
+# pnpmのインストール
+RUN npm install -g pnpm
+
+# 依存関係ファイルをコピー
+COPY package.json pnpm-lock.yaml ./
+
+# 依存関係のインストール
+RUN pnpm install
+
+# アプリケーションのファイルをコピー
+COPY . .
+
+# ポートの公開
+EXPOSE 3000
+
+# アプリケーションの起動
+CMD ["pnpm", "run", "dev"]
