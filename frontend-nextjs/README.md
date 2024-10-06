@@ -9,6 +9,12 @@
 - Dockerイメージ作成 `docker compose build`
 - Dockerコンテナ起動 `docker compose up`
 
+# 環境変数の設定
+- `frontend-nextjs`フォルダ内の`.env.local.sample`をコピーして、`.env.local`を作成
+- [firebaseのコンソール](https://console.firebase.google.com/)を開く
+- アプリAI-Notebookの設定を開いて、「SDK の設定と構成」のConfigをコピー
+- 環境変数として`firebase`の`config`から追記　
+
 
 # （参考）Next.jsディレクトリをゼロから　設定する方法
 - AI-Notebookのディレクトリ内にfrontend-nextjsディレクトリを作成する設定

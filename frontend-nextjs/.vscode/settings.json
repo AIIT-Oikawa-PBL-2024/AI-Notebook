@@ -4,5 +4,6 @@
 		"editor.tabSize": 2, // インデントのサイズ指定（biome.jsonと合わせる）
 		"editor.defaultFormatter": "biomejs.biome" // フォーマッターの指定
 	},
-	"reactSnippets.settings.importReactOnTop": false
+	"reactSnippets.settings.importReactOnTop": false,
+	"css.customData": [".vscode/css_custom_data.json"]
 }
