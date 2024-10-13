@@ -1,6 +1,7 @@
 "use client";
 
 import { ButtonWithIcon } from "@/app/components/Button";
+import { useAuthFetch } from "@/app/hooks/useAuthFetch";
 import { type ChangeEvent, useRef, useState } from "react";
 
 const ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
@@ -27,6 +28,7 @@ export default function FileUpload() {
 	const [files, setFiles] = useState<File[]>([]);
 	const [message, setMessage] = useState<string>("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const authFetch = useAuthFetch();
 
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const newFiles = Array.from(event.target.files || []).filter((file) => {
@@ -54,13 +56,17 @@ export default function FileUpload() {
 		}
 
 		try {
-			const response = await fetch(BACKEND_DEV_API_URL, {
+			const response = await authFetch(BACKEND_DEV_API_URL, {
 				method: "POST",
 				body: formData,
 				headers: {
 					Accept: "application/json",
 				},
 			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
 
 			const result: UploadResponse = await response.json();
 
