@@ -1,6 +1,7 @@
 import { Inter, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import type { Metadata } from "next";
+import { AuthProvider } from "./components/AuthProvider";
 import ClientThemeProvider from "./components/ClientThemeProvider";
 
 const notoSansJP = Noto_Sans_JP({
@@ -31,7 +32,9 @@ export default function RootLayout({
 					fontFamily: `var(--font-inter), var(--font-noto-sans-jp), Arial, 'Helvetica Neue', sans-serif`,
 				}}
 			>
-				<ClientThemeProvider>{children}</ClientThemeProvider>
+				<ClientThemeProvider>
+					<AuthProvider>{children}</AuthProvider>
+				</ClientThemeProvider>
 			</body>
 		</html>
 	);
