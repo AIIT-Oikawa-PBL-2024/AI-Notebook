@@ -17,7 +17,7 @@ async def session(
 
 @pytest.fixture
 async def create_test_note(
-    session: AsyncSession, test_user_id: int
+    session: AsyncSession, test_user_id: str
 ) -> notes_models.Note:
     note_create = notes_shemas.NoteCreate(
         title="test_title",
@@ -29,7 +29,7 @@ async def create_test_note(
 
 
 @pytest.mark.asyncio
-async def test_create_note(session: AsyncSession, test_user_id: int) -> None:
+async def test_create_note(session: AsyncSession, test_user_id: str) -> None:
     note_create = notes_shemas.NoteCreate(
         title="test_title",
         content="test_content",
@@ -71,7 +71,7 @@ async def test_get_notes_by_user_id(
     session: AsyncSession, create_test_note: notes_models.Note
 ) -> None:
     notes = await notes_cruds.get_notes_by_user_id(
-        session, user_id=int(create_test_note.user_id), offset=0, limit=10
+        session, user_id=str(create_test_note.user_id), offset=0, limit=10
     )
 
     assert len(notes) > 0

@@ -133,7 +133,7 @@ async def request_content(
 
                 output_create = outputs_schemas.OutputCreate(
                     output=final_content,
-                    user_id=1,  # ユーザIDは仮で1を設定
+                    user_id="firebase-1",  # ユーザIDは仮でfirebase-1を設定
                     created_at=now_japan,  # 日本時間の現在日時を設定
                 )
 

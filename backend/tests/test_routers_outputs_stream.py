@@ -85,9 +85,10 @@ async def test_request_content_stream_success(
     )
 
     transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"]
+            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"], headers=headers
         )
 
     assert response.status_code == 200
@@ -114,9 +115,10 @@ async def test_request_content_stream_file_not_found(
     mock_generate_content_stream.side_effect = NotFound("File not found")
 
     transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["non_existent_file.pdf"]
+            "/outputs/request_stream", json=["non_existent_file.pdf"], headers=headers
         )
 
     assert response.status_code == 404
@@ -145,8 +147,11 @@ async def test_request_content_stream_invalid_argument(
     mock_generate_content_stream.side_effect = InvalidArgument("Invalid file format")
 
     transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post("/outputs/request_stream", json=["invalid_format.txt"])
+        response = await ac.post(
+            "/outputs/request_stream", json=["invalid_format.txt"], headers=headers
+        )
 
     assert response.status_code == 400
     assert response.json() == {
@@ -173,9 +178,10 @@ async def test_request_content_stream_google_api_error(
     mock_generate_content_stream.side_effect = GoogleAPIError("Google API error")
 
     transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"]
+            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"], headers=headers
         )
 
     assert response.status_code == 500
@@ -204,9 +210,10 @@ async def test_request_content_stream_unexpected_error(
     mock_generate_content_stream.side_effect = Exception("Unexpected error")
 
     transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"]
+            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"], headers=headers
         )
 
     assert response.status_code == 500
@@ -249,9 +256,12 @@ async def test_request_content_stream_final_content_logging(
 
     with caplog.at_level(logging.INFO):
         transport = ASGITransport(app=app)  # type: ignore
+        headers = {"Authorization": "Bearer fake_token"}
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             response = await ac.post(
-                "/outputs/request_stream", json=["file1.pdf", "file2.pdf"]
+                "/outputs/request_stream",
+                json=["file1.pdf", "file2.pdf"],
+                headers=headers,
             )
 
         assert response.status_code == 200

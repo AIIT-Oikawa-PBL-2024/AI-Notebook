@@ -30,7 +30,7 @@ async def client(session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
 
 @pytest.fixture
 async def create_test_note(
-    session: AsyncSession, test_user_id: int
+    session: AsyncSession, test_user_id: str
 ) -> notes_models.Note:
     note_create = notes_schemas.NoteCreate(
         title="test_title",
@@ -45,7 +45,8 @@ async def create_test_note(
 async def test_get_notes(
     client: AsyncClient, create_test_note: notes_models.Note
 ) -> None:
-    response = await client.get("/notes/")
+    headers = {"Authorization": "Bearer fake_token"}
+    response = await client.get("/notes/", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0
@@ -57,8 +58,9 @@ async def test_get_notes(
 async def test_get_notes_by_user_id(
     client: AsyncClient, create_test_note: notes_models.Note
 ) -> None:
-    user_id = create_test_note.user_id
-    response = await client.get(f"/notes/{user_id}/notes")
+    headers = {"Authorization": "Bearer fake_token"}
+    user_id = "firebase_test_user_123456"
+    response = await client.get(f"/notes/{user_id}/notes", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) > 0
@@ -68,13 +70,15 @@ async def test_get_notes_by_user_id(
 
 
 @pytest.mark.asyncio
-async def test_create_note(client: AsyncClient, test_user_id: int) -> None:
+async def test_create_note(client: AsyncClient, test_user_id: str) -> None:
+    headers = {"Authorization": "Bearer fake_token"}
+    user_id = "firebase_test_user_123456"
     note_create = notes_schemas.NoteCreate(
         title="test_title",
         content="test_content",
-        user_id=test_user_id,
+        user_id=user_id,
     )
-    response = await client.post("/notes/", json=note_create.model_dump())
+    response = await client.post("/notes/", json=note_create.model_dump(), headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["title"] == "test_title"
@@ -85,25 +89,28 @@ async def test_create_note(client: AsyncClient, test_user_id: int) -> None:
 async def test_update_note(
     client: AsyncClient, create_test_note: notes_models.Note
 ) -> None:
+    headers = {"Authorization": "Bearer fake_token"}
+    user_id = "firebase_test_user_123456"
     note_id = create_test_note.id
     note_update = notes_schemas.NoteUpdate(
         title="updated_title", content="updated_content"
     )
-    response = await client.put(f"/notes/{note_id}", json=note_update.model_dump())
+    response = await client.put(f"/notes/{note_id}", json=note_update.model_dump(), headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["title"] == "updated_title"
     assert data["content"] == "updated_content"
-    assert data["user_id"] == create_test_note.user_id
+    assert data["user_id"] == user_id
 
 
 @pytest.mark.asyncio
 async def test_delete_note(
     client: AsyncClient, create_test_note: notes_models.Note
 ) -> None:
+    headers = {"Authorization": "Bearer fake_token"}
     note_id = create_test_note.id
-    response = await client.delete(f"/notes/{note_id}")
+    response = await client.delete(f"/notes/{note_id}", headers=headers)
     assert response.status_code == 200
     assert response.json() == True
-    deleted_response = await client.delete(f"/notes/{note_id}")
+    deleted_response = await client.delete(f"/notes/{note_id}", headers=headers)
     assert deleted_response.status_code == 404

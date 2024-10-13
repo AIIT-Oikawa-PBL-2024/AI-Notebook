@@ -22,7 +22,7 @@ async def session(
 
 # 学習帳作成のテスト
 @pytest.mark.asyncio
-async def test_create_output(session: AsyncSession, test_user_id: int) -> None:
+async def test_create_output(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         output="テストマークダウン🚀",
         user_id=test_user_id,
@@ -36,7 +36,7 @@ async def test_create_output(session: AsyncSession, test_user_id: int) -> None:
 
 # 学習帳取得のテスト
 @pytest.mark.asyncio
-async def test_get_outputs(session: AsyncSession, test_user_id: int) -> None:
+async def test_get_outputs(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         output="テストマークダウン🚀",
         user_id=test_user_id,
@@ -52,7 +52,7 @@ async def test_get_outputs(session: AsyncSession, test_user_id: int) -> None:
 
 # 学習帳IDによる学習帳取得のテスト
 @pytest.mark.asyncio
-async def test_get_output_by_id(session: AsyncSession, test_user_id: int) -> None:
+async def test_get_output_by_id(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         output="テストマークダウン🚀",
         user_id=test_user_id,
@@ -77,7 +77,7 @@ async def test_get_output_by_id_not_found(session: AsyncSession) -> None:
 
 # 学習帳削除のテスト
 @pytest.mark.asyncio
-async def test_delete_output(session: AsyncSession, test_user_id: int) -> None:
+async def test_delete_output(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         output="テストマークダウン🚀",
         user_id=test_user_id,

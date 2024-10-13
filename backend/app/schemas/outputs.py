@@ -19,12 +19,12 @@ class OutputCreate(OutputBase):
     OutputCreateクラスは、OutputBaseクラスを継承した出力データの作成を表します。
 
     :param user_id: ユーザーID
-    :type user_id: int
+    :type user_id: str
     :param created_at: 作成日時
     :type created_at: datetime
     """
 
-    user_id: int
+    user_id: str
     created_at: datetime
 
 

@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.notes as notes_cruds
-import app.cruds.users as users_cruds
 import app.schemas.notes as notes_schemas
 from app.database import get_db
 
@@ -41,13 +40,13 @@ async def get_notes(
 
 @router.get("/{user_id}/notes")
 async def get_notes_by_user(
-    user_id: int, db: AsyncSession = db_dependency, offset: int = 0, limit: int = 100
+    user_id: str, db: AsyncSession = db_dependency, offset: int = 0, limit: int = 100
 ) -> Sequence[notes_schemas.NoteByCurrentUserResponse]:
     """
     指定されたユーザーのノートのリストを取得するエンドポイント
 
     :param user_id: ユーザーID
-    :type user_id: int
+    :type user_id: str
     :param db: データベースセッション
     :type db: AsyncSession
     :param offset: オフセット
@@ -58,9 +57,6 @@ async def get_notes_by_user(
     :rtype: Sequence[notes_schemas.NoteByCurrentUserResponse]
     """
 
-    user = await users_cruds.get_user_by_id(db, user_id)
-    if user is None:
-        raise HTTPException(status_code=404, detail="ユーザーが見つかりません。")
     return await notes_cruds.get_notes_by_user_id(
         db, user_id=user_id, offset=offset, limit=limit
     )

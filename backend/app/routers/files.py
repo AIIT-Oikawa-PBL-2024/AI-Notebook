@@ -10,6 +10,7 @@ import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
 from app.utils.operate_cloud_storage import delete_files_from_gcs, post_files
+from app.utils.user_auth import get_uid
 
 # 環境変数を読み込む
 load_dotenv()
@@ -35,6 +36,7 @@ db_dependency = Depends(get_db)
 async def upload_files(
     files: list[UploadFile],
     db: AsyncSession = db_dependency,
+    uid: str = Depends(get_uid),
 ) -> dict:
     """
     ファイルをGoogle Cloud Storageにアップロードし、ファイル名をDBに登録します。
@@ -43,6 +45,8 @@ async def upload_files(
     :type files: list[UploadFile]
     :param db: データベースセッション
     :type db: AsyncSession
+    :param uid: ユーザーID
+    :type uid: str
     :return: アップロード結果の辞書
     :rtype: dict
     :raises HTTPException: アップロードまたはデータベース登録に失敗した場合
@@ -66,18 +70,18 @@ async def upload_files(
             file_create = files_schemas.FileCreate(
                 file_name=normalized_filename,
                 file_size=file.size,
-                user_id=1,  # ユーザIDは仮で1を設定
-                created_at=now_japan,  # 日本時間の現在日時を設定
+                user_id=uid,
+                created_at=now_japan,
             )
 
             # ファイル情報を保存
             try:
-                regist_file = await files_cruds.create_file(db, file_create)
+                regist_file = await files_cruds.create_file(db, file_create, uid)
                 logging.info(f"File {regist_file.file_name} saved to database.")
             except Exception as e:
                 raise HTTPException(
                     status_code=500,
-                    detail=f"{regist_file.file_name} データベース登録に失敗しました",
+                    detail=f"{file.filename} データベース登録に失敗しました",
                 ) from e
 
     response_data["success"] = upload_result.get("success", False)
@@ -88,22 +92,26 @@ async def upload_files(
 
 # ファイルの一覧取得
 @router.get("/", response_model=list[files_schemas.File])
-async def get_files(db: AsyncSession = db_dependency) -> list[files_schemas.File]:
+async def get_files(
+    db: AsyncSession = db_dependency, uid: str = Depends(get_uid)
+) -> list[files_schemas.File]:
     """
     データベースからファイルの一覧を取得します。
 
     :param db: データベースセッション
     :type db: AsyncSession
+    :param uid: ユーザーID
+    :type uid: str
     :return: ファイルのリスト
     :rtype: list[files_schemas.File]
     """
-    return await files_cruds.get_files(db)
+    return await files_cruds.get_files_by_user_id(db, uid)
 
 
 # ファイルの取得
 @router.get("/{file_id}", response_model=files_schemas.File)
 async def get_file_by_id(
-    file_id: int, db: AsyncSession = db_dependency
+    file_id: int, db: AsyncSession = db_dependency, uid: str = Depends(get_uid)
 ) -> files_schemas.File:
     """
     指定されたIDのファイルをデータベースから取得します。
@@ -112,11 +120,13 @@ async def get_file_by_id(
     :type file_id: int
     :param db: データベースセッション
     :type db: AsyncSession
+    :param uid: ユーザーID
+    :type uid: str
     :return: ファイル情報
     :rtype: files_schemas.File
     :raises HTTPException: ファイルが見つからない場合
     """
-    file = await files_cruds.get_file_by_id(db, file_id)
+    file = await files_cruds.get_file_by_id_and_user_id(db, file_id, uid)
     if not file:
         raise HTTPException(status_code=404, detail="ファイルが見つかりません")
     return file
@@ -125,24 +135,24 @@ async def get_file_by_id(
 # ファイル名のリストとユーザーIDによるファイルの削除
 @router.delete("/delete_files", response_model=dict)
 async def delete_files(
-    files: list[str], user_id: int, db: AsyncSession = db_dependency
+    files: list[str], db: AsyncSession = db_dependency, uid: str = Depends(get_uid)
 ) -> dict:
     """
     ファイルを削除するAPIエンドポイントです。
 
     :param files: 削除するファイルのリスト
     :type files: list[str]
-    :param user_id: ユーザーID
-    :type user_id: int
-    :param db: データベースセッション (省略可能)
-    :type db: AsyncSession, optional
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param uid: ユーザーID
+    :type uid: str
     :return: 削除結果の辞書
     :rtype: dict
     """
     try:
         # ファイルをDBから削除
         for file_name in files:
-            await files_cruds.delete_file_by_name_and_userid(db, file_name, user_id)
+            await files_cruds.delete_file_by_name_and_userid(db, file_name, uid)
 
         await db.commit()
     except Exception as e:
