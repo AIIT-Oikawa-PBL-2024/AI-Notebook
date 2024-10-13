@@ -192,3 +192,24 @@ async def test_upload_file_with_dakuten(session: AsyncSession) -> None:
         assert uploaded_filename == nfc_filename
         assert uploaded_filename != nfd_filename
         assert unicodedata.is_normalized("NFC", uploaded_filename)
+
+
+# 署名付きURL取得のテスト
+@pytest.mark.asyncio
+async def test_generate_upload_signed_url(session: AsyncSession) -> None:
+    user_id = await get_user_id(session)
+
+    async with AsyncClient(
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://test",
+    ) as client:
+        testfiles = ["test_file1.pdf", "test_file2.pdf"]
+        response = await client.post(
+            f"/files/generate_upload_signed_url/",
+            json=testfiles,
+        )
+        print(response.text)  # デバッグ用出力
+        assert response.status_code == 200
+        data = response.json()
+        assert data["test_file1.pdf"] is not None
+        assert data["test_file2.pdf"] is not None

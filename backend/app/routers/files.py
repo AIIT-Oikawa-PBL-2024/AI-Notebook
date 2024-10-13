@@ -9,7 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
-from app.utils.operate_cloud_storage import delete_files_from_gcs, post_files
+from app.utils.operate_cloud_storage import (
+    delete_files_from_gcs,
+    generate_upload_signed_url_v4,
+    post_files,
+)
 
 # 環境変数を読み込む
 load_dotenv()
@@ -160,3 +164,25 @@ async def delete_files(
     response_data["success_files"] = delete_result.get("success_files", [])
     response_data["failed_files"] = delete_result.get("failed_files", [])
     return response_data
+
+
+# 署名付きURLの生成
+@router.post("/generate_upload_signed_url/", response_model=dict)
+async def generate_upload_signed_url(files: list[str]) -> dict:
+    """
+    指定されたファイルリストに対してアップロード用の署名付きURLを生成します。
+
+    :param files: 署名付きURLを生成するファイルのリスト
+    :type files: list[str]
+    :raises HTTPException: URL生成中にエラーが発生した場合、
+    ステータスコード500とエラーメッセージを含むHTTPExceptionを送出します。
+    :return: ファイル名をキーとし、署名付きURLを値とする辞書
+    :rtype: dict
+    """
+    try:
+        upload_signed_urls: dict[str, str] = {}
+        upload_signed_urls = await generate_upload_signed_url_v4(files)
+        return upload_signed_urls
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
