@@ -37,7 +37,7 @@ async def get_notes(
 
 
 async def get_notes_by_user_id(
-    db: AsyncSession, user_id: int, offset: int, limit: int
+    db: AsyncSession, user_id: str, offset: int, limit: int
 ) -> Sequence[notes_models.Note]:
     result: Result = await db.execute(
         select(notes_models.Note)
