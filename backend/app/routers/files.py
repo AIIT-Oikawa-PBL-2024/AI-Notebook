@@ -186,3 +186,46 @@ async def generate_upload_signed_url(files: list[str]) -> dict:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+# 署名付きURLでアップロードしたファイルのDB登録
+@router.post("/register_files", response_model=bool)
+async def register_files(
+    files: list[UploadFile], db: AsyncSession = db_dependency
+) -> bool:
+    """
+    署名付きURLでアップロードしたファイルの情報をDBに登録します。
+
+    :param files: アップロードしたファイルのリスト
+    :type files: list[UploadFile]
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: 登録結果の辞書
+    :rtype: bool
+    """
+    for file in files:
+        if file.filename and file.size:
+            # ファイル名を正規化
+            normalized_filename = unicodedata.normalize("NFC", file.filename)
+
+            # 日本時間の現在日時を取得
+            now_japan = datetime.now(JST)
+
+            file_create = files_schemas.FileCreate(
+                file_name=normalized_filename,
+                file_size=file.size,
+                user_id=1,  # ユーザIDは仮で1を設定
+                created_at=now_japan,  # 日本時間の現在日時を設定
+            )
+
+            # ファイル情報を保存
+            try:
+                regist_file = await files_cruds.create_file(db, file_create)
+                logging.info(f"File {regist_file.file_name} saved to database.")
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"{file_create.file_name} データベース登録に失敗しました",
+                ) from e
+                return False
+    return True

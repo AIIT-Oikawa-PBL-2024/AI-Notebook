@@ -213,3 +213,32 @@ async def test_generate_upload_signed_url(session: AsyncSession) -> None:
         data = response.json()
         assert data["test_file1.pdf"] is not None
         assert data["test_file2.pdf"] is not None
+
+
+# ファイル登録のテスト
+@pytest.mark.asyncio
+async def test_register_files(session: AsyncSession) -> None:
+    """
+    ファイル登録のエンドポイントをテストする関数
+
+    :param session: テスト用のデータベースセッション
+    :type session: AsyncSession
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
+    user_id = await get_user_id(session)
+
+    file_content = b"test file content"
+    files = [
+        ("files", ("test_file.pdf", file_content, "application/pdf")),
+    ]
+    async with AsyncClient(
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://test",
+    ) as client:
+        response = await client.post(
+            f"/files/register_files?user_id={user_id}", files=files
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data is True
