@@ -1,3 +1,4 @@
+import datetime
 import io
 import logging
 import os
@@ -176,3 +177,48 @@ async def delete_files_from_gcs(files: list[str]) -> dict:
         }
 
     return {"success": True, "success_files": success_files}
+
+
+async def generate_upload_signed_url_v4(files: list[str]) -> dict:
+    """
+    指定されたファイルリストに対して、Google Cloud Storageにアップロードするための
+    署名付きURLを生成します。
+
+    :param files: アップロードするファイル名のリスト
+    :type files: list[str]
+    :return: ファイル名をキーとし、署名付きURLを値とする辞書
+    :rtype: dict
+    """
+    upload_signed_urls = {}
+
+    # 環境変数から認証情報を取得
+    credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    bucket_name = os.getenv("BUCKET_NAME")
+
+    client = storage.Client.from_service_account_json(credentials)
+    bucket = storage.Bucket(client, bucket_name)
+    for file in files:
+        # ブロブ名を正規化
+        normalized_blobname = unicodedata.normalize("NFC", file)
+        blob = bucket.blob(normalized_blobname)
+
+        url = blob.generate_signed_url(
+            version="v4",
+            # This URL is valid for 15 minutes
+            expiration=datetime.timedelta(minutes=15),
+            # Allow PUT requests using this URL.
+            method="PUT",
+            content_type="application/octet-stream",
+        )
+        """
+        デバッグ用の出力
+        print("Generated PUT signed URL:")
+        print(url)
+        print("You can use this URL with any user agent, for example:")
+        print(
+            "curl -X PUT -H 'Content-Type: application/octet-stream' "
+            "--upload-file my-file '{}'".format(url)
+        )
+        """
+        upload_signed_urls[normalized_blobname] = url
+    return upload_signed_urls
