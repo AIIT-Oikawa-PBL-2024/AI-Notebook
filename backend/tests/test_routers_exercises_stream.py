@@ -2,10 +2,12 @@ import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, patch
 from app.main import app
-from app.routers.exercises_stream import request_content
 from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 
+
+# テスト用のクライアントを作成
 client = TestClient(app)
+client.headers.update({"Authorization": f"Bearer fake_token"})
 
 
 # 正常系のテスト
@@ -33,25 +35,6 @@ async def test_request_content_normal(mock_generate_content_stream: AsyncMock) -
 
     # generate_content_streamが正しい引数で呼ばれたことを検証
     mock_generate_content_stream.assert_called_once_with(files)
-
-    # 異常系のテスト - GoogleAPIError
-    @pytest.mark.asyncio
-    @patch("app.routers.exercises_stream.generate_content_stream")
-    async def test_request_content_google_api_error(
-        mock_generate_content_stream: AsyncMock,
-    ) -> None:
-        # モックの設定
-        mock_generate_content_stream.side_effect = GoogleAPIError("Google API error")
-
-        # リクエストデータ
-        files = ["file1.txt", "file2.txt"]
-
-        # リクエストの送信
-        response = client.post("/exercises/request_stream", json=files)
-
-        # レスポンスの検証
-        assert response.status_code == 500
-        assert response.json() == {"detail": "Google API error"}
 
 
 # 異常系のテスト - InvalidArgument
