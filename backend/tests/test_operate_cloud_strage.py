@@ -8,6 +8,7 @@ from app.utils.operate_cloud_storage import (
     post_files,
     upload_files,
     delete_files_from_gcs,
+    generate_upload_signed_url_v4,
 )
 from app.main import app
 from unittest.mock import patch, MagicMock
@@ -238,3 +239,20 @@ async def test_delete_files_from_gcs() -> None:
         result = await delete_files_from_gcs(deletefiles)
         assert result["success"] == False
         assert "Delete failed" in result["failed_files"]
+
+
+@pytest.mark.asyncio
+async def test_generate_upload_signed_url_v4() -> None:
+    # 署名付きURLを作成するファイル名のリスト
+    testfiles: list[str] = [
+        "5_アジャイルⅡ.pdf",
+        "AI-powered Code Review with LLM.pdf",
+    ]
+
+    # 署名付きURLを作成する
+    result = await generate_upload_signed_url_v4(testfiles)
+
+    # 結果の検証
+    assert result["5_アジャイルⅡ.pdf"] is not None
+    assert result["AI-powered Code Review with LLM.pdf"] is not None
+    assert len(result) == 2
