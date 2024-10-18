@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/app/components/AuthProvider";
 import { firebaseConfig } from "@/app/lib/firebase";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { Button, Input, Typography } from "@material-tailwind/react";
@@ -18,33 +19,67 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+// 許可されるメールアドレスのドメインを取得
+const ALLOWED_DOMAINS = process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAINS
+	? process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAINS.split(",").map((domain) =>
+			domain.trim(),
+		)
+	: [];
+
 export function SignInForm() {
 	const [passwordShown, setPasswordShown] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
+	const { setUser } = useAuth();
 
 	const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
 
-	const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			await signInWithEmailAndPassword(auth, email, password);
-			console.log("Signed in successfully");
-			router.push("/");
+			const userCredential = await signInWithEmailAndPassword(
+				auth,
+				email,
+				password,
+			);
+
+			if (userCredential.user.emailVerified) {
+				setUser(userCredential.user);
+				console.log("Signed in successfully");
+				router.push("/");
+			} else {
+				setError(
+					"メールアドレスが確認されていません。メールを確認してアカウントを有効化してください。",
+				);
+			}
 		} catch (error) {
-			setError((error as Error).message);
+			console.error("サインインエラー:", error);
+			setError(
+				"サインインに失敗しました。メールアドレスとパスワードを確認してください",
+			);
 		}
 	};
 
 	const handleGoogleSignIn = async () => {
 		try {
-			await signInWithPopup(auth, googleProvider);
+			const result = await signInWithPopup(auth, googleProvider);
+			const email = result.user.email;
+			if (email && ALLOWED_DOMAINS.length > 0) {
+				const domain = email.split("@")[1];
+				if (!ALLOWED_DOMAINS.includes(domain)) {
+					throw new Error(
+						"このGoogleアカウントのドメインは許可されていません。",
+					);
+				}
+			}
+			setUser(result.user);
 			console.log("Signed in with Google successfully");
 			router.push("/");
 		} catch (error) {
-			setError((error as Error).message);
+			console.error("Googleサインインエラー:", error);
+			setError("サインインに失敗しました。Googleアカウントを確認してください");
 		}
 	};
 
@@ -55,10 +90,10 @@ export function SignInForm() {
 					Sign In
 				</Typography>
 				<Typography className="mb-16 text-gray-600 font-normal text-[18px]">
-					Enter your email and password to sign in
+					メールアドレスとパスワードを入力してください
 				</Typography>
 				<form
-					onSubmit={handleSignIn}
+					onSubmit={handleEmailSignIn}
 					className="mx-auto max-w-[24rem] text-left"
 				>
 					<div className="mb-6">
@@ -67,7 +102,7 @@ export function SignInForm() {
 								variant="small"
 								className="mb-2 block font-medium text-gray-900"
 							>
-								Your Email
+								Email
 							</Typography>
 						</label>
 						<Input
@@ -77,7 +112,7 @@ export function SignInForm() {
 							type="email"
 							name="email"
 							placeholder="name@mail.com"
-							className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200"
+							className="!border-t-blue-gray-200 focus:!border-t-gray-900"
 							labelProps={{
 								className: "hidden",
 							}}
@@ -95,12 +130,13 @@ export function SignInForm() {
 							</Typography>
 						</label>
 						<Input
+							id="password"
 							size="lg"
 							placeholder="********"
 							labelProps={{
 								className: "hidden",
 							}}
-							className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200"
+							className="!border-t-blue-gray-200 focus:!border-t-gray-900"
 							type={passwordShown ? "text" : "password"}
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
@@ -139,12 +175,12 @@ export function SignInForm() {
 					<div className="!mt-4 flex justify-end">
 						<Typography
 							as="a"
-							href="/forgot-password"
+							href="/reset-password"
 							color="blue-gray"
 							variant="small"
 							className="font-medium"
 						>
-							Forgot password
+							パスワードを忘れた方はこちら
 						</Typography>
 					</div>
 					<Button
@@ -153,12 +189,13 @@ export function SignInForm() {
 						className="mt-6 flex h-12 items-center justify-center gap-2"
 						fullWidth
 						onClick={handleGoogleSignIn}
+						aria-label="Sign in with Google"
 					>
 						<img
 							src={"https://www.material-tailwind.com/logos/logo-google.png"}
-							alt="google"
+							alt=""
 							className="h-6 w-6"
-						/>{" "}
+						/>
 						Sign in with Google
 					</Button>
 					<Typography
@@ -166,9 +203,9 @@ export function SignInForm() {
 						color="gray"
 						className="!mt-4 text-center font-normal"
 					>
-						Not registered?{" "}
-						<a href="/create-account" className="font-medium text-gray-900">
-							Create account
+						アカウント未登録の方は{" "}
+						<a href="/signup" className="font-medium text-gray-900">
+							サインアップへ
 						</a>
 					</Typography>
 				</form>
