@@ -1,9 +1,7 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
-from unittest.mock import patch, AsyncMock, Mock
-from fastapi import FastAPI
+from unittest.mock import patch, Mock
 from pytest import MonkeyPatch
-from app.routers.outputs_stream import router
 from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession

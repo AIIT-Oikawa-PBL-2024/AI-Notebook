@@ -1,92 +1,13 @@
-from distutils import filelist
-from typing import AsyncGenerator, Generator
 import pytest
 from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.main import app
 import unicodedata
-import os
 from unittest.mock import Mock
-import jwt
-import time
-import os
-from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, patch
-from fastapi import Request
-from fastapi.security import HTTPAuthorizationCredentials
-
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
-
-# # テスト環境であることを示す環境変数を設定
-# os.environ["TESTING"] = "True"
-
-
-# # sessionフィクスチャを提供するフィクスチャを定義
-# @pytest.fixture
-# async def session(
-#     setup_and_teardown_database: AsyncGenerator[AsyncSession, None],
-# ) -> AsyncGenerator[AsyncSession, None]:
-#     async with setup_and_teardown_database as session:  # type: ignore
-#         yield session
-#     await session.close()
-
-
-# # テスト用のJWTトークンを生成する関数
-# def generate_test_token(uid: str = "test_user") -> str:
-#     payload = {
-#         "uid": uid,
-#         "exp": int(time.time()) + 3600,  # 1時間有効
-#         "iat": int(time.time()),
-#     }
-#     secret = "test_secret"  # テスト用の秘密鍵
-#     return jwt.encode(payload, secret, algorithm="HS256")
-
-
-# # 認証をモックする関数
-# def mock_authenticate_request(
-#     request: Request, credentials: HTTPAuthorizationCredentials
-# ) -> None:
-#     request.state.uid = "test_user"
-#     return None
-
-
-# # テスト用のクライアントを作成
-# test_token = generate_test_token()
-# client = TestClient(app)
-# client.headers.update({"Authorization": f"Bearer {test_token}"})
-
-# # テスト用のダミーFirebase認証情報
-# dummy_firebase_credentials = {
-#     "type": "service_account",
-#     "project_id": "dummy-project",
-#     "private_key_id": "dummy-key-id",
-#     "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC9hxWe/UJH1QAF\n-----END PRIVATE KEY-----\n",
-#     "client_email": "dummy@dummy-project.iam.gserviceaccount.com",
-#     "client_id": "123456789",
-#     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-#     "token_uri": "https://oauth2.googleapis.com/token",
-#     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-#     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dummy%40dummy-project.iam.gserviceaccount.com",
-# }
-
-
-# # 環境変数をモック
-# @pytest.fixture(autouse=True)
-# def mock_env_vars() -> Generator:
-#     with patch.dict(
-#         os.environ, {"FIREBASE_CREDENTIALS": str(dummy_firebase_credentials)}
-#     ):
-#         yield
-
-
-# # 認証をモックするフィクスチャ
-# @pytest.fixture(autouse=True)
-# def mock_auth() -> Generator:
-#     with patch("app.utils.user_auth.authenticate_request", mock_authenticate_request):
-#         yield
 
 
 # ファイルアップロードのテスト
