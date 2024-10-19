@@ -80,7 +80,11 @@
 <span class="kn">import</span> <span class="nn">app.cruds.files</span> <span class="k">as</span> <span class="nn">files_cruds</span>
 <span class="kn">import</span> <span class="nn">app.schemas.files</span> <span class="k">as</span> <span class="nn">files_schemas</span>
 <span class="kn">from</span> <span class="nn">app.database</span> <span class="kn">import</span> <span class="n">get_db</span>
-<span class="kn">from</span> <span class="nn">app.utils.operate_cloud_storage</span> <span class="kn">import</span> <span class="n">delete_files_from_gcs</span><span class="p">,</span> <span class="n">post_files</span>
+<span class="kn">from</span> <span class="nn">app.utils.operate_cloud_storage</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">delete_files_from_gcs</span><span class="p">,</span>
+    <span class="n">generate_upload_signed_url_v4</span><span class="p">,</span>
+    <span class="n">post_files</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># 環境変数を読み込む</span>
 <span class="n">load_dotenv</span><span class="p">()</span>
@@ -242,6 +246,77 @@
     <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;success_files&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delete_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;success_files&quot;</span><span class="p">,</span> <span class="p">[])</span>
     <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;failed_files&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delete_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;failed_files&quot;</span><span class="p">,</span> <span class="p">[])</span>
     <span class="k">return</span> <span class="n">response_data</span></div>
+
+
+
+<span class="c1"># 署名付きURLの生成</span>
+<div class="viewcode-block" id="generate_upload_signed_url">
+<a class="viewcode-back" href="../../../app.routers.html#app.routers.files.generate_upload_signed_url">[ドキュメント]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/generate_upload_signed_url/&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_upload_signed_url</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    指定されたファイルリストに対してアップロード用の署名付きURLを生成します。</span>
+
+<span class="sd">    :param files: 署名付きURLを生成するファイルのリスト</span>
+<span class="sd">    :type files: list[str]</span>
+<span class="sd">    :raises HTTPException: URL生成中にエラーが発生した場合、</span>
+<span class="sd">    ステータスコード500とエラーメッセージを含むHTTPExceptionを送出します。</span>
+<span class="sd">    :return: ファイル名をキーとし、署名付きURLを値とする辞書</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">upload_signed_urls</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">upload_signed_urls</span> <span class="o">=</span> <span class="k">await</span> <span class="n">generate_upload_signed_url_v4</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">upload_signed_urls</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+
+<span class="c1"># 署名付きURLでアップロードしたファイルのDB登録</span>
+<div class="viewcode-block" id="register_files">
+<a class="viewcode-back" href="../../../app.routers.html#app.routers.files.register_files">[ドキュメント]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register_files&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">register_files</span><span class="p">(</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UploadFile</span><span class="p">],</span> <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span> <span class="o">=</span> <span class="n">db_dependency</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    署名付きURLでアップロードしたファイルの情報をDBに登録します。</span>
+
+<span class="sd">    :param files: アップロードしたファイルのリスト</span>
+<span class="sd">    :type files: list[UploadFile]</span>
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :return: 登録結果の辞書</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">file</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="c1"># ファイル名を正規化</span>
+            <span class="n">normalized_filename</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+            <span class="c1"># 日本時間の現在日時を取得</span>
+            <span class="n">now_japan</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">JST</span><span class="p">)</span>
+
+            <span class="n">file_create</span> <span class="o">=</span> <span class="n">files_schemas</span><span class="o">.</span><span class="n">FileCreate</span><span class="p">(</span>
+                <span class="n">file_name</span><span class="o">=</span><span class="n">normalized_filename</span><span class="p">,</span>
+                <span class="n">file_size</span><span class="o">=</span><span class="n">file</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># ユーザIDは仮で1を設定</span>
+                <span class="n">created_at</span><span class="o">=</span><span class="n">now_japan</span><span class="p">,</span>  <span class="c1"># 日本時間の現在日時を設定</span>
+            <span class="p">)</span>
+
+            <span class="c1"># ファイル情報を保存</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">regist_file</span> <span class="o">=</span> <span class="k">await</span> <span class="n">files_cruds</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">file_create</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">regist_file</span><span class="o">.</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> saved to database.&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_create</span><span class="o">.</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> データベース登録に失敗しました&quot;</span><span class="p">,</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
 
 </pre></div>
 
