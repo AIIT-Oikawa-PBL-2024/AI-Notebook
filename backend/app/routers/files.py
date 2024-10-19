@@ -9,7 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
 from app.database import get_db
-from app.utils.operate_cloud_storage import delete_files_from_gcs, post_files
+from app.utils.operate_cloud_storage import (
+    delete_files_from_gcs,
+    generate_upload_signed_url_v4,
+    post_files,
+)
 from app.utils.user_auth import get_uid
 
 # 環境変数を読み込む
@@ -170,3 +174,72 @@ async def delete_files(
     response_data["success_files"] = delete_result.get("success_files", [])
     response_data["failed_files"] = delete_result.get("failed_files", [])
     return response_data
+
+
+# 署名付きURLの生成
+@router.post("/generate_upload_signed_url/", response_model=dict)
+async def generate_upload_signed_url(
+    files: list[str], uid: str = Depends(get_uid)
+) -> dict:
+    """
+    指定されたファイルリストに対してアップロード用の署名付きURLを生成します。
+
+    :param files: 署名付きURLを生成するファイルのリスト
+    :type files: list[str]
+    :raises HTTPException: URL生成中にエラーが発生した場合、
+    ステータスコード500とエラーメッセージを含むHTTPExceptionを送出します。
+    :return: ファイル名をキーとし、署名付きURLを値とする辞書
+    :rtype: dict
+    """
+    try:
+        upload_signed_urls: dict[str, str] = {}
+        upload_signed_urls = await generate_upload_signed_url_v4(files)
+        return upload_signed_urls
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+# 署名付きURLでアップロードしたファイルのDB登録
+@router.post("/register_files", response_model=bool)
+async def register_files(
+    files: list[UploadFile],
+    db: AsyncSession = db_dependency,
+    uid: str = Depends(get_uid),
+) -> bool:
+    """
+    署名付きURLでアップロードしたファイルの情報をDBに登録します。
+
+    :param files: アップロードしたファイルのリスト
+    :type files: list[UploadFile]
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :return: 登録結果の辞書
+    :rtype: bool
+    """
+    for file in files:
+        if file.filename and file.size:
+            # ファイル名を正規化
+            normalized_filename = unicodedata.normalize("NFC", file.filename)
+
+            # 日本時間の現在日時を取得
+            now_japan = datetime.now(JST)
+
+            file_create = files_schemas.FileCreate(
+                file_name=normalized_filename,
+                file_size=file.size,
+                user_id=uid,
+                created_at=now_japan,  # 日本時間の現在日時を設定
+            )
+
+            # ファイル情報を保存
+            try:
+                regist_file = await files_cruds.create_file(db, file_create, uid)
+                logging.info(f"File {regist_file.file_name} saved to database.")
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"{file_create.file_name} データベース登録に失敗しました",
+                ) from e
+                return False
+    return True

@@ -237,3 +237,53 @@ async def test_upload_file_with_dakuten(session: AsyncSession, mock_auth: Mock) 
         assert uploaded_filename == nfc_filename
         assert uploaded_filename != nfd_filename
         assert unicodedata.is_normalized("NFC", uploaded_filename)
+
+
+# 署名付きURL取得のテスト
+@pytest.mark.asyncio
+async def test_generate_upload_signed_url(session: AsyncSession) -> None:
+    headers = {"Authorization": "Bearer fake_token"}
+    async with AsyncClient(
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://test",
+    ) as client:
+        testfiles = ["test_file1.pdf", "test_file2.pdf"]
+        response = await client.post(
+            f"/files/generate_upload_signed_url/",
+            headers=headers,
+            json=testfiles,
+        )
+        print(response.text)  # デバッグ用出力
+        assert response.status_code == 200
+        data = response.json()
+        assert data["test_file1.pdf"] is not None
+        assert data["test_file2.pdf"] is not None
+
+
+# ファイル登録のテスト
+@pytest.mark.asyncio
+async def test_register_files(session: AsyncSession) -> None:
+    """
+    ファイル登録のエンドポイントをテストする関数
+
+    :param session: テスト用のデータベースセッション
+    :type session: AsyncSession
+    :return: None
+    :raises AssertionError: テストが失敗した場合
+    """
+    headers = {"Authorization": "Bearer fake_token"}
+
+    file_content = b"test file content"
+    files = [
+        ("files", ("test_file.pdf", file_content, "application/pdf")),
+    ]
+    async with AsyncClient(
+        transport=ASGITransport(app),  # type: ignore
+        base_url="http://test",
+    ) as client:
+        response = await client.post(
+            f"/files/register_files", files=files, headers=headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data is True
