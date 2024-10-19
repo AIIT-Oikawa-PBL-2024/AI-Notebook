@@ -1,7 +1,7 @@
 "use client";
 
-import { ButtonWithIcon } from "@/app/components/Button";
-import { useAuthFetch } from "@/app/hooks/useAuthFetch";
+import { ButtonWithIcon } from "@/features/(dashboard)/Button";
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { type ChangeEvent, useRef, useState } from "react";
 
 const ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];

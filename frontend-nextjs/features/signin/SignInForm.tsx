@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuth } from "@/app/components/AuthProvider";
-import { firebaseConfig } from "@/app/lib/firebase";
+import { useAuth } from "@/providers/AuthProvider";
+import { firebaseConfig } from "@/lib/firebase";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { Button, Input, Typography } from "@material-tailwind/react";
 import { initializeApp } from "firebase/app";

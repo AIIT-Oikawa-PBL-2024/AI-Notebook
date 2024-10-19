@@ -1,8 +1,8 @@
 import { Inter, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/providers/AuthProvider";
+import ClientThemeProvider from "@/providers/ClientThemeProvider";
 import type { Metadata } from "next";
-import { AuthProvider } from "./components/AuthProvider";
-import ClientThemeProvider from "./components/ClientThemeProvider";
 
 const notoSansJP = Noto_Sans_JP({
 	subsets: ["latin"],

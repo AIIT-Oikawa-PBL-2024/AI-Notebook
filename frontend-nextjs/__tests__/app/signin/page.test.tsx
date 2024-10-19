@@ -1,16 +1,16 @@
-import SignInPage from "@/app/signin/page";
+import SignInPage from "@/app/(auth)/signin/page";
 import { render, screen } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 // BackgroundCardとSignInFormをモック
-vi.mock("@/app/components/BackgroundCard", () => ({
+vi.mock("@/components/layouts/BackgroundCard", () => ({
 	BackgroundCard: () => (
 		<div data-testid="background-card">Mocked BackgroundCard</div>
 	),
 }));
 
-vi.mock("@/app/components/signin/SignInForm", () => ({
+vi.mock("@/features/signin/SignInForm", () => ({
 	SignInForm: () => <div data-testid="sign-in-form">Mocked SignInForm</div>,
 }));
 

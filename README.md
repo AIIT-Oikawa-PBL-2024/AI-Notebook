@@ -199,7 +199,6 @@ AI-Notebook
   - ⭐️VSCode の拡張機能でも ruff と mypy をインストール
 
 ## テストの実行
-
 - Dev Container での実行
   - `pytest tests/ --cov=app`
 
@@ -213,3 +212,15 @@ AI-Notebook
     - Ruff, Mypy, Pytest が実行されます。
   - 参考ページ
     - https://github.com/MishaKav/pytest-coverage-comment
+
+## FIREBASEの設定
+- バックエンド側
+  - [firebaseのコンソール](https://console.firebase.google.com/)を開く
+  - 「プロジェクトの設定」->「サービスアカウント」->「新しい秘密鍵を生成」
+  - バックエンドフォルダ内の任意の場所に秘密鍵を保存して、ルートにある.envに秘密鍵のパスを指定
+    - `FIREBASE_CREDENTIALS=<FirebaseAdminSDKキーJSONファイルへのパス>`
+- フロントエンド側
+  - `frontend-nextjs`フォルダ内の`.env.local.sample`をコピーして、`.env.local`を作成
+  - [firebaseのコンソール](https://console.firebase.google.com/)を開く
+  - アプリAI-Notebookの設定を開いて、「SDK の設定と構成」のConfigをコピー
+  - 環境変数として`firebase`の`config`から追記　

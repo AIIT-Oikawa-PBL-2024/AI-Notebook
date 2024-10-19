@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function useAuthFetch() {
 	const { idToken } = useAuth();

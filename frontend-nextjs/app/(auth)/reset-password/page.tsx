@@ -1,9 +1,7 @@
-// SignInPage.tsx
-import { BackgroundCard } from "@/app/components/BackgroundCard";
-import { SignInForm } from "@/app/components/signin/SignInForm";
-import type React from "react";
+import { BackgroundCard } from "@/components/layouts/BackgroundCard";
+import ResetPasswordForm from "@/features/reset-password/ResetPasswordForm";
 
-const SignInPage: React.FC = () => {
+const ResetPasswordPage = () => {
 	return (
 		<main className="flex min-h-screen justify-center items-center bg-gray-100 p-4">
 			<div className="flex bg-gray max-w-5xl w-full">
@@ -13,11 +11,10 @@ const SignInPage: React.FC = () => {
 				</div>
 				{/* 右側のサインインフォーム モバイルでは全幅 */}
 				<div className="w-full md:w-1/2 p-6 flex items-center">
-					<SignInForm />
+					<ResetPasswordForm />
 				</div>
 			</div>
 		</main>
 	);
 };
-
-export default SignInPage;
+export default ResetPasswordPage;

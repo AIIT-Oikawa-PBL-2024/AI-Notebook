@@ -1,13 +1,15 @@
 "use client";
 
-import { useAuth } from "@/app/components/AuthProvider";
-import FileUpload from "@/app/components/FileUpload";
-import { withAuth } from "@/app/components/withAuth";
+import FileUpload from "@/features/(dashboard)/FileUpload";
+import { useSignOut } from "@/hooks/useSignOut";
+import { useAuth } from "@/providers/AuthProvider";
+import { withAuth } from "@/utils/withAuth";
+import { Button } from "@material-tailwind/react";
 import type { NextPage } from "next";
-import Image from "next/image";
 
 const UploadPage: NextPage = () => {
 	const { user } = useAuth();
+	const { signOutUser, error, isLoading } = useSignOut();
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -16,22 +18,16 @@ const UploadPage: NextPage = () => {
 			</h1>
 			{user && (
 				<div className="mb-6 text-center text-gray-600">
-					ユーザー: {user.displayName || user.email}
+					<p>ユーザー: {user.displayName || user.email}</p>
+					<Button onClick={signOutUser} disabled={isLoading}>
+						{isLoading ? "サインアウト中..." : "サインアウト"}
+					</Button>
+					{error && <p className="text-red-500 mt-2">{error}</p>}
 				</div>
 			)}
 			<div className="max-w-xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
 				<div className="p-6">
 					<FileUpload />
-				</div>
-				<div className="mt-6">
-					<Image
-						src="/pbl-flyer.jpg"
-						alt="アプリの説明画像"
-						width={500}
-						height={300}
-						layout="responsive"
-						className="rounded-b-lg"
-					/>
 				</div>
 			</div>
 		</div>
