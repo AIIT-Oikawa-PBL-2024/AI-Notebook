@@ -29,7 +29,7 @@ interface AuthContextType {
 }
 
 // 認証コンテキストの作成
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // 認証プロバイダーコンポーネント
 export function AuthProvider({ children }: { children: React.ReactNode }) {
