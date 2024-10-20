@@ -1,6 +1,10 @@
 import NavBar from "@/components/layouts/NavBar";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+type LayoutProps = {
+	children: React.ReactNode;
+};
+
+export default function Layout({ children }: LayoutProps) {
 	return (
 		<div className="flex">
 			<NavBar />

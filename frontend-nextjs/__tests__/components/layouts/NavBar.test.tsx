@@ -1,6 +1,6 @@
 import NavBar from "@/components/layouts/NavBar";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("NavBar", () => {
 	it("renders the NavBar component", () => {

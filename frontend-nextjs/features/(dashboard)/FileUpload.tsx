@@ -105,11 +105,12 @@ const FileUploadComponent: React.FC = () => {
 
 		if (!response.ok) {
 			alert("アップロードに失敗しました");
+			setIsUploading(false);
 		 	return;
 		}
 
 		const data = await response.json();
-	  let success = true;
+	  let success_upload_singnedurl = true;
 		for (const file of files) {
 			//NFC正規化
 			file.name = file.name.normalize("NFC");
@@ -135,23 +136,23 @@ const FileUploadComponent: React.FC = () => {
 					});
 					if (!response.ok) {
 						alert("アップロードに失敗しました");
-						success = false;
+						success_upload_singnedurl = false;
+						setIsUploading(false);
 						return;
 					}
 				} else {
+					success_upload_singnedurl = false;
 					throw new Error("アップロードに失敗しました");
-					success = false;
 				}
 			} catch (error) {
 				alert(
 					`エラー: ${error instanceof Error ? error.message : "不明なエラーが発生しました"}`,
 				);
-				success = false;
-			} finally {
-				setIsUploading(false);
+				success_upload_singnedurl = false;
 			}
+				setIsUploading(false);
 		}
-		if (success) {
+		if (success_upload_singnedurl) {
 			alert("ファイルが正常にアップロードされました");
 			setFiles([]);
 		}
