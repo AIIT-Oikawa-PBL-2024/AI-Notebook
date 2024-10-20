@@ -26,6 +26,7 @@ pymupdf = "^1.24.7"
 sphinx = "^7.4.6"
 sphinx-rtd-theme = "^2.0.0"
 myst-parser = "^3.0.1"
+firebase-admin = "^6.5.0"
 
 
 [tool.poetry.group.dev.dependencies]

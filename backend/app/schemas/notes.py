@@ -42,13 +42,13 @@ class NoteByCurrentUserResponse(NoteBase):
     :ivar id: ノートのID
     :vartype id: int
     :ivar user_id: ユーザーID
-    :vartype user_id: int
+    :vartype user_id: str
     :ivar model_config: モデルの設定
     :vartype model_config: ConfigDict
     """
 
     id: int
-    user_id: int
+    user_id: str
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -59,10 +59,10 @@ class NoteCreate(NoteBase):
     :param NoteBase: ノートの基本クラス
     :type NoteBase: NoteBase
     :ivar user_id: ユーザーID
-    :vartype user_id: int
+    :vartype user_id: str
     """
 
-    user_id: int
+    user_id: str
 
 
 class NoteCreateResponse(NoteCreate):
@@ -105,5 +105,5 @@ class NoteUpdateResponse(NoteUpdate):
     """
 
     id: int
-    user_id: int
+    user_id: str
     model_config = ConfigDict(from_attributes=True)

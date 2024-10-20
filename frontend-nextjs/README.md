@@ -86,7 +86,7 @@ CTRL+Cで停止
 - `pnpm biome init`
 - `biom.json`　対象ファイルを指定
 
-- 試しにフォーマット実行（CLIでフォーマット） `pnpm biome check app`
+- 試しにフォーマット実行（CLIでフォーマット） `pnpm check`　または　`pnpm biome check`
 - VSCodeのファイル保存でもフォーマット可能になる
 
 - `biome`が動かない場合

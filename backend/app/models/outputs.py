@@ -1,30 +1,25 @@
-from sqlalchemy import TEXT, Column, DateTime, ForeignKey, Integer
-from sqlalchemy.orm import relationship
+from sqlalchemy import TEXT, Column, DateTime, Integer, String
 
 from app.database import Base
 
 
-# Ouputテーブルのモデルを定義
 class Output(Base):
     """
-    出力データを表すクラスです。
+    出力データを表すクラス。
 
-    Attributes:
-        id (int): 出力のID。
-        user_id (int): ユーザーのID。外部キー制約があります。
-        output (str): 出力データ。
-        created_at (datetime): 作成日時。
-        user (User): ユーザーとの関連。
-
+    :param id: 出力のID
+    :type id: int
+    :param user_id: ユーザーのID（Firebase UID）
+    :type user_id: str
+    :param output: 出力データ
+    :type output: str
+    :param created_at: 作成日時
+    :type created_at: datetime
     """
 
     __tablename__ = "outputs"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(
-        Integer, ForeignKey("users.id"), nullable=False
-    )  # 外部キー制約を追加
+    user_id = Column(String(128), nullable=False, index=True)
     output = Column(TEXT, nullable=False)
     created_at = Column(DateTime, nullable=False)
-
-    user = relationship("User", back_populates="outputs")
