@@ -36,14 +36,6 @@ app.routers.outputs\_stream module
    :undoc-members:
    :show-inheritance:
 
-app.routers.users module
-------------------------
-
-.. automodule:: app.routers.users
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

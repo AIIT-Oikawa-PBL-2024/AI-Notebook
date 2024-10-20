@@ -50,8 +50,8 @@
 <li><a class="reference internal" href="#module-app.cruds.files">app.cruds.files module</a><ul>
 <li><a class="reference internal" href="#app.cruds.files.create_file"><code class="docutils literal notranslate"><span class="pre">create_file()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.files.delete_file_by_name_and_userid"><code class="docutils literal notranslate"><span class="pre">delete_file_by_name_and_userid()</span></code></a></li>
-<li><a class="reference internal" href="#app.cruds.files.get_file_by_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id()</span></code></a></li>
-<li><a class="reference internal" href="#app.cruds.files.get_files"><code class="docutils literal notranslate"><span class="pre">get_files()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.files.get_file_by_id_and_user_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id_and_user_id()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.files.get_files_by_user_id"><code class="docutils literal notranslate"><span class="pre">get_files_by_user_id()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.cruds.notes">app.cruds.notes module</a><ul>
@@ -68,13 +68,6 @@
 <li><a class="reference internal" href="#app.cruds.outputs.delete_output"><code class="docutils literal notranslate"><span class="pre">delete_output()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.outputs.get_output_by_id"><code class="docutils literal notranslate"><span class="pre">get_output_by_id()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.outputs.get_outputs"><code class="docutils literal notranslate"><span class="pre">get_outputs()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-app.cruds.users">app.cruds.users module</a><ul>
-<li><a class="reference internal" href="#app.cruds.users.create_user"><code class="docutils literal notranslate"><span class="pre">create_user()</span></code></a></li>
-<li><a class="reference internal" href="#app.cruds.users.delete_user"><code class="docutils literal notranslate"><span class="pre">delete_user()</span></code></a></li>
-<li><a class="reference internal" href="#app.cruds.users.get_user_by_id"><code class="docutils literal notranslate"><span class="pre">get_user_by_id()</span></code></a></li>
-<li><a class="reference internal" href="#app.cruds.users.get_users"><code class="docutils literal notranslate"><span class="pre">get_users()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.cruds">Module contents</a></li>
@@ -115,13 +108,14 @@
 <span id="app-cruds-files-module"></span><h2>app.cruds.files module<a class="headerlink" href="#module-app.cruds.files" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="app.cruds.files.create_file">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">create_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_create</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate" title="app.schemas.files.FileCreate"><span class="pre">FileCreate</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a></span></span><a class="reference internal" href="_modules/app/cruds/files.html#create_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.create_file" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">create_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_create</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate" title="app.schemas.files.FileCreate"><span class="pre">FileCreate</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a></span></span><a class="reference internal" href="_modules/app/cruds/files.html#create_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.create_file" title="Link to this definition"></a></dt>
 <dd><p>新しいファイルを作成する関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
 <li><p><strong>file_create</strong> (<em>files_schemas.FileCreate</em>) -- 作成するファイルの情報</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ファイルを所有するユーザーのID</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
@@ -135,14 +129,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.cruds.files.delete_file_by_name_and_userid">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">delete_file_by_name_and_userid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#delete_file_by_name_and_userid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.delete_file_by_name_and_userid" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">delete_file_by_name_and_userid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#delete_file_by_name_and_userid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.delete_file_by_name_and_userid" title="Link to this definition"></a></dt>
 <dd><p>指定されたファイル名とユーザーIDに基づいてファイルを削除します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
 <li><p><strong>file_name</strong> (<em>str</em>) -- 削除するファイルの名前</p></li>
-<li><p><strong>user_id</strong> (<em>int</em>) -- ファイルを所有するユーザーのID</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ファイルを所有するユーザーのID</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
@@ -155,14 +149,15 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.files.get_file_by_id">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">get_file_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#get_file_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.get_file_by_id" title="Link to this definition"></a></dt>
-<dd><p>ファイルIDから特定のファイルを取得する関数</p>
+<dt class="sig sig-object py" id="app.cruds.files.get_file_by_id_and_user_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">get_file_by_id_and_user_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#get_file_by_id_and_user_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.get_file_by_id_and_user_id" title="Link to this definition"></a></dt>
+<dd><p>ファイルIDとユーザーIDから特定のファイルを取得する関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
 <li><p><strong>file_id</strong> (<em>int</em>) -- 取得するファイルのID</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ファイルを所有するユーザーのID</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
@@ -175,12 +170,15 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.files.get_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.files.File" title="app.schemas.files.File"><span class="pre">File</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#get_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.get_files" title="Link to this definition"></a></dt>
-<dd><p>全ファイルを取得する関数</p>
+<dt class="sig sig-object py" id="app.cruds.files.get_files_by_user_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">get_files_by_user_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.files.File" title="app.schemas.files.File"><span class="pre">File</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#get_files_by_user_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.get_files_by_user_id" title="Link to this definition"></a></dt>
+<dd><p>特定のユーザーに関連する全ファイルを取得する関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ファイルを所有するユーザーのID</p></li>
+</ul>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
 <dd class="field-even"><p>ファイルのリスト</p>
@@ -216,7 +214,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.cruds.notes.get_notes_by_user_id">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.notes.</span></span><span class="sig-name descname"><span class="pre">get_notes_by_user_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.models.html#app.models.notes.Note" title="app.models.notes.Note"><span class="pre">Note</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/notes.html#get_notes_by_user_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.notes.get_notes_by_user_id" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.notes.</span></span><span class="sig-name descname"><span class="pre">get_notes_by_user_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.models.html#app.models.notes.Note" title="app.models.notes.Note"><span class="pre">Note</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/notes.html#get_notes_by_user_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.notes.get_notes_by_user_id" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -300,86 +298,6 @@
 </dd>
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list[outputs_schemas.Output]</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-app.cruds.users">
-<span id="app-cruds-users-module"></span><h2>app.cruds.users module<a class="headerlink" href="#module-app.cruds.users" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.users.create_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.users.</span></span><span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_create</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate" title="app.schemas.users.UserCreate"><span class="pre">UserCreate</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.users.User" title="app.models.users.User"><span class="pre">User</span></a></span></span><a class="reference internal" href="_modules/app/cruds/users.html#create_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.users.create_user" title="Link to this definition"></a></dt>
-<dd><p>新しいユーザーを作成する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-<li><p><strong>user_create</strong> (<em>users_schemas.UserCreate</em>) -- 作成するユーザーのデータ</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>作成されたユーザー</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>users_models.User</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.users.delete_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.users.</span></span><span class="sig-name descname"><span class="pre">delete_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/users.html#delete_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.users.delete_user" title="Link to this definition"></a></dt>
-<dd><p>ユーザーIDから特定のユーザーを削除する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-<li><p><strong>user_id</strong> (<em>int</em>) -- 削除するユーザーのID</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>なし</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.users.get_user_by_id">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.users.</span></span><span class="sig-name descname"><span class="pre">get_user_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.users.User" title="app.models.users.User"><span class="pre">User</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/users.html#get_user_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.users.get_user_by_id" title="Link to this definition"></a></dt>
-<dd><p>ユーザーIDから特定のユーザーを取得する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-<li><p><strong>user_id</strong> (<em>int</em>) -- 取得するユーザーのID</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ユーザー情報、存在しない場合はNone</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>users_models.User | None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.users.get_users">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.users.</span></span><span class="sig-name descname"><span class="pre">get_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.users.User" title="app.schemas.users.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/users.html#get_users"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.users.get_users" title="Link to this definition"></a></dt>
-<dd><p>全ユーザーを取得する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ユーザーのリスト</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[users_schemas.User]</p>
 </dd>
 </dl>
 </dd></dl>

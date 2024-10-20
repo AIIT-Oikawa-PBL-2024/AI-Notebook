@@ -52,10 +52,7 @@
 <li><a class="reference internal" href="#app.database.get_db"><code class="docutils literal notranslate"><span class="pre">get_db()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-app.main">app.main module</a><ul>
-<li><a class="reference internal" href="#app.main.read_root"><code class="docutils literal notranslate"><span class="pre">read_root()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#app-main-module">app.main module</a></li>
 <li><a class="reference internal" href="#module-app.migrate_cloud_db">app.migrate_cloud_db module</a><ul>
 <li><a class="reference internal" href="#app.migrate_cloud_db.create_database"><code class="docutils literal notranslate"><span class="pre">create_database()</span></code></a></li>
 <li><a class="reference internal" href="#app.migrate_cloud_db.create_tables"><code class="docutils literal notranslate"><span class="pre">create_tables()</span></code></a></li>
@@ -107,8 +104,8 @@
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds.files">app.cruds.files module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.files.create_file"><code class="docutils literal notranslate"><span class="pre">create_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.files.delete_file_by_name_and_userid"><code class="docutils literal notranslate"><span class="pre">delete_file_by_name_and_userid()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.files.get_file_by_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.files.get_files"><code class="docutils literal notranslate"><span class="pre">get_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.files.get_file_by_id_and_user_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id_and_user_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.files.get_files_by_user_id"><code class="docutils literal notranslate"><span class="pre">get_files_by_user_id()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds.notes">app.cruds.notes module</a><ul>
@@ -127,13 +124,6 @@
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.get_outputs"><code class="docutils literal notranslate"><span class="pre">get_outputs()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds.users">app.cruds.users module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.users.create_user"><code class="docutils literal notranslate"><span class="pre">create_user()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.users.delete_user"><code class="docutils literal notranslate"><span class="pre">delete_user()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.users.get_user_by_id"><code class="docutils literal notranslate"><span class="pre">get_user_by_id()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.users.get_users"><code class="docutils literal notranslate"><span class="pre">get_users()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds">Module contents</a></li>
 </ul>
 </li>
@@ -145,7 +135,6 @@
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.file_name"><code class="docutils literal notranslate"><span class="pre">File.file_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.file_size"><code class="docutils literal notranslate"><span class="pre">File.file_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.user"><code class="docutils literal notranslate"><span class="pre">File.user</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.user_id"><code class="docutils literal notranslate"><span class="pre">File.user_id</span></code></a></li>
 </ul>
 </li>
@@ -158,7 +147,6 @@
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.notes.Note.id"><code class="docutils literal notranslate"><span class="pre">Note.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.notes.Note.title"><code class="docutils literal notranslate"><span class="pre">Note.title</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.notes.Note.updated_at"><code class="docutils literal notranslate"><span class="pre">Note.updated_at</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.notes.Note.user"><code class="docutils literal notranslate"><span class="pre">Note.user</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.notes.Note.user_id"><code class="docutils literal notranslate"><span class="pre">Note.user_id</span></code></a></li>
 </ul>
 </li>
@@ -166,29 +154,10 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.outputs">app.models.outputs module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.outputs.Output"><code class="docutils literal notranslate"><span class="pre">Output</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.id"><code class="docutils literal notranslate"><span class="pre">Output.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.user_id"><code class="docutils literal notranslate"><span class="pre">Output.user_id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.output"><code class="docutils literal notranslate"><span class="pre">Output.output</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.created_at"><code class="docutils literal notranslate"><span class="pre">Output.created_at</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.user"><code class="docutils literal notranslate"><span class="pre">Output.user</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#id0"><code class="docutils literal notranslate"><span class="pre">Output.created_at</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#id1"><code class="docutils literal notranslate"><span class="pre">Output.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#id2"><code class="docutils literal notranslate"><span class="pre">Output.output</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#id3"><code class="docutils literal notranslate"><span class="pre">Output.user</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#id4"><code class="docutils literal notranslate"><span class="pre">Output.user_id</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.users">app.models.users module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.users.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.email"><code class="docutils literal notranslate"><span class="pre">User.email</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.files"><code class="docutils literal notranslate"><span class="pre">User.files</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.id"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.notes"><code class="docutils literal notranslate"><span class="pre">User.notes</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.outputs"><code class="docutils literal notranslate"><span class="pre">User.outputs</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.password"><code class="docutils literal notranslate"><span class="pre">User.password</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.users.User.username"><code class="docutils literal notranslate"><span class="pre">User.username</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.id"><code class="docutils literal notranslate"><span class="pre">Output.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.output"><code class="docutils literal notranslate"><span class="pre">Output.output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.user_id"><code class="docutils literal notranslate"><span class="pre">Output.user_id</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -202,15 +171,7 @@
 <li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.exercises_stream.request_content"><code class="docutils literal notranslate"><span class="pre">request_content()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.files">app.routers.files module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.files.delete_files"><code class="docutils literal notranslate"><span class="pre">delete_files()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.files.generate_upload_signed_url"><code class="docutils literal notranslate"><span class="pre">generate_upload_signed_url()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.files.get_file_by_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.files.get_files"><code class="docutils literal notranslate"><span class="pre">get_files()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.files.register_files"><code class="docutils literal notranslate"><span class="pre">register_files()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.files.upload_files"><code class="docutils literal notranslate"><span class="pre">upload_files()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="app.routers.html#app-routers-files-module">app.routers.files module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.notes">app.routers.notes module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.notes.create_note"><code class="docutils literal notranslate"><span class="pre">create_note()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.notes.delete_note"><code class="docutils literal notranslate"><span class="pre">delete_note()</span></code></a></li>
@@ -223,13 +184,6 @@
 <li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.outputs_stream.request_content"><code class="docutils literal notranslate"><span class="pre">request_content()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers.users">app.routers.users module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.users.create_user"><code class="docutils literal notranslate"><span class="pre">create_user()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.users.delete_user"><code class="docutils literal notranslate"><span class="pre">delete_user()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.users.get_user"><code class="docutils literal notranslate"><span class="pre">get_user()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.routers.html#app.routers.users.list_users"><code class="docutils literal notranslate"><span class="pre">list_users()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="app.routers.html#module-app.routers">Module contents</a></li>
 </ul>
 </li>
@@ -238,25 +192,34 @@
 <li class="toctree-l2"><a class="reference internal" href="app.schemas.html#module-app.schemas.files">app.schemas.files module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.files.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.File.user_id"><code class="docutils literal notranslate"><span class="pre">File.user_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.File.created_at"><code class="docutils literal notranslate"><span class="pre">File.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id0"><code class="docutils literal notranslate"><span class="pre">File.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id1"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.File.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">File.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.File.model_config"><code class="docutils literal notranslate"><span class="pre">File.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.File.model_fields"><code class="docutils literal notranslate"><span class="pre">File.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id2"><code class="docutils literal notranslate"><span class="pre">File.user_id</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileBase"><code class="docutils literal notranslate"><span class="pre">FileBase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileBase.file_name"><code class="docutils literal notranslate"><span class="pre">FileBase.file_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileBase.file_size"><code class="docutils literal notranslate"><span class="pre">FileBase.file_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id3"><code class="docutils literal notranslate"><span class="pre">FileBase.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id4"><code class="docutils literal notranslate"><span class="pre">FileBase.file_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">FileBase.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileBase.model_config"><code class="docutils literal notranslate"><span class="pre">FileBase.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileBase.model_fields"><code class="docutils literal notranslate"><span class="pre">FileBase.model_fields</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate"><code class="docutils literal notranslate"><span class="pre">FileCreate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate.user_id"><code class="docutils literal notranslate"><span class="pre">FileCreate.user_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate.created_at"><code class="docutils literal notranslate"><span class="pre">FileCreate.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id5"><code class="docutils literal notranslate"><span class="pre">FileCreate.created_at</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">FileCreate.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate.model_config"><code class="docutils literal notranslate"><span class="pre">FileCreate.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">FileCreate.model_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileCreate.user_id"><code class="docutils literal notranslate"><span class="pre">FileCreate.user_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id6"><code class="docutils literal notranslate"><span class="pre">FileCreate.user_id</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -328,7 +291,7 @@
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.model_config"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id0"><code class="docutils literal notranslate"><span class="pre">OutputBase.output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id7"><code class="docutils literal notranslate"><span class="pre">OutputBase.output</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate"><code class="docutils literal notranslate"><span class="pre">OutputCreate</span></code></a><ul>
@@ -337,43 +300,6 @@
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.model_config"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.user_id"><code class="docutils literal notranslate"><span class="pre">OutputCreate.user_id</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="app.schemas.html#module-app.schemas.users">app.schemas.users module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.users.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.User.id"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id1"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.User.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">User.model_computed_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.User.model_config"><code class="docutils literal notranslate"><span class="pre">User.model_config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.User.model_fields"><code class="docutils literal notranslate"><span class="pre">User.model_fields</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserBase"><code class="docutils literal notranslate"><span class="pre">UserBase</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserBase.username"><code class="docutils literal notranslate"><span class="pre">UserBase.username</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserBase.email"><code class="docutils literal notranslate"><span class="pre">UserBase.email</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id2"><code class="docutils literal notranslate"><span class="pre">UserBase.email</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">UserBase.model_computed_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserBase.model_config"><code class="docutils literal notranslate"><span class="pre">UserBase.model_config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserBase.model_fields"><code class="docutils literal notranslate"><span class="pre">UserBase.model_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id3"><code class="docutils literal notranslate"><span class="pre">UserBase.username</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate"><code class="docutils literal notranslate"><span class="pre">UserCreate</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate.password"><code class="docutils literal notranslate"><span class="pre">UserCreate.password</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">UserCreate.model_computed_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate.model_config"><code class="docutils literal notranslate"><span class="pre">UserCreate.model_config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">UserCreate.model_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id4"><code class="docutils literal notranslate"><span class="pre">UserCreate.password</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreateResponse"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreateResponse.id"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#id5"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreateResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.model_computed_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreateResponse.model_config"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.model_config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreateResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">UserCreateResponse.model_fields</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -404,6 +330,7 @@
 <li class="toctree-l3"><a class="reference internal" href="app.utils.html#app.utils.operate_cloud_storage.upload_files"><code class="docutils literal notranslate"><span class="pre">upload_files()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="app.utils.html#app-utils-user-auth-module">app.utils.user_auth module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.utils.html#module-app.utils">Module contents</a></li>
 </ul>
 </li>
@@ -430,22 +357,8 @@
 </dd></dl>
 
 </section>
-<section id="module-app.main">
-<span id="app-main-module"></span><h2>app.main module<a class="headerlink" href="#module-app.main" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.main.read_root">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">read_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/main.html#read_root"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.main.read_root" title="Link to this definition"></a></dt>
-<dd><p>ルートエンドポイントを読み取ります。</p>
-<dl class="field-list simple">
-<dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>メッセージを含む辞書</p>
-</dd>
-<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict[str, str]</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="app-main-module">
+<h2>app.main module<a class="headerlink" href="#app-main-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-app.migrate_cloud_db">
 <span id="app-migrate-cloud-db-module"></span><h2>app.migrate_cloud_db module<a class="headerlink" href="#module-app.migrate_cloud_db" title="Link to this heading"></a></h2>

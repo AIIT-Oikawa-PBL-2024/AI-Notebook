@@ -28,6 +28,14 @@ app.utils.operate\_cloud\_storage module
    :undoc-members:
    :show-inheritance:
 
+app.utils.user\_auth module
+---------------------------
+
+.. automodule:: app.utils.user_auth
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

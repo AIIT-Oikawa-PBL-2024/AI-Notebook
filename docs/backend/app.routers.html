@@ -51,15 +51,7 @@
 <li><a class="reference internal" href="#app.routers.exercises_stream.request_content"><code class="docutils literal notranslate"><span class="pre">request_content()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-app.routers.files">app.routers.files module</a><ul>
-<li><a class="reference internal" href="#app.routers.files.delete_files"><code class="docutils literal notranslate"><span class="pre">delete_files()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.files.generate_upload_signed_url"><code class="docutils literal notranslate"><span class="pre">generate_upload_signed_url()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.files.get_file_by_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.files.get_files"><code class="docutils literal notranslate"><span class="pre">get_files()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.files.register_files"><code class="docutils literal notranslate"><span class="pre">register_files()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.files.upload_files"><code class="docutils literal notranslate"><span class="pre">upload_files()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#app-routers-files-module">app.routers.files module</a></li>
 <li><a class="reference internal" href="#module-app.routers.notes">app.routers.notes module</a><ul>
 <li><a class="reference internal" href="#app.routers.notes.create_note"><code class="docutils literal notranslate"><span class="pre">create_note()</span></code></a></li>
 <li><a class="reference internal" href="#app.routers.notes.delete_note"><code class="docutils literal notranslate"><span class="pre">delete_note()</span></code></a></li>
@@ -70,13 +62,6 @@
 </li>
 <li><a class="reference internal" href="#module-app.routers.outputs_stream">app.routers.outputs_stream module</a><ul>
 <li><a class="reference internal" href="#app.routers.outputs_stream.request_content"><code class="docutils literal notranslate"><span class="pre">request_content()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-app.routers.users">app.routers.users module</a><ul>
-<li><a class="reference internal" href="#app.routers.users.create_user"><code class="docutils literal notranslate"><span class="pre">create_user()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.users.delete_user"><code class="docutils literal notranslate"><span class="pre">delete_user()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.users.get_user"><code class="docutils literal notranslate"><span class="pre">get_user()</span></code></a></li>
-<li><a class="reference internal" href="#app.routers.users.list_users"><code class="docutils literal notranslate"><span class="pre">list_users()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.routers">Module contents</a></li>
@@ -133,129 +118,8 @@
 </dd></dl>
 
 </section>
-<section id="module-app.routers.files">
-<span id="app-routers-files-module"></span><h2>app.routers.files module<a class="headerlink" href="#module-app.routers.files" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.files.delete_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.files.</span></span><span class="sig-name descname"><span class="pre">delete_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/routers/files.html#delete_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.files.delete_files" title="Link to this definition"></a></dt>
-<dd><p>ファイルを削除するAPIエンドポイントです。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- 削除するファイルのリスト</p></li>
-<li><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em><em>, </em><em>optional</em>) -- データベースセッション (省略可能)</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>削除結果の辞書</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.files.generate_upload_signed_url">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.files.</span></span><span class="sig-name descname"><span class="pre">generate_upload_signed_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/routers/files.html#generate_upload_signed_url"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.files.generate_upload_signed_url" title="Link to this definition"></a></dt>
-<dd><p>指定されたファイルリストに対してアップロード用の署名付きURLを生成します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>files</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- 署名付きURLを生成するファイルのリスト</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>HTTPException</strong> -- URL生成中にエラーが発生した場合、</p>
-</dd>
-</dl>
-<p>ステータスコード500とエラーメッセージを含むHTTPExceptionを送出します。
-:return: ファイル名をキーとし、署名付きURLを値とする辞書
-:rtype: dict</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.files.get_file_by_id">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.files.</span></span><span class="sig-name descname"><span class="pre">get_file_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.schemas.html#app.schemas.files.File" title="app.schemas.files.File"><span class="pre">File</span></a></span></span><a class="reference internal" href="_modules/app/routers/files.html#get_file_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.files.get_file_by_id" title="Link to this definition"></a></dt>
-<dd><p>指定されたIDのファイルをデータベースから取得します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_id</strong> (<em>int</em>) -- ファイルのID</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ファイル情報</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>files_schemas.File</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>HTTPException</strong> -- ファイルが見つからない場合</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.files.get_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.files.</span></span><span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.files.File" title="app.schemas.files.File"><span class="pre">File</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/routers/files.html#get_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.files.get_files" title="Link to this definition"></a></dt>
-<dd><p>データベースからファイルの一覧を取得します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ファイルのリスト</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[files_schemas.File]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.files.register_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.files.</span></span><span class="sig-name descname"><span class="pre">register_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">UploadFile</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/routers/files.html#register_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.files.register_files" title="Link to this definition"></a></dt>
-<dd><p>署名付きURLでアップロードしたファイルの情報をDBに登録します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>list</em><em>[</em><em>UploadFile</em><em>]</em>) -- アップロードしたファイルのリスト</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>登録結果の辞書</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.files.upload_files">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.files.</span></span><span class="sig-name descname"><span class="pre">upload_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">UploadFile</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/routers/files.html#upload_files"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.files.upload_files" title="Link to this definition"></a></dt>
-<dd><p>ファイルをGoogle Cloud Storageにアップロードし、ファイル名をDBに登録します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>list</em><em>[</em><em>UploadFile</em><em>]</em>) -- アップロードするファイルのリスト</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>アップロード結果の辞書</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>HTTPException</strong> -- アップロードまたはデータベース登録に失敗した場合</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="app-routers-files-module">
+<h2>app.routers.files module<a class="headerlink" href="#app-routers-files-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-app.routers.notes">
 <span id="app-routers-notes-module"></span><h2>app.routers.notes module<a class="headerlink" href="#module-app.routers.notes" title="Link to this heading"></a></h2>
@@ -322,12 +186,12 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.routers.notes.get_notes_by_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.notes.</span></span><span class="sig-name descname"><span class="pre">get_notes_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.notes.NoteByCurrentUserResponse" title="app.schemas.notes.NoteByCurrentUserResponse"><span class="pre">NoteByCurrentUserResponse</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/routers/notes.html#get_notes_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.notes.get_notes_by_user" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.notes.</span></span><span class="sig-name descname"><span class="pre">get_notes_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.notes.NoteByCurrentUserResponse" title="app.schemas.notes.NoteByCurrentUserResponse"><span class="pre">NoteByCurrentUserResponse</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/routers/notes.html#get_notes_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.notes.get_notes_by_user" title="Link to this definition"></a></dt>
 <dd><p>指定されたユーザーのノートのリストを取得するエンドポイント</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID</p></li>
 <li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
 <li><p><strong>offset</strong> (<em>int</em>) -- オフセット</p></li>
 <li><p><strong>limit</strong> (<em>int</em>) -- 取得するノートの数</p></li>
@@ -391,92 +255,6 @@
 またはGoogle APIからエラーが返された場合、
 またはコンテンツのストリーミング中にエラーが発生した場合</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-app.routers.users">
-<span id="app-routers-users-module"></span><h2>app.routers.users module<a class="headerlink" href="#module-app.routers.users" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.users.create_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.users.</span></span><span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreate" title="app.schemas.users.UserCreate"><span class="pre">UserCreate</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.schemas.html#app.schemas.users.UserCreateResponse" title="app.schemas.users.UserCreateResponse"><span class="pre">UserCreateResponse</span></a></span></span><a class="reference internal" href="_modules/app/routers/users.html#create_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.users.create_user" title="Link to this definition"></a></dt>
-<dd><p>新しいユーザーを作成する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>user_body</strong> (<em>users_schemas.UserCreate</em>) -- ユーザー作成のためのデータ</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>作成されたユーザーの情報</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>users_schemas.UserCreateResponse</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.users.delete_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.users.</span></span><span class="sig-name descname"><span class="pre">delete_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/routers/users.html#delete_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.users.delete_user" title="Link to this definition"></a></dt>
-<dd><p>ユーザーIDから特定のユーザーを削除する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>削除結果のメッセージ</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>HTTPException</strong> -- ユーザーが見つからない場合に404エラーを返す</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.users.get_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.users.</span></span><span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.schemas.html#app.schemas.users.User" title="app.schemas.users.User"><span class="pre">User</span></a></span></span><a class="reference internal" href="_modules/app/routers/users.html#get_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.users.get_user" title="Link to this definition"></a></dt>
-<dd><p>ユーザーIDから特定のユーザーを取得する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>user_id</strong> (<em>int</em>) -- ユーザーID</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ユーザーの情報</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>users_schemas.User</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>HTTPException</strong> -- ユーザーが見つからない場合に404エラーを返す</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.users.list_users">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.users.</span></span><span class="sig-name descname"><span class="pre">list_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.users.User" title="app.schemas.users.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/routers/users.html#list_users"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.users.list_users" title="Link to this definition"></a></dt>
-<dd><p>ユーザーの一覧を取得する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ユーザーのリスト</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[users_schemas.User]</p>
 </dd>
 </dl>
 </dd></dl>
