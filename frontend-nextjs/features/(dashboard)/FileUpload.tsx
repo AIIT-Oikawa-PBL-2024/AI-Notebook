@@ -110,13 +110,13 @@ const FileUploadComponent: React.FC = () => {
 		}
 
 		const data = await response.json();
-	  let success_upload_singnedurl = true;
+	  let success_upload_signedurl = true;
 		for (const file of files) {
 			//NFC正規化
 			file.name = file.name.normalize("NFC");
 			const signedUrl = data[file.name];
 			try {
-				const response = await fetch(signedUrl, {
+				const uploadResponse = await fetch(signedUrl, {
 					method: "PUT",
 					body: file.file,
 					headers: {
@@ -124,35 +124,35 @@ const FileUploadComponent: React.FC = () => {
 					},
 				});
 	
-				if (response.ok) {
+				if (uploadResponse.ok) {
 					const formData = new FormData();
 					formData.append("files", file.file, file.file.name);
-					const response = await authFetch(BACKEND_DEV_API_URL_REGISTERFILES, {
+					const registerResponse = await authFetch(BACKEND_DEV_API_URL_REGISTERFILES, {
 						method: "POST",
 						body: formData,
 						headers: {
 							Accept: "application/json",
 						},
 					});
-					if (!response.ok) {
+					if (!registerResponse.ok) {
 						alert("アップロードに失敗しました");
-						success_upload_singnedurl = false;
+						success_upload_signedurl = false;
 						setIsUploading(false);
 						return;
 					}
 				} else {
-					success_upload_singnedurl = false;
+					success_upload_signedurl = false;
 					throw new Error("アップロードに失敗しました");
 				}
 			} catch (error) {
 				alert(
 					`エラー: ${error instanceof Error ? error.message : "不明なエラーが発生しました"}`,
 				);
-				success_upload_singnedurl = false;
+				success_upload_signedurl = false;
 			}
 				setIsUploading(false);
 		}
-		if (success_upload_singnedurl) {
+		if (success_upload_signedurl) {
 			alert("ファイルが正常にアップロードされました");
 			setFiles([]);
 		}
