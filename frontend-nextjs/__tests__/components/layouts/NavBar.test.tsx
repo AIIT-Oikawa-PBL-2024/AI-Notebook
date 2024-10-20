@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
 import NavBar from "@/components/layouts/NavBar";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 describe("NavBar", () => {

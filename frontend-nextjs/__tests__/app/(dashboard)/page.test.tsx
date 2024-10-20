@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
 import UploadPage from "@/app/(dashboard)/page";
-import { vi, type Mock, describe, it, expect } from "vitest";
-import { useAuth } from "@/providers/AuthProvider";
 import { useSignOut } from "@/hooks/useSignOut";
+import { useAuth } from "@/providers/AuthProvider";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { type Mock, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/providers/AuthProvider", () => ({
 	useAuth: vi.fn(),

@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
 import Layout from "@/app/(dashboard)/layout";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 // Mock NavBar component
 vi.mock("@/components/layouts/NavBar", () => ({
