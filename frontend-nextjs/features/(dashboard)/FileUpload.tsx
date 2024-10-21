@@ -303,7 +303,7 @@ const FileUploadComponent: React.FC = () => {
 						type="button"
 						onClick={uploadFiles}
 						disabled={isUploading || files.length === 0}
-						className={`mt-4 px-4 py-2 text-white rounded hover: flex items-center justify-center ${isUploading || files.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+						className={`mt-4 px-4 py-2 text-white rounded flex items-center justify-center hover:bg-gray-300 ${isUploading || files.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
 						{isUploading ? (
 							"アップロード中..."
