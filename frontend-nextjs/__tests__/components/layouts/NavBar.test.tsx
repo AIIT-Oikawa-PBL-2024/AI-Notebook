@@ -2,7 +2,7 @@ import NavBar from "@/components/layouts/NavBar";
 import { useSignOut } from "@/hooks/useSignOut";
 import { useAuth } from "@/providers/AuthProvider";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
+import { type Mock, beforeEach, describe, expect, it} from "vitest";
 
 // 必要なフックをモックします
 vi.mock("@/providers/AuthProvider", () => ({
