@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.110.2"
+fastapi = "0.115.2"
 uvicorn = {extras = ["standard"], version = "^0.29.0"}
 python-multipart = "^0.0.9"
 aiofiles = "^23.2.1"
@@ -27,6 +27,7 @@ sphinx = "^7.4.6"
 sphinx-rtd-theme = "^2.0.0"
 myst-parser = "^3.0.1"
 firebase-admin = "^6.5.0"
+starlette = "0.40.0"
 
 
 [tool.poetry.group.dev.dependencies]
