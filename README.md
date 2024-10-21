@@ -224,3 +224,11 @@ AI-Notebook
   - [firebaseのコンソール](https://console.firebase.google.com/)を開く
   - アプリAI-Notebookの設定を開いて、「SDK の設定と構成」のConfigをコピー
   - 環境変数として`firebase`の`config`から追記　
+
+## 署名付きURLを利用してアップロードする場合はCORSの設定を行う必要がある
+- 開発環境については設定済
+- 本番環境については以下の手順で設定を行う必要がある
+  - backendのコンテナから現在のcors設定を確認する
+　- `gsutil cors get gs://BUCKET_NAME`
+  - 設定内容に基づいてjsonファイルを作成して、以下のコマンドcorsの設定を行う
+  - `gcloud storage buckets update gs://BUCKET_NAME --cors-file=JSON_FILE`
