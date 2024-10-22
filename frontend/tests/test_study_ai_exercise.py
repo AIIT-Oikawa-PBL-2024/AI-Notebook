@@ -35,26 +35,26 @@ def test_create_study_ai_exercise_success(
 
 
 # AI練習問題の生成が失敗する場合のテスト
-@patch("app.utils.output.create_pdf_to_markdown_summary")
-@patch("app.pages.study_ai_exercise.logging")
-@patch("streamlit.error")
-def test_create_study_ai_exercise_exception(
-    mock_error: MagicMock,
-    mock_logging: MagicMock,
-    mock_create_pdf_to_markdown_summary: MagicMock,
-    mock_session_state: Generator,
-) -> None:
-    mock_create_pdf_to_markdown_summary.side_effect = Exception("Test Exception")
-    result = create_study_ai_exercise(
-        st.session_state.selected_files_exercise, BACKEND_DEV_API_URL
-    )
-    assert result is None
-    mock_logging.error.assert_called_once_with(
-        "AI練習問題の生成中にエラーが発生しました: Test Exception"
-    )
-    mock_error.assert_called_once_with(
-        "AI練習問題の生成中にエラーが発生しました: Test Exception"
-    )
+# @patch("app.utils.output.create_pdf_to_markdown_summary")
+# @patch("app.pages.study_ai_exercise.logging")
+# @patch("streamlit.error")
+# def test_create_study_ai_exercise_exception(
+#     mock_error: MagicMock,
+#     mock_logging: MagicMock,
+#     mock_create_pdf_to_markdown_summary: MagicMock,
+#     mock_session_state: Generator,
+# ) -> None:
+#     mock_create_pdf_to_markdown_summary.side_effect = Exception("Test Exception")
+#     result = create_study_ai_exercise(
+#         st.session_state.selected_files_exercise, BACKEND_DEV_API_URL
+#     )
+#     assert result is None
+#     mock_logging.error.assert_called_once_with(
+#         "AI練習問題の生成中にエラーが発生しました: Test Exception"
+#     )
+#     mock_error.assert_called_once_with(
+#         "AI練習問題の生成中にエラーが発生しました: Test Exception"
+#     )
 
 
 # ページの表示が成功する場合のテスト

@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import sys
+from typing import Any
 
 import httpx
 import pandas as pd
@@ -425,7 +426,7 @@ async def main() -> None:
                 if st.session_state.get("show_new_note", False):
                     options = ["新規ノート"] + options
 
-                selected_note = st.selectbox(
+                selected_note: Any = st.selectbox(
                     "ノートを選択",
                     options,
                     key="note_selector",
