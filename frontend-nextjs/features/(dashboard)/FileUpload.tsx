@@ -1,9 +1,9 @@
 "use client";
 
-import type React from "react";
-import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import { ButtonWithIcon } from "@/features/(dashboard)/Button";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
+import type React from "react";
+import { type ChangeEvent, type DragEvent, useRef, useState } from "react";
 
 interface FileInfo {
 	name: string;
@@ -21,7 +21,6 @@ const FileUploadComponent: React.FC = () => {
 
 	const BACKEND_DEV_API_URL_SIGNEDURL = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/generate_upload_signed_url/`;
 	const BACKEND_DEV_API_URL_REGISTERFILES = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/register_files/`;
-
 
 	const isAllowedFile = (file: File): boolean => {
 		const allowedTypes = ["application/pdf", "image/png", "image/jpeg"];
@@ -89,7 +88,7 @@ const FileUploadComponent: React.FC = () => {
 	};
 
 	const authFetch = useAuthFetch();
-	
+
 	const uploadFiles = async () => {
 		setIsUploading(true);
 
@@ -99,18 +98,18 @@ const FileUploadComponent: React.FC = () => {
 			body: JSON.stringify(filenames),
 			headers: {
 				Accept: "application/json",
-				'Content-Type': 'application/json',
+				"Content-Type": "application/json",
 			},
 		});
 
 		if (!response.ok) {
 			alert("アップロードに失敗しました");
 			setIsUploading(false);
-		 	return;
+			return;
 		}
 
 		const data = await response.json();
-	  let success_upload_signedurl = true;
+		let success_upload_signedurl = true;
 		for (const file of files) {
 			//NFC正規化
 			file.name = file.name.normalize("NFC");
@@ -123,17 +122,20 @@ const FileUploadComponent: React.FC = () => {
 						"Content-Type": "application/octet-stream",
 					},
 				});
-	
+
 				if (uploadResponse.ok) {
 					const formData = new FormData();
 					formData.append("files", file.file, file.file.name);
-					const registerResponse = await authFetch(BACKEND_DEV_API_URL_REGISTERFILES, {
-						method: "POST",
-						body: formData,
-						headers: {
-							Accept: "application/json",
+					const registerResponse = await authFetch(
+						BACKEND_DEV_API_URL_REGISTERFILES,
+						{
+							method: "POST",
+							body: formData,
+							headers: {
+								Accept: "application/json",
+							},
 						},
-					});
+					);
 					if (!registerResponse.ok) {
 						alert("アップロードに失敗しました");
 						success_upload_signedurl = false;
@@ -150,7 +152,7 @@ const FileUploadComponent: React.FC = () => {
 				);
 				success_upload_signedurl = false;
 			}
-				setIsUploading(false);
+			setIsUploading(false);
 		}
 		if (success_upload_signedurl) {
 			alert("ファイルが正常にアップロードされました");

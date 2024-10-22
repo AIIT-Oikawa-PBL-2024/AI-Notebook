@@ -16,25 +16,66 @@ vi.mock("next/navigation", () => ({
 
 describe("useSignOut", () => {
 	const mockPush = vi.fn();
+	const mockClear = vi.fn();
+	const mockCacheDelete = vi.fn();
 
 	beforeEach(() => {
 		vi.clearAllMocks();
 		(useRouter as Mock).mockReturnValue({ push: mockPush });
+
+		// ローカルストレージとセッションストレージのモック
+		Object.defineProperty(window, "localStorage", {
+			value: { clear: mockClear },
+			writable: true,
+		});
+		Object.defineProperty(window, "sessionStorage", {
+			value: { clear: mockClear },
+			writable: true,
+		});
+
+		// クッキーのモック
+		let cookies: string[] = ["test=value"];
+		Object.defineProperty(document, "cookie", {
+			get: () => cookies.join("; "),
+			set: (value) => {
+				const [name, ...rest] = value.split("=");
+				const newCookie = `${name}=${rest.join("=")}`;
+				const index = cookies.findIndex((c) => c.startsWith(`${name}=`));
+				if (index !== -1) {
+					cookies[index] = newCookie;
+				} else {
+					cookies.push(newCookie);
+				}
+				if (newCookie.includes("expires=Thu, 01 Jan 1970 00:00:00 GMT")) {
+					cookies = cookies.filter((c) => !c.startsWith(`${name}=`));
+				}
+			},
+			configurable: true,
+		});
+
+		// キャッシュのモック
+		Object.defineProperty(window, "caches", {
+			value: {
+				keys: vi.fn().mockResolvedValue(["test-cache"]),
+				delete: mockCacheDelete,
+			},
+			writable: true,
+		});
 	});
 
-	it("should sign out successfully", async () => {
+	it("should sign out successfully and clear data", async () => {
 		(signOut as Mock).mockResolvedValue(undefined);
 
 		const { result } = renderHook(() => useSignOut());
-
-		expect(result.current.isLoading).toBe(false);
-		expect(result.current.error).toBeNull();
 
 		await act(async () => {
 			await result.current.signOutUser();
 		});
 
 		expect(signOut).toHaveBeenCalled();
+		expect(mockClear).toHaveBeenCalledTimes(2); // localStorage と sessionStorage
+		expect(document.cookie).toBe("");
+		expect(mockCacheDelete).toHaveBeenCalledWith("test-cache");
 		expect(mockPush).toHaveBeenCalledWith("/signin");
 		expect(result.current.isLoading).toBe(false);
 		expect(result.current.error).toBeNull();
@@ -86,5 +127,30 @@ describe("useSignOut", () => {
 		});
 
 		expect(result.current.isLoading).toBe(false);
+	});
+
+	it("should handle cache clearing error", async () => {
+		(signOut as Mock).mockResolvedValue(undefined);
+		(window.caches.delete as Mock).mockRejectedValue(
+			new Error("Cache delete failed"),
+		);
+
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		const { result } = renderHook(() => useSignOut());
+
+		await act(async () => {
+			await result.current.signOutUser();
+		});
+
+		expect(consoleSpy).toHaveBeenCalledWith(
+			"キャッシュのクリアに失敗しました:",
+			expect.any(Error),
+		);
+		expect(mockPush).toHaveBeenCalledWith("/signin");
+		expect(result.current.isLoading).toBe(false);
+		expect(result.current.error).toBeNull();
+
+		consoleSpy.mockRestore();
 	});
 });
