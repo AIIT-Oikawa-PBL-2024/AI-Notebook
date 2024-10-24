@@ -67,10 +67,10 @@ describe("SignUpForm", () => {
 		const passwordInput = screen.getByPlaceholderText("********");
 
 		fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-		fireEvent.change(passwordInput, { target: { value: "password123" } });
+		fireEvent.change(passwordInput, { target: { value: "Password123!" } });
 
 		expect(emailInput).toHaveValue("test@example.com");
-		expect(passwordInput).toHaveValue("password123");
+		expect(passwordInput).toHaveValue("Password123!");
 	});
 
 	it("無効なメールアドレスでエラーメッセージが表示される", async () => {
@@ -87,19 +87,34 @@ describe("SignUpForm", () => {
 		});
 	});
 
-	it("無効なパスワードでエラーメッセージが表示される", async () => {
+	it("パスワードバリデーションが正しく機能する", async () => {
 		render(<SignUpForm />);
 		const passwordInput = screen.getByPlaceholderText("********");
 
+		// 弱いパスワード
 		fireEvent.change(passwordInput, { target: { value: "weak" } });
-		fireEvent.blur(passwordInput);
-
 		await waitFor(() => {
-			expect(
-				screen.getByText(
-					"パスワードは英数字を含む8文字以上で入力してください。",
-				),
-			).toBeInTheDocument();
+			expect(screen.getByText("8文字以上")).toHaveClass("text-red-700");
+			expect(screen.getByText("大文字を含む")).toHaveClass("text-red-700");
+			expect(screen.getByText("小文字を含む")).toHaveClass("text-green-700");
+			expect(screen.getByText("数字を含む")).toHaveClass("text-red-700");
+			expect(screen.getByText("特殊文字を含む")).toHaveClass("text-red-700");
+			expect(screen.getByText("スペースを含まない")).toHaveClass(
+				"text-green-700",
+			);
+		});
+
+		// 強いパスワード
+		fireEvent.change(passwordInput, { target: { value: "StrongP@ssw0rd" } });
+		await waitFor(() => {
+			expect(screen.getByText("8文字以上")).toHaveClass("text-green-700");
+			expect(screen.getByText("大文字を含む")).toHaveClass("text-green-700");
+			expect(screen.getByText("小文字を含む")).toHaveClass("text-green-700");
+			expect(screen.getByText("数字を含む")).toHaveClass("text-green-700");
+			expect(screen.getByText("特殊文字を含む")).toHaveClass("text-green-700");
+			expect(screen.getByText("スペースを含まない")).toHaveClass(
+				"text-green-700",
+			);
 		});
 	});
 
@@ -116,7 +131,7 @@ describe("SignUpForm", () => {
 		const signUpButton = screen.getByRole("button", { name: "Sign Up" });
 
 		fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-		fireEvent.change(passwordInput, { target: { value: "Password123" } });
+		fireEvent.change(passwordInput, { target: { value: "StrongP@ssw0rd" } });
 		fireEvent.click(signUpButton);
 
 		await waitFor(() => {
@@ -125,7 +140,7 @@ describe("SignUpForm", () => {
 	});
 
 	it("Googleサインインが成功した場合、ユーザーを設定しホームにリダイレクトする", async () => {
-		const mockUser = {};
+		const mockUser = { email: "test@example.com" };
 		(signInWithPopup as Mock).mockResolvedValueOnce({ user: mockUser });
 
 		render(<SignUpForm />);
