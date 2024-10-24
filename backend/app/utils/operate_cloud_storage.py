@@ -14,7 +14,7 @@ load_dotenv()
 
 
 # ファイルを読み込む関数
-async def post_files(files: list[UploadFile]) -> dict:
+async def post_files(files: list[UploadFile], uid: str) -> dict:
     """
     アップロードされたファイルを処理し、
     Google Cloud Storageにアップロードするエンドポイント
@@ -38,7 +38,7 @@ async def post_files(files: list[UploadFile]) -> dict:
                 ext_correct_files.append(file)
 
     # ファイルのアップロード処理
-    upload_result = await upload_files(ext_correct_files)
+    upload_result = await upload_files(ext_correct_files, uid)
 
     if "success" not in upload_result or not upload_result["success"]:
         raise HTTPException(
@@ -54,7 +54,7 @@ async def post_files(files: list[UploadFile]) -> dict:
     return upload_result
 
 
-async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
+async def upload_files(ext_correct_files: list[UploadFile], uid: str) -> dict:
     """
     ファイルをGoogle Cloud Storageにアップロードする
 
@@ -72,7 +72,9 @@ async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
     for file in ext_correct_files:
         # ブロブ名を正規化
         if file.filename:
-            normalized_blobname = unicodedata.normalize("NFC", file.filename)
+            normalized_blobname = unicodedata.normalize(
+                "NFC", uid + "/" + file.filename
+            )
 
         client = storage.Client.from_service_account_json(credentials)
         bucket = storage.Bucket(client, bucket_name)
@@ -124,7 +126,7 @@ async def upload_files(ext_correct_files: list[UploadFile]) -> dict:
     return {"success": True, "success_files": success_files}
 
 
-async def delete_files_from_gcs(files: list[str]) -> dict:
+async def delete_files_from_gcs(files: list[str], uid: str) -> dict:
     """
     Google Cloud Storageからファイルを削除します。
 
@@ -144,7 +146,7 @@ async def delete_files_from_gcs(files: list[str]) -> dict:
 
     for filename in files:
         # ブロブ名を正規化
-        normalized_blobname = unicodedata.normalize("NFC", filename)
+        normalized_blobname = unicodedata.normalize("NFC", uid + "/" + filename)
         blob = bucket.blob(normalized_blobname)
 
         try:
@@ -179,7 +181,7 @@ async def delete_files_from_gcs(files: list[str]) -> dict:
     return {"success": True, "success_files": success_files}
 
 
-async def generate_upload_signed_url_v4(files: list[str]) -> dict:
+async def generate_upload_signed_url_v4(files: list[str], uid: str) -> dict:
     """
     指定されたファイルリストに対して、Google Cloud Storageにアップロードするための
     署名付きURLを生成します。
@@ -199,7 +201,7 @@ async def generate_upload_signed_url_v4(files: list[str]) -> dict:
     bucket = storage.Bucket(client, bucket_name)
     for file in files:
         # ブロブ名を正規化
-        normalized_blobname = unicodedata.normalize("NFC", file)
+        normalized_blobname = unicodedata.normalize("NFC", uid + "/" + file)
         blob = bucket.blob(normalized_blobname)
 
         url = blob.generate_signed_url(
