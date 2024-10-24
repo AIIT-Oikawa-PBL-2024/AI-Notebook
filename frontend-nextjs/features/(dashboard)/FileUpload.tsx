@@ -4,6 +4,7 @@ import type React from "react";
 import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import { ButtonWithIcon } from "@/features/(dashboard)/Button";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface FileInfo {
 	name: string;
@@ -13,6 +14,7 @@ interface FileInfo {
 }
 
 const FileUploadComponent: React.FC = () => {
+	const { user } = useAuth();
 	const [files, setFiles] = useState<FileInfo[]>([]);
 	const [isDragActive, setIsDragActive] = useState<boolean>(false);
 	const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -112,8 +114,13 @@ const FileUploadComponent: React.FC = () => {
 		const data = await response.json();
 	  let success_upload_signedurl = true;
 		for (const file of files) {
-			//NFC正規化
-			file.name = file.name.normalize("NFC");
+			let org_file_name = file.name;
+			if (user) {
+				file.name = user.uid + "/" + file.name;
+				file.name = file.name.normalize("NFC");
+			} else {
+				throw new Error("User is not authenticated");
+			}
 			const signedUrl = data[file.name];
 			try {
 				const uploadResponse = await fetch(signedUrl, {
@@ -126,7 +133,7 @@ const FileUploadComponent: React.FC = () => {
 	
 				if (uploadResponse.ok) {
 					const formData = new FormData();
-					formData.append("files", file.file, file.file.name);
+					formData.append("files", file.file, org_file_name);
 					const registerResponse = await authFetch(BACKEND_DEV_API_URL_REGISTERFILES, {
 						method: "POST",
 						body: formData,

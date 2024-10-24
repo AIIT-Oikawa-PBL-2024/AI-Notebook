@@ -71,7 +71,7 @@ async def test_get_file_by_id(session: AsyncSession, mock_auth: Mock) -> None:
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == 1
-        assert data["file_name"] == "test_file.pdf"
+        assert data["file_name"] == "test_user/test_file.pdf"
 
 
 # ファイル名のリストとユーザーIDによるファイルの削除のテスト
@@ -155,8 +155,8 @@ async def test_upload_file_with_dakuten(session: AsyncSession, mock_auth: Mock) 
         uploaded_filename = file_data[-1]["file_name"]
 
         # ファイル名がNFC形式になっていることを確認
-        assert uploaded_filename == nfc_filename
-        assert uploaded_filename != nfd_filename
+        assert uploaded_filename == "test_user/" + nfc_filename
+        assert uploaded_filename != "test_user/" + nfd_filename
         assert unicodedata.is_normalized("NFC", uploaded_filename)
 
 
@@ -177,8 +177,8 @@ async def test_generate_upload_signed_url(session: AsyncSession) -> None:
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()
-        assert data["test_file1.pdf"] is not None
-        assert data["test_file2.pdf"] is not None
+        assert data["test_user/test_file1.pdf"] is not None
+        assert data["test_user/test_file2.pdf"] is not None
 
 
 # ファイル登録のテスト

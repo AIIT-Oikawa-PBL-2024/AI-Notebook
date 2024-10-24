@@ -36,13 +36,16 @@ async def test_post_files_with_valid_extension() -> None:
         "AI-powered Code Review with LLM.pdf",
     ]
 
+    # ユーザーID
+    uid = "test_user"
+
     # BytesIOでダミーファイルを作成してリクエストデータを作成
     files: list[UploadFile] = []
     for file_path in file_paths:
         dummy_content = b"dummy pdf content"  # ダミーのPDFコンテンツ (必要に応じて変更)
         files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_path))
 
-    result = await post_files(files)
+    result = await post_files(files, uid)
 
     # 結果の検証
     assert result["success"] == True
@@ -61,6 +64,9 @@ async def test_upload_files_with_invalid_extension() -> None:
     # 無効な拡張子のファイル名
     invalid_file_names = ["test001.txt", "test002.txt"]
 
+    # ユーザーID
+    uid = "test_user"
+
     # BytesIOでダミーファイルを作成してリクエストデータを作成
     invalid_files = []
     for file_name in invalid_file_names:
@@ -71,7 +77,7 @@ async def test_upload_files_with_invalid_extension() -> None:
 
     # post_files関数を直接呼び出す
     with pytest.raises(HTTPException) as exc_info:
-        await post_files(invalid_files)
+        await post_files(invalid_files, uid)
 
     # 例外の内容を検証
     assert exc_info.value.status_code == 400
@@ -93,13 +99,16 @@ async def test_upload_files() -> None:
         "AI-powered Code Review with LLM.pdf",
     ]
 
+    # ユーザーID
+    uid = "test_user"
+
     # BytesIOでダミーファイルを作成してリクエストデータを作成
     files: list[UploadFile] = []
     for file_path in file_paths:
         dummy_content = b"dummy pdf content"  # ダミーのPDFコンテンツ (必要に応じて変更)
         files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_path))
 
-    result = await post_files(files)
+    result = await post_files(files, uid)
 
     # 結果の検証
     assert result["success"] == True
@@ -121,6 +130,9 @@ async def test_upload_files_with_failure() -> None:
         "AI-powered Code Review with LLM.pdf",
     ]
 
+    # ユーザーID
+    uid = "test_user"
+
     # BytesIOでダミーファイルを作成してリクエストデータを作成
     files: list[UploadFile] = []
     for file_path in file_paths:
@@ -133,7 +145,7 @@ async def test_upload_files_with_failure() -> None:
         side_effect=GoogleAPIError("Upload failed"),
     ):
         # upload_files関数を直接呼び出す
-        result = await upload_files(files)
+        result = await upload_files(files, uid)
 
         # 結果の検証
         assert result["success"] == False
@@ -153,6 +165,10 @@ async def test_upload_files_nfc_normalization() -> None:
     :return: None
     :raises AssertionError: テストが失敗した場合
     """
+
+    # ユーザーID
+    uid = "test_user"
+
     # NFD形式（濁点が分離された形式）の日本語ファイル名
     nfd_filename = (
         "テスト" + "\u3099" + "ファイル.pdf"
@@ -180,7 +196,7 @@ async def test_upload_files_nfc_normalization() -> None:
         patch("os.getenv", return_value="mock_value"),
     ):
         # upload_files関数を呼び出す
-        result = await upload_files([file])
+        result = await upload_files([file], uid)
 
         # アサーション
         assert result["success"] is True
@@ -189,8 +205,8 @@ async def test_upload_files_nfc_normalization() -> None:
         # bucket.blob()が正規化されたファイル名で呼び出されたことを確認
         mock_bucket.blob.assert_called_once()
         called_filename = mock_bucket.blob.call_args[0][0]
-        assert called_filename == nfc_filename
-        assert called_filename != nfd_filename
+        assert called_filename == "test_user/" + nfc_filename
+        assert called_filename != "test_user/" + nfd_filename
         assert unicodedata.is_normalized("NFC", called_filename)
 
 
@@ -209,6 +225,9 @@ async def test_delete_files_from_gcs() -> None:
         "AI-powered Code Review with LLM.pdf",
     ]
 
+    # ユーザーID
+    uid = "test_user"
+
     # BytesIOでダミーファイルを作成してリクエストデータを作成
     files: list[UploadFile] = []
     for file_path in file_paths:
@@ -216,7 +235,7 @@ async def test_delete_files_from_gcs() -> None:
         files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_path))
 
     # ファイルをアップロード
-    await post_files(files)
+    await post_files(files, uid)
 
     # 削除するファイル名のリスト
     deletefiles: list[str] = [
@@ -225,7 +244,7 @@ async def test_delete_files_from_gcs() -> None:
     ]
 
     # ファイルの削除
-    result = await delete_files_from_gcs(deletefiles)
+    result = await delete_files_from_gcs(deletefiles, uid)
 
     # 結果の検証
     assert result["success"] == True
@@ -236,7 +255,7 @@ async def test_delete_files_from_gcs() -> None:
         "google.cloud.storage.Blob.delete",
         side_effect=GoogleAPIError("Delete failed"),
     ):
-        result = await delete_files_from_gcs(deletefiles)
+        result = await delete_files_from_gcs(deletefiles, uid)
         assert result["success"] == False
         assert "Delete failed" in result["failed_files"]
 
@@ -249,10 +268,13 @@ async def test_generate_upload_signed_url_v4() -> None:
         "AI-powered Code Review with LLM.pdf",
     ]
 
+    # ユーザーID
+    uid = "test_user"
+
     # 署名付きURLを作成する
-    result = await generate_upload_signed_url_v4(testfiles)
+    result = await generate_upload_signed_url_v4(testfiles, uid)
 
     # 結果の検証
-    assert result["5_アジャイルⅡ.pdf"] is not None
-    assert result["AI-powered Code Review with LLM.pdf"] is not None
+    assert result["test_user/5_アジャイルⅡ.pdf"] is not None
+    assert result["test_user/AI-powered Code Review with LLM.pdf"] is not None
     assert len(result) == 2

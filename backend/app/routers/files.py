@@ -58,7 +58,7 @@ async def upload_files(
     response_data = {}
 
     # ファイルをGoogle Cloud Storageにアップロード
-    upload_result = await post_files(files)
+    upload_result = await post_files(files, uid)
 
     if "success" not in upload_result or not upload_result["success"]:
         raise HTTPException(status_code=500, detail="Upload failed")
@@ -66,7 +66,9 @@ async def upload_files(
     for file in files:
         if file.filename and file.size:
             # ファイル名を正規化
-            normalized_filename = unicodedata.normalize("NFC", file.filename)
+            normalized_filename = unicodedata.normalize(
+                "NFC", uid + "/" + file.filename
+            )
 
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
@@ -156,7 +158,9 @@ async def delete_files(
     try:
         # ファイルをDBから削除
         for file_name in files:
-            await files_cruds.delete_file_by_name_and_userid(db, file_name, uid)
+            await files_cruds.delete_file_by_name_and_userid(
+                db, uid + "/" + file_name, uid
+            )
 
         await db.commit()
     except Exception as e:
@@ -168,7 +172,7 @@ async def delete_files(
 
     # ファイルをGoogle Cloud Storageから削除
     response_data = {}
-    delete_result = await delete_files_from_gcs(files)
+    delete_result = await delete_files_from_gcs(files, uid)
 
     response_data["success"] = delete_result.get("success", False)
     response_data["success_files"] = delete_result.get("success_files", [])
@@ -193,7 +197,7 @@ async def generate_upload_signed_url(
     """
     try:
         upload_signed_urls: dict[str, str] = {}
-        upload_signed_urls = await generate_upload_signed_url_v4(files)
+        upload_signed_urls = await generate_upload_signed_url_v4(files, uid)
         return upload_signed_urls
 
     except Exception as e:
@@ -220,7 +224,9 @@ async def register_files(
     for file in files:
         if file.filename and file.size:
             # ファイル名を正規化
-            normalized_filename = unicodedata.normalize("NFC", file.filename)
+            normalized_filename = unicodedata.normalize(
+                "NFC", uid + "/" + file.filename
+            )
 
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
