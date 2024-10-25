@@ -55,13 +55,21 @@ export default function NavBar() {
 					</ListItemPrefix>
 					ホーム
 				</ListItem>
-				<ListItem>
+			<Link href="/select-files" className="block">
+				<ListItem className={getActiveClass("/select-files")}>
+      				<ListItemPrefix>
+        				<FolderIcon className="h-5 w-5" />
+      				</ListItemPrefix>
+      				ファイル選択
+    			</ListItem>
+  			</Link>
+				{/* <ListItem>
 					<ListItemPrefix>
 						<FolderIcon className="h-5 w-5" />
 					</ListItemPrefix>
 					ファイル選択
 				</ListItem>
-				<ListItem>
+				<ListItem> */}
 					<ListItemPrefix>
 						<ComputerDesktopIcon className="h-5 w-5" />
 					</ListItemPrefix>
