@@ -66,9 +66,7 @@ async def upload_files(
     for file in files:
         if file.filename and file.size:
             # ファイル名を正規化
-            normalized_filename = unicodedata.normalize(
-                "NFC", uid + "/" + file.filename
-            )
+            normalized_filename = unicodedata.normalize("NFC", file.filename)
 
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
@@ -158,9 +156,7 @@ async def delete_files(
     try:
         # ファイルをDBから削除
         for file_name in files:
-            await files_cruds.delete_file_by_name_and_userid(
-                db, uid + "/" + file_name, uid
-            )
+            await files_cruds.delete_file_by_name_and_userid(db, file_name, uid)
 
         await db.commit()
     except Exception as e:
@@ -224,9 +220,7 @@ async def register_files(
     for file in files:
         if file.filename and file.size:
             # ファイル名を正規化
-            normalized_filename = unicodedata.normalize(
-                "NFC", uid + "/" + file.filename
-            )
+            normalized_filename = unicodedata.normalize("NFC", file.filename)
 
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)

@@ -113,9 +113,9 @@ const FileUploadComponent: React.FC = () => {
 		const data = await response.json();
 		let success_upload_signedurl = true;
 		for (const file of files) {
-			let org_file_name = file.name;
+			const org_file_name = file.name;
 			if (user) {
-				file.name = user.uid + "/" + file.name;
+				file.name = `${user.uid}/${file.name}`;
 				file.name = file.name.normalize("NFC");
 			} else {
 				throw new Error("User is not authenticated");
@@ -133,13 +133,16 @@ const FileUploadComponent: React.FC = () => {
 				if (uploadResponse.ok) {
 					const formData = new FormData();
 					formData.append("files", file.file, org_file_name);
-					const registerResponse = await authFetch(BACKEND_DEV_API_URL_REGISTERFILES, {
-						method: "POST",
-						body: formData,
-						headers: {
-							Accept: "application/json",
+					const registerResponse = await authFetch(
+						BACKEND_DEV_API_URL_REGISTERFILES,
+						{
+							method: "POST",
+							body: formData,
+							headers: {
+								Accept: "application/json",
+							},
 						},
-				});
+					);
 					if (!registerResponse.ok) {
 						alert("アップロードに失敗しました");
 						success_upload_signedurl = false;

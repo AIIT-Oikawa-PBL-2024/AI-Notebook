@@ -72,8 +72,14 @@ async def upload_files(ext_correct_files: list[UploadFile], uid: str) -> dict:
     for file in ext_correct_files:
         # ブロブ名を正規化
         if file.filename:
+            # ユーザーIDの検証
+            if not uid or not uid.strip():
+                raise ValueError("Invalid user ID")
+
+            # パスの正規化
+            safe_uid = uid.strip().rstrip("/")
             normalized_blobname = unicodedata.normalize(
-                "NFC", uid + "/" + file.filename
+                "NFC", f"{safe_uid}/{file.filename}"
             )
 
         client = storage.Client.from_service_account_json(credentials)
@@ -145,8 +151,13 @@ async def delete_files_from_gcs(files: list[str], uid: str) -> dict:
     bucket = storage.Bucket(client, bucket_name)
 
     for filename in files:
-        # ブロブ名を正規化
-        normalized_blobname = unicodedata.normalize("NFC", uid + "/" + filename)
+        # ユーザーIDの検証
+        if not uid or not uid.strip():
+            raise ValueError("Invalid user ID")
+
+        # パスの正規化
+        safe_uid = uid.strip().rstrip("/")
+        normalized_blobname = unicodedata.normalize("NFC", f"{safe_uid}/{filename}")
         blob = bucket.blob(normalized_blobname)
 
         try:
