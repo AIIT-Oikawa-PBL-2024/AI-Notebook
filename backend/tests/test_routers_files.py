@@ -177,8 +177,8 @@ async def test_generate_upload_signed_url(session: AsyncSession) -> None:
         print(response.text)  # デバッグ用出力
         assert response.status_code == 200
         data = response.json()
-        assert data["test_file1.pdf"] is not None
-        assert data["test_file2.pdf"] is not None
+        assert data["test_user/test_file1.pdf"] is not None
+        assert data["test_user/test_file2.pdf"] is not None
 
 
 # ファイル登録のテスト
