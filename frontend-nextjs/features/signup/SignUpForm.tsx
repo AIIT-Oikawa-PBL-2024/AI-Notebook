@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuth } from "@/providers/AuthProvider";
 import { firebaseConfig } from "@/lib/firebase";
+import { useAuth } from "@/providers/AuthProvider";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import {
 	Button,
@@ -20,7 +20,7 @@ import {
 } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -34,47 +34,127 @@ const ALLOWED_DOMAINS = process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAINS
 		)
 	: [];
 
+interface ValidationState {
+	length: boolean;
+	uppercase: boolean;
+	lowercase: boolean;
+	number: boolean;
+	specialChar: boolean;
+	noSpace: boolean;
+}
+
+const allowedSpecialChars = "^$*.[]{}()?\"!@#%&/\\,><':;|_~`";
+
+const ValidationItem = ({
+	satisfied,
+	text,
+}: { satisfied: boolean; text: string }) => (
+	<div className="flex items-center space-x-1 text-xs">
+		{satisfied ? (
+			<svg
+				className="h-2.5 w-2.5 text-green-500"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<title>満たされた条件</title>
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					d="M5 13l4 4L19 7"
+				/>
+			</svg>
+		) : (
+			<svg
+				className="h-2.5 w-2.5 text-red-500"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<title>満たされていない条件</title>
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth={2}
+					d="M6 18L18 6M6 6l12 12"
+				/>
+			</svg>
+		)}
+		<span
+			className={`${satisfied ? "text-green-700" : "text-red-700"} text-[10px]`}
+		>
+			{text}
+		</span>
+	</div>
+);
+
 export function SignUpForm() {
 	const [passwordShown, setPasswordShown] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [emailError, setEmailError] = useState<string | null>(null);
-	const [passwordError, setPasswordError] = useState<string | null>(null);
+	const [passwordValidations, setPasswordValidations] =
+		useState<ValidationState>({
+			length: false,
+			uppercase: false,
+			lowercase: false,
+			number: false,
+			specialChar: false,
+			noSpace: true,
+		});
 	const [verificationSent, setVerificationSent] = useState(false);
 	const router = useRouter();
 	const { setUser } = useAuth();
 
-	const validateEmail = (email: string) => {
+	const validateEmail = useCallback((email: string) => {
 		const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 		if (!re.test(email)) {
-			setEmailError("有効なメールアドレスを入力してください。");
-			return false;
+			return "有効なメールアドレスを入力してください。";
 		}
 		const domain = email.split("@")[1];
 		if (ALLOWED_DOMAINS.length > 0 && !ALLOWED_DOMAINS.includes(domain)) {
-			setEmailError("このドメインのメールアドレスは許可されていません。");
-			return false;
+			return "このドメインのメールアドレスは許可されていません。";
 		}
-		setEmailError(null);
-		return true;
-	};
+		return null;
+	}, []);
 
-	const validatePassword = (password: string) => {
-		const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-		if (!re.test(password)) {
-			setPasswordError("パスワードは英数字を含む8文字以上で入力してください。");
-			return false;
-		}
-		setPasswordError(null);
-		return true;
-	};
+	const handleEmailChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			const newEmail = e.target.value;
+			setEmail(newEmail);
+			setEmailError(validateEmail(newEmail));
+		},
+		[validateEmail],
+	);
+
+	useEffect(() => {
+		const newValidations = {
+			length: password.length >= 8,
+			uppercase: /[A-Z]/.test(password),
+			lowercase: /[a-z]/.test(password),
+			number: /\d/.test(password),
+			specialChar: new RegExp(
+				`[${allowedSpecialChars.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}]`,
+			).test(password),
+			noSpace: !/\s/.test(password),
+		};
+		setPasswordValidations(newValidations);
+	}, [password]);
+
+	const isPasswordValid = useCallback(
+		() => Object.values(passwordValidations).every(Boolean),
+		[passwordValidations],
+	);
 
 	const handleEmailSignUp = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
 
-		if (!validateEmail(email) || !validatePassword(password)) {
+		if (emailError || !isPasswordValid()) {
 			return;
 		}
 
@@ -168,10 +248,7 @@ export function SignUpForm() {
 							className: "min-w-0",
 						}}
 						value={email}
-						onChange={(e) => {
-							setEmail(e.target.value);
-							validateEmail(e.target.value);
-						}}
+						onChange={handleEmailChange}
 					/>
 					{emailError && (
 						<Typography color="red" className="mt-2 text-sm font-normal">
@@ -194,10 +271,7 @@ export function SignUpForm() {
 								className: "min-w-0",
 							}}
 							value={password}
-							onChange={(e) => {
-								setPassword(e.target.value);
-								validatePassword(e.target.value);
-							}}
+							onChange={(e) => setPassword(e.target.value)}
 						/>
 						<IconButton
 							variant="text"
@@ -212,18 +286,49 @@ export function SignUpForm() {
 							)}
 						</IconButton>
 					</div>
-					{passwordError && (
-						<Typography color="red" className="mt-2 text-sm font-normal">
-							{passwordError}
+					<div className="mt-1 space-y-0.5">
+						<div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+							<ValidationItem
+								satisfied={passwordValidations.length}
+								text="8文字以上"
+							/>
+							<ValidationItem
+								satisfied={passwordValidations.uppercase}
+								text="大文字を含む"
+							/>
+							<ValidationItem
+								satisfied={passwordValidations.lowercase}
+								text="小文字を含む"
+							/>
+							<ValidationItem
+								satisfied={passwordValidations.number}
+								text="数字を含む"
+							/>
+							<ValidationItem
+								satisfied={passwordValidations.specialChar}
+								text="特殊文字を含む"
+							/>
+							<ValidationItem
+								satisfied={passwordValidations.noSpace}
+								text="スペースを含まない"
+							/>
+						</div>
+						<Typography color="gray" className="text-[10px]">
+							使用可能な特殊文字: {allowedSpecialChars}
 						</Typography>
-					)}
+					</div>
 				</div>
 				{error && (
 					<Typography color="red" className="mt-2 text-center font-normal">
 						{error}
 					</Typography>
 				)}
-				<Button className="mt-6" fullWidth type="submit">
+				<Button
+					className="mt-6"
+					fullWidth
+					type="submit"
+					disabled={!!emailError || !isPasswordValid()}
+				>
 					Sign Up
 				</Button>
 				<Button
