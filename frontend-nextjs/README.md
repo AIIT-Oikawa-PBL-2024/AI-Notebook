@@ -53,7 +53,7 @@ URLクリックでブラウザ起動
 ```
 
 ## Dockerコンテナの設定
-- `./frontend-netjs/Dockerfile.frontend-nextjs`のファイル作成
+- `./frontend-nextjs/Dockerfile.frontend-nextjs`のファイル作成
 - `./docker-compose.yml`にサービス追加
 
 - ターミナルでコンテナ起動確認
