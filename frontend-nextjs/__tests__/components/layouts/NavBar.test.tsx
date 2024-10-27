@@ -20,7 +20,12 @@ describe("NavBar", () => {
 	});
 
 	it("NavBarコンポーネントがレンダリングされること", () => {
-		(useAuth as Mock).mockReturnValue({ user: null });
+		(useAuth as Mock).mockReturnValue({
+			user: {
+				displayName: "テストユーザー",
+				email: "test@example.com",
+			},
+		});
 		(useSignOut as Mock).mockReturnValue({
 			signOutUser: vi.fn(),
 			error: null,
