@@ -257,7 +257,7 @@ jobs:
     # pnpmで依存関係をインストール
     - name: Install Dependencies
       run: pnpm install --frozen-lockfile
-
+    
     # Biome Reviewdogの実行
     - name: Run Biome Reviewdog
       uses: mongolyy/reviewdog-action-biome@v1
@@ -265,6 +265,9 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         reporter: github-pr-review
         workdir: frontend-nextjs
+        level: warning           # warning レベルまでチェック
+        fail_on_error: true     # エラーがあった場合にCIを失敗させる
+        filter_mode: nofilter   # 全てのコードをチェック対象にする
 
     # Vitestでテストを実行
     - name: Run Vitest
