@@ -22,6 +22,10 @@ export default function NavBar() {
 	const { user } = useAuth();
 	const { signOutUser, error, isLoading } = useSignOut();
 
+	if (!user) {
+		return null; // ユーザーが存在しない場合は何も表示しない
+	}
+
 	return (
 		<Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
 			<div className="mb-2 p-4">
