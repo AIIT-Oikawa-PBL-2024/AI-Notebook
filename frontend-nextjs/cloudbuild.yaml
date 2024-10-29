@@ -22,7 +22,7 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "nextjs-service"
+      - "ai-notebook-frontend-nextjs"
       - "--image"
       - "gcr.io/$PROJECT_ID/nextjs-app"
       - "--region"
