@@ -147,6 +147,13 @@ export default function FileSelectComponent() {
 			}
 
 			try {
+				// AI練習問題の場合は、既存のキャッシュをクリア
+				if (type === "exercise") {
+					localStorage.removeItem("cached_exercise");
+					localStorage.removeItem("exercise_generation_status");
+				}
+
+				// 選択されたファイルとタイトルを保存
 				localStorage.setItem("selectedFiles", JSON.stringify(selectedFiles));
 				localStorage.setItem("title", title);
 				localStorage.setItem("uid", user.uid);
