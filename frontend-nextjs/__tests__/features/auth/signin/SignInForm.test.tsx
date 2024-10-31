@@ -1,4 +1,4 @@
-import { SignInForm } from "@/features/signin/SignInForm";
+import { SignInForm } from "@/features/auth/signin/SignInForm";
 import { useAuth } from "@/providers/AuthProvider";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";

@@ -9,7 +9,7 @@ vi.mock("@/components/layouts/BackgroundCard", () => ({
 	),
 }));
 
-vi.mock("@/features/reset-password/ResetPasswordForm", () => ({
+vi.mock("@/features/auth/reset-password/ResetPasswordForm", () => ({
 	__esModule: true,
 	default: () => (
 		<div data-testid="reset-password-form">Mocked ResetPasswordForm</div>
