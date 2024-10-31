@@ -17,6 +17,7 @@ import {
 	ListItemPrefix,
 	Typography,
 } from "@material-tailwind/react";
+import Link from "next/link";
 
 export default function NavBar() {
 	const { user } = useAuth();
@@ -27,7 +28,7 @@ export default function NavBar() {
 	}
 
 	return (
-		<Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+		<Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 sticky top-4 self-start overflow-y-auto">
 			<div className="mb-2 p-4">
 				<Typography variant="h5" color="blue-gray">
 					AIノートブック
@@ -53,24 +54,28 @@ export default function NavBar() {
 				</div>
 			)}
 			<List className="mt-4">
-				<ListItem>
-					<ListItemPrefix>
-						<HomeIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					ホーム
-				</ListItem>
+				<Link href="/">
+					<ListItem>
+						<ListItemPrefix>
+							<HomeIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ホーム
+					</ListItem>
+				</Link>
 				<ListItem>
 					<ListItemPrefix>
 						<FolderIcon className="h-5 w-5" />
 					</ListItemPrefix>
 					ファイル選択
 				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<ComputerDesktopIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					AI出力
-				</ListItem>
+				<Link href="/study-ai-note">
+					<ListItem>
+						<ListItemPrefix>
+							<ComputerDesktopIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI出力
+					</ListItem>
+				</Link>
 				<ListItem>
 					<ListItemPrefix>
 						<PencilSquareIcon className="h-5 w-5" />
