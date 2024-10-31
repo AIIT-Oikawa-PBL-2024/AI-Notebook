@@ -1,4 +1,4 @@
-import { SignUpForm } from "@/features/signup/SignUpForm";
+import { SignUpForm } from "@/features/auth/signup/SignUpForm";
 import { useAuth } from "@/providers/AuthProvider";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import {

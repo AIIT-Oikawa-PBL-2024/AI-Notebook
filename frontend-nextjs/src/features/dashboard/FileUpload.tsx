@@ -1,6 +1,6 @@
 "use client";
 
-import { ButtonWithIcon } from "@/features/(dashboard)/Button";
+import { ButtonWithIcon } from "@/features/dashboard/Button";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import type React from "react";
