@@ -1,5 +1,5 @@
 import { BackgroundCard } from "@/components/layouts/BackgroundCard";
-import ResetPasswordForm from "@/features/reset-password/ResetPasswordForm";
+import ResetPasswordForm from "@/features/auth/reset-password/ResetPasswordForm";
 
 const ResetPasswordPage = () => {
 	return (
