@@ -10,7 +10,7 @@ vi.mock("@/components/layouts/BackgroundCard", () => ({
 	),
 }));
 
-vi.mock("@/features/signin/SignInForm", () => ({
+vi.mock("@/features/auth/signin/SignInForm", () => ({
 	SignInForm: () => <div data-testid="sign-in-form">Mocked SignInForm</div>,
 }));
 

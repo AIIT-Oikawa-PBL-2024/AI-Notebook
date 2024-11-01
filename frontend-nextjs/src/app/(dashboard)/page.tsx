@@ -1,6 +1,6 @@
 "use client";
 
-import FileUpload from "@/features/(dashboard)/FileUpload";
+import FileUpload from "@/features/dashboard/FileUpload";
 import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 

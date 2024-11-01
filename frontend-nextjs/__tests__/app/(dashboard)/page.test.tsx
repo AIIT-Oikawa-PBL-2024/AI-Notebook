@@ -6,7 +6,7 @@ vi.mock("@/utils/withAuth", () => ({
 	withAuth: (component: React.ComponentType) => component,
 }));
 
-vi.mock("@/features/(dashboard)/FileUpload", () => ({
+vi.mock("@/features/dashboard/FileUpload", () => ({
 	__esModule: true,
 	default: () => <div>FileUpload Component</div>,
 }));

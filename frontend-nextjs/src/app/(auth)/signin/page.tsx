@@ -1,6 +1,6 @@
 // SignInPage.tsx
 import { BackgroundCard } from "@/components/layouts/BackgroundCard";
-import { SignInForm } from "@/features/signin/SignInForm";
+import { SignInForm } from "@/features/auth/signin/SignInForm";
 import type React from "react";
 
 const SignInPage: React.FC = () => {
