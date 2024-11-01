@@ -17,13 +17,14 @@ import {
 	ListItemPrefix,
 	Typography,
 } from "@material-tailwind/react";
+import Link from "next/link";
 
 export default function NavBar() {
 	const { user } = useAuth();
 	const { signOutUser, error, isLoading } = useSignOut();
 
 	if (!user) {
-		return null; // ユーザーが存在しない場合は何も表示しない
+		return null;
 	}
 
 	return (
@@ -53,36 +54,46 @@ export default function NavBar() {
 				</div>
 			)}
 			<List className="mt-4">
-				<ListItem>
-					<ListItemPrefix>
-						<HomeIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					ホーム
-				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<FolderIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					ファイル選択
-				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<ComputerDesktopIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					AI出力
-				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<PencilSquareIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					AI練習問題
-				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<PencilIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					ノート
-				</ListItem>
+				<Link href="/">
+					<ListItem>
+						<ListItemPrefix>
+							<HomeIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ホーム
+					</ListItem>
+				</Link>
+				<Link href="/select-files">
+					<ListItem>
+						<ListItemPrefix>
+							<FolderIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ファイル選択
+					</ListItem>
+				</Link>
+				<Link href="/ai-content/output">
+					<ListItem>
+						<ListItemPrefix>
+							<ComputerDesktopIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI出力
+					</ListItem>
+				</Link>
+				<Link href="/ai-content/exercise">
+					<ListItem>
+						<ListItemPrefix>
+							<PencilSquareIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI練習問題
+					</ListItem>
+				</Link>
+				<Link href="/notes">
+					<ListItem>
+						<ListItemPrefix>
+							<PencilIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ノート
+					</ListItem>
+				</Link>
 			</List>
 		</Card>
 	);
