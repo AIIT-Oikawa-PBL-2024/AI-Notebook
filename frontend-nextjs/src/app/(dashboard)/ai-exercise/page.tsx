@@ -1,7 +1,7 @@
 "use client";
 
-import { ExerciseDisplay } from "@/features/(dashboard)/ai-content/exercise/ExerciseDisplay";
-import { useExerciseGenerator } from "@/hooks/useExerciseGenerator";
+import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/ExerciseDisplay";
+import { useExerciseGenerator } from "@/features/dashboard/ai-exercise/useExerciseGenerator";
 import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 

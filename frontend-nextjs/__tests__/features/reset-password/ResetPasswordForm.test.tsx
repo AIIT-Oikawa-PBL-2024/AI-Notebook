@@ -1,4 +1,4 @@
-import ResetPasswordForm from "@/features/reset-password/ResetPasswordForm";
+import ResetPasswordForm from "@/features/auth/reset-password/ResetPasswordForm";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";

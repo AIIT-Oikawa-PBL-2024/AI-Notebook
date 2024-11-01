@@ -2,7 +2,6 @@
 
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
-import type { FileData } from "@/types/files";
 import {
 	Alert,
 	Button,
@@ -20,6 +19,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 const BACKEND_HOST = process.env.NEXT_PUBLIC_BACKEND_HOST;
 const BACKEND_API_URL_GET_FILES = `${BACKEND_HOST}/files/`;
 const BACKEND_API_URL_DELETE_FILES = `${BACKEND_HOST}/files/delete_files`;
+
+interface FileData {
+	file_name: string;
+	file_size: string;
+	created_at: string;
+	select?: boolean;
+	id?: string;
+	user_id?: string;
+}
 
 export default function FileSelectComponent() {
 	const router = useRouter();
@@ -132,7 +140,7 @@ export default function FileSelectComponent() {
 	}, []);
 
 	const createAiContent = useCallback(
-		async (type: "note" | "exercise") => {
+		async (type: "ai-output" | "ai-exercise") => {
 			if (!user) {
 				setError("認証が必要です");
 				return;
@@ -148,7 +156,7 @@ export default function FileSelectComponent() {
 
 			try {
 				// AI練習問題の場合は、既存のキャッシュをクリア
-				if (type === "exercise") {
+				if (type === "ai-exercise") {
 					localStorage.removeItem("cached_exercise");
 					localStorage.removeItem("exercise_generation_status");
 				}
@@ -157,7 +165,7 @@ export default function FileSelectComponent() {
 				localStorage.setItem("selectedFiles", JSON.stringify(selectedFiles));
 				localStorage.setItem("title", title);
 				localStorage.setItem("uid", user.uid);
-				router.push(`/ai-content/${type}`);
+				router.push(`/${type}`);
 			} catch (err) {
 				setError("データの保存に失敗しました。もう一度お試しください。");
 			}
@@ -377,7 +385,10 @@ export default function FileSelectComponent() {
 									onChange={(e) => setTitle(e.target.value)}
 									placeholder="AIノート/演習のタイトルを入力してください（最大100文字）"
 									maxLength={100}
-									className="mt-1"
+									className="mt-1 focus:outline-none !border !border-gray-300 focus:!border-gray-900 rounded-lg"
+									labelProps={{
+										className: "before:content-none after:content-none",
+									}}
 									disabled={loading}
 								/>
 							</div>
@@ -386,7 +397,7 @@ export default function FileSelectComponent() {
 								<div className="flex gap-4">
 									<Button
 										size="lg"
-										onClick={() => createAiContent("note")}
+										onClick={() => createAiContent("ai-output")}
 										className="flex-1"
 										disabled={loading}
 									>
@@ -394,7 +405,7 @@ export default function FileSelectComponent() {
 									</Button>
 									<Button
 										size="lg"
-										onClick={() => createAiContent("exercise")}
+										onClick={() => createAiContent("ai-exercise")}
 										className="flex-1"
 										disabled={loading}
 									>

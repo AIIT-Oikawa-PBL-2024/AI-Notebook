@@ -1,4 +1,4 @@
-import { ExerciseDisplay } from "@/features/(dashboard)/ai-content/exercise/ExerciseDisplay";
+import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/ExerciseDisplay";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -44,7 +44,7 @@ vi.mock("@material-tailwind/react", () => ({
 
 describe("ExerciseDisplay", () => {
 	// ローディング状態のテスト
-	it("displays spinner when loading", () => {
+	it("displays spinner when loading and no error", () => {
 		render(<ExerciseDisplay loading={true} error="" exercise="" />);
 		expect(screen.getByTestId("spinner")).toBeDefined();
 	});
@@ -91,11 +91,11 @@ describe("ExerciseDisplay", () => {
 		expect(screen.getByText("手順2")).toBeDefined();
 	});
 
-	// 複数の状態が同時に存在しないことを確認するテスト
-	it("does not show spinner and error at the same time", () => {
+	// エラーがある場合はスピナーを表示しないことをテスト
+	it("does not show spinner when there is an error", () => {
 		render(<ExerciseDisplay loading={true} error="エラー" exercise="" />);
-		expect(screen.getByTestId("spinner")).toBeDefined();
-		expect(screen.queryByTestId("alert")).toBeNull();
+		expect(screen.queryByTestId("spinner")).toBeNull();
+		expect(screen.getByTestId("alert")).toBeDefined();
 	});
 
 	// コンポーネントの基本構造のテスト

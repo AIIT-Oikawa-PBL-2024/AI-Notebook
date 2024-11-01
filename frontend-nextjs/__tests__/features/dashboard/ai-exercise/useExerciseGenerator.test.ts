@@ -1,5 +1,5 @@
+import { useExerciseGenerator } from "@/features/dashboard/ai-exercise/useExerciseGenerator";
 import * as useAuthFetchModule from "@/hooks/useAuthFetch";
-import { useExerciseGenerator } from "@/hooks/useExerciseGenerator";
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

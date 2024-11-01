@@ -70,7 +70,7 @@ export default function NavBar() {
 						ファイル選択
 					</ListItem>
 				</Link>
-				<Link href="/ai-content/output">
+				<Link href="/ai-output">
 					<ListItem>
 						<ListItemPrefix>
 							<ComputerDesktopIcon className="h-5 w-5" />
@@ -78,7 +78,7 @@ export default function NavBar() {
 						AI出力
 					</ListItem>
 				</Link>
-				<Link href="/ai-content/exercise">
+				<Link href="/ai-exercise">
 					<ListItem>
 						<ListItemPrefix>
 							<PencilSquareIcon className="h-5 w-5" />

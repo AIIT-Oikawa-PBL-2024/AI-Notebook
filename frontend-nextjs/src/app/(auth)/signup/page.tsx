@@ -1,5 +1,5 @@
 import { BackgroundCard } from "@/components/layouts/BackgroundCard";
-import { SignUpForm } from "@/features/signup/SignUpForm";
+import { SignUpForm } from "@/features/auth/signup/SignUpForm";
 import type React from "react";
 
 const SignUpPage: React.FC = () => {
