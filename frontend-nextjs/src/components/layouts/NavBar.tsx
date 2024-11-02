@@ -28,7 +28,7 @@ export default function NavBar() {
 	}
 
 	return (
-		<Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+		<Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 sticky top-4 self-start overflow-y-auto">
 			<div className="mb-2 p-4">
 				<Typography variant="h5" color="blue-gray">
 					<Link href="/">AIノートブック</Link>
@@ -66,12 +66,14 @@ export default function NavBar() {
 					</ListItemPrefix>
 					ファイル選択
 				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<ComputerDesktopIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					AI出力
-				</ListItem>
+				<Link href="/ai-output">
+					<ListItem>
+						<ListItemPrefix>
+							<ComputerDesktopIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI出力
+					</ListItem>
+				</Link>
 				<ListItem>
 					<ListItemPrefix>
 						<PencilSquareIcon className="h-5 w-5" />

@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+import unicodedata
 from typing import AsyncGenerator
 
 import vertexai
@@ -50,6 +51,7 @@ def check_file_exists(bucket_name: str, file_name: str) -> bool:
 # 複数のPDF, imageファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
+    uid: str,
     model_name: str = MODEL_NAME,
     generation_config: GenerationConfig = GENERATION_CONFIG,
     bucket_name: str = BUCKET_NAME,
@@ -76,6 +78,15 @@ async def generate_content_stream(
 
     try:
         for file_name in files:
+            # ブロブ名を正規化
+            if file_name:
+                # ユーザーIDの検証
+                if not uid or not uid.strip():
+                    raise ValueError("Invalid user ID")
+
+                # パスの正規化
+                safe_uid = uid.strip().rstrip("/")
+                file_name = unicodedata.normalize("NFC", f"{safe_uid}/{file_name}")
             # ファイルがGCSに存在するかチェック
             if check_file_exists(bucket_name, file_name):
                 if file_name.endswith(".pdf"):
@@ -162,7 +173,7 @@ async def generate_content_stream(
 # テスト用のコード
 async def main() -> None:
     response: AsyncGenerator = generate_content_stream(
-        ["kougi_sample.png", "kougi_sample2.png"]
+        ["kougi_sample.png", "kougi_sample2.png"], "test_uid"
     )
     async for content in response:
         # まず辞書形式に変換
