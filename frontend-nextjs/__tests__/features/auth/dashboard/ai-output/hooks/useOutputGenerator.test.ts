@@ -1,6 +1,6 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock useAuthFetch
 vi.mock("@/hooks/useAuthFetch", () => ({
