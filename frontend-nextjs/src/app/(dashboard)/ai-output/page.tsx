@@ -1,20 +1,27 @@
 "use client";
 
-import CreateOutput from "@/features/dashboard/ai-output/CreateOutput";
+import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
+import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
 import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 
-const AIOutputPage: NextPage = () => {
+const CreateOutputPage: NextPage = () => {
+	const { loading, error, output, resetOutput } = useOutputGenerator();
+
 	return (
-		<div className="container mx-auto px-4 py-8">
-			<h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-				AIノート
-			</h1>
-			<div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-				<CreateOutput />
-			</div>
+		<div className="container mx-auto p-4">
+			<OutputDisplay loading={loading} error={error} output={output} />
+			{!loading && output && (
+				<button
+					type="button"
+					onClick={resetOutput}
+					className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+				>
+					新しいノートを生成
+				</button>
+			)}
 		</div>
 	);
 };
 
-export default withAuth(AIOutputPage as React.ComponentType);
+export default withAuth(CreateOutputPage as React.ComponentType);
