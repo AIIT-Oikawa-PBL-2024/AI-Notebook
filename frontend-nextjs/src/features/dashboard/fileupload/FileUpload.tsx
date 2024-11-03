@@ -1,10 +1,7 @@
-"use client";
-
 import { ButtonWithIcon } from "@/features/dashboard/Button";
-import { useAuthFetch } from "@/hooks/useAuthFetch";
-import { useAuth } from "@/providers/AuthProvider";
 import type React from "react";
 import { type ChangeEvent, type DragEvent, useRef, useState } from "react";
+import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
 
 interface FileInfo {
 	name: string;
@@ -14,15 +11,11 @@ interface FileInfo {
 }
 
 const FileUploadComponent: React.FC = () => {
-	const { user } = useAuth();
 	const [files, setFiles] = useState<FileInfo[]>([]);
 	const [isDragActive, setIsDragActive] = useState<boolean>(false);
-	const [isUploading, setIsUploading] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
-
-	const BACKEND_DEV_API_URL_SIGNEDURL = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/generate_upload_signed_url/`;
-	const BACKEND_DEV_API_URL_REGISTERFILES = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/register_files/`;
+	const { uploadFiles, isUploading } = useFileUpload();
 
 	const isAllowedFile = (file: File): boolean => {
 		const allowedTypes = ["application/pdf", "image/png", "image/jpeg"];
@@ -89,81 +82,17 @@ const FileUploadComponent: React.FC = () => {
 		setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
 	};
 
-	const authFetch = useAuthFetch();
-
-	const uploadFiles = async () => {
-		setIsUploading(true);
-
-		const filenames = files.map((file) => file.name);
-		const response = await authFetch(BACKEND_DEV_API_URL_SIGNEDURL, {
-			method: "POST",
-			body: JSON.stringify(filenames),
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-		});
-
-		if (!response.ok) {
-			alert("アップロードに失敗しました");
-			setIsUploading(false);
-			return;
-		}
-
-		const data = await response.json();
-		let success_upload_signedurl = true;
-		for (const file of files) {
-			const org_file_name = file.name;
-			if (user) {
-				file.name = `${user.uid}/${file.name}`;
-				file.name = file.name.normalize("NFC");
-			} else {
-				throw new Error("User is not authenticated");
+	const handleUpload = async () => {
+		try {
+			const success = await uploadFiles(files);
+			if (success) {
+				alert("ファイルが正常にアップロードされました");
+				setFiles([]);
 			}
-			const signedUrl = data[file.name];
-			try {
-				const uploadResponse = await fetch(signedUrl, {
-					method: "PUT",
-					body: file.file,
-					headers: {
-						"Content-Type": "application/octet-stream",
-					},
-				});
-
-				if (uploadResponse.ok) {
-					const formData = new FormData();
-					formData.append("files", file.file, org_file_name);
-					const registerResponse = await authFetch(
-						BACKEND_DEV_API_URL_REGISTERFILES,
-						{
-							method: "POST",
-							body: formData,
-							headers: {
-								Accept: "application/json",
-							},
-						},
-					);
-					if (!registerResponse.ok) {
-						alert("アップロードに失敗しました");
-						success_upload_signedurl = false;
-						setIsUploading(false);
-						return;
-					}
-				} else {
-					success_upload_signedurl = false;
-					throw new Error("アップロードに失敗しました");
-				}
-			} catch (error) {
-				alert(
-					`エラー: ${error instanceof Error ? error.message : "不明なエラーが発生しました"}`,
-				);
-				success_upload_signedurl = false;
-			}
-			setIsUploading(false);
-		}
-		if (success_upload_signedurl) {
-			alert("ファイルが正常にアップロードされました");
-			setFiles([]);
+		} catch (error) {
+			alert(
+				`エラー: ${error instanceof Error ? error.message : "不明なエラーが発生しました"}`,
+			);
 		}
 	};
 
@@ -255,7 +184,7 @@ const FileUploadComponent: React.FC = () => {
 						viewBox="0 0 20 20"
 						fill="currentColor"
 					>
-						<title>Upload icon</title>
+						<title>Error icon</title>
 						<path
 							fillRule="evenodd"
 							d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -310,9 +239,13 @@ const FileUploadComponent: React.FC = () => {
 					</ul>
 					<button
 						type="button"
-						onClick={uploadFiles}
+						onClick={handleUpload}
 						disabled={isUploading || files.length === 0}
-						className={`mt-4 px-4 py-2 text-white rounded flex items-center justify-center hover:bg-gray-300 ${isUploading || files.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+						className={`mt-4 px-4 py-2 text-white rounded flex items-center justify-center hover:bg-gray-300 ${
+							isUploading || files.length === 0
+								? "opacity-50 cursor-not-allowed"
+								: ""
+						}`}
 					>
 						{isUploading ? (
 							"アップロード中..."
