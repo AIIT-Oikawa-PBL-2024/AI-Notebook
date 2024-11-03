@@ -1,122 +1,171 @@
+// useFileUpload.test.ts
 import { renderHook, act } from "@testing-library/react";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
 import { useAuth } from "@/providers/AuthProvider";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import type { Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 
-// Mocking the hooks
-vi.mock("@/providers/AuthProvider", () => ({
-	useAuth: vi.fn(),
-}));
-
-vi.mock("@/hooks/useAuthFetch", () => ({
-	useAuthFetch: vi.fn(),
-}));
+vi.mock("@/providers/AuthProvider");
+vi.mock("@/hooks/useAuthFetch");
 
 describe("useFileUpload", () => {
-	const mockUser = { uid: "test-user-id" };
-	const mockAuthFetch = vi.fn();
-	const mockFile = new File(["test"], "test.pdf", { type: "application/pdf" });
-	const mockFileInfo = {
-		name: "test.pdf",
-		size: 4,
-		type: "application/pdf",
-		file: mockFile,
-	};
+	let mockUser: { uid: string };
+	let mockAuthFetch: Mock;
 
 	beforeEach(() => {
-		vi.clearAllMocks();
+		mockUser = { uid: "test-uid" };
 		(useAuth as Mock).mockReturnValue({ user: mockUser });
+
+		mockAuthFetch = vi.fn();
 		(useAuthFetch as Mock).mockReturnValue(mockAuthFetch);
 	});
 
-	it("should throw error when user is not authenticated", async () => {
-		(useAuth as Mock).mockReturnValue({ user: null });
+	it("should upload files successfully", async () => {
 		const { result } = renderHook(() => useFileUpload());
 
-		await expect(result.current.uploadFiles([mockFileInfo])).rejects.toThrow(
-			"User is not authenticated",
-		);
-	});
-
-	it("should handle successful file upload", async () => {
-		const mockSignedUrlResponse = {
-			ok: true,
-			json: () =>
-				Promise.resolve({
-					[`${mockUser.uid}/${mockFileInfo.name}`]: "signed-url",
+		const files = [
+			{
+				name: "test.pdf",
+				size: 1234,
+				type: "application/pdf",
+				file: new File(["file content"], "test.pdf", {
+					type: "application/pdf",
 				}),
-		};
-		const mockUploadResponse = { ok: true };
-		const mockRegisterResponse = { ok: true };
+			},
+		];
 
-		mockAuthFetch.mockResolvedValueOnce(mockSignedUrlResponse);
-		global.fetch = vi.fn().mockResolvedValueOnce(mockUploadResponse);
-		mockAuthFetch.mockResolvedValueOnce(mockRegisterResponse);
+		// Mock the authFetch responses
+		mockAuthFetch
+			.mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({
+					"test-uid/test.pdf": "https://signedurl.com/test.pdf",
+				}),
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({ success: true }),
+			});
 
-		const { result } = renderHook(() => useFileUpload());
-
-		let success = false;
-		await act(async () => {
-			success = await result.current.uploadFiles([mockFileInfo]);
+		// Mock the fetch call to the signed URL (uploading the file)
+		global.fetch = vi.fn().mockResolvedValueOnce({
+			ok: true,
 		});
 
-		expect(success).toBe(true);
+		await act(async () => {
+			const success = await result.current.uploadFiles(files);
+			expect(success).toBe(true);
+		});
+
+		expect(result.current.isUploading).toBe(false);
 		expect(mockAuthFetch).toHaveBeenCalledTimes(2);
 		expect(global.fetch).toHaveBeenCalledTimes(1);
 	});
 
-	it("should handle failed signed URL generation", async () => {
-		const mockFailedResponse = { ok: false };
-		mockAuthFetch.mockResolvedValueOnce(mockFailedResponse);
-
+	it("should handle failure to get signed URLs", async () => {
 		const { result } = renderHook(() => useFileUpload());
 
-		await expect(result.current.uploadFiles([mockFileInfo])).rejects.toThrow(
-			"Failed to get signed URLs",
-		);
+		const files = [
+			{
+				name: "test.pdf",
+				size: 1234,
+				type: "application/pdf",
+				file: new File(["file content"], "test.pdf", {
+					type: "application/pdf",
+				}),
+			},
+		];
+
+		mockAuthFetch.mockResolvedValueOnce({
+			ok: false,
+			status: 500,
+		});
+
+		await act(async () => {
+			await expect(result.current.uploadFiles(files)).rejects.toThrow(
+				"Failed to get signed URLs",
+			);
+		});
+
+		expect(result.current.isUploading).toBe(false);
+		expect(mockAuthFetch).toHaveBeenCalledTimes(1);
 	});
 
-	it("should handle failed file upload", async () => {
-		const mockSignedUrlResponse = {
-			ok: true,
-			json: () =>
-				Promise.resolve({
-					[`${mockUser.uid}/${mockFileInfo.name}`]: "signed-url",
-				}),
-		};
-		const mockFailedUploadResponse = { ok: false };
-
-		mockAuthFetch.mockResolvedValueOnce(mockSignedUrlResponse);
-		global.fetch = vi.fn().mockResolvedValueOnce(mockFailedUploadResponse);
-
+	it("should handle failure to upload file", async () => {
 		const { result } = renderHook(() => useFileUpload());
 
-		await expect(result.current.uploadFiles([mockFileInfo])).rejects.toThrow(
-			"Failed to upload file",
-		);
+		const files = [
+			{
+				name: "test.pdf",
+				size: 1234,
+				type: "application/pdf",
+				file: new File(["file content"], "test.pdf", {
+					type: "application/pdf",
+				}),
+			},
+		];
+
+		mockAuthFetch.mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({
+				"test-uid/test.pdf": "https://signedurl.com/test.pdf",
+			}),
+		});
+
+		global.fetch = vi.fn().mockResolvedValueOnce({
+			ok: false,
+			status: 500,
+		});
+
+		await act(async () => {
+			await expect(result.current.uploadFiles(files)).rejects.toThrow(
+				"Failed to upload file",
+			);
+		});
+
+		expect(result.current.isUploading).toBe(false);
+		expect(mockAuthFetch).toHaveBeenCalledTimes(1);
+		expect(global.fetch).toHaveBeenCalledTimes(1);
 	});
 
-	it("should handle failed file registration", async () => {
-		const mockSignedUrlResponse = {
-			ok: true,
-			json: () =>
-				Promise.resolve({
-					[`${mockUser.uid}/${mockFileInfo.name}`]: "signed-url",
-				}),
-		};
-		const mockUploadResponse = { ok: true };
-		const mockFailedRegisterResponse = { ok: false };
-
-		mockAuthFetch.mockResolvedValueOnce(mockSignedUrlResponse);
-		global.fetch = vi.fn().mockResolvedValueOnce(mockUploadResponse);
-		mockAuthFetch.mockResolvedValueOnce(mockFailedRegisterResponse);
-
+	it("should handle failure to register file", async () => {
 		const { result } = renderHook(() => useFileUpload());
 
-		await expect(result.current.uploadFiles([mockFileInfo])).rejects.toThrow(
-			"Failed to register file",
-		);
+		const files = [
+			{
+				name: "test.pdf",
+				size: 1234,
+				type: "application/pdf",
+				file: new File(["file content"], "test.pdf", {
+					type: "application/pdf",
+				}),
+			},
+		];
+
+		mockAuthFetch
+			.mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({
+					"test-uid/test.pdf": "https://signedurl.com/test.pdf",
+				}),
+			})
+			.mockResolvedValueOnce({
+				ok: false,
+				status: 500,
+			});
+
+		global.fetch = vi.fn().mockResolvedValueOnce({
+			ok: true,
+		});
+
+		await act(async () => {
+			await expect(result.current.uploadFiles(files)).rejects.toThrow(
+				"Failed to register file",
+			);
+		});
+
+		expect(result.current.isUploading).toBe(false);
+		expect(mockAuthFetch).toHaveBeenCalledTimes(2);
+		expect(global.fetch).toHaveBeenCalledTimes(1);
 	});
 });

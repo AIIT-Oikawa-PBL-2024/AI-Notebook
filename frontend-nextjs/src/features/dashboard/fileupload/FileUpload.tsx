@@ -1,7 +1,7 @@
 import { ButtonWithIcon } from "@/features/dashboard/Button";
+import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
 import type React from "react";
 import { type ChangeEvent, type DragEvent, useRef, useState } from "react";
-import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
 
 interface FileInfo {
 	name: string;

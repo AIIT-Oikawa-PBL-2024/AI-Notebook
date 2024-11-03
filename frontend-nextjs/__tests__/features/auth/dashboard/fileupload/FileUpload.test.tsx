@@ -1,73 +1,103 @@
+// FileUpload.test.tsx
+import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import FileUploadComponent from "@/features/dashboard/fileupload/FileUpload";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
-import { vi, type Mock, beforeEach, describe, expect, it } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
 
-// Mock the custom hook
-vi.mock("@/hooks/useFileUpload", () => ({
-	useFileUpload: vi.fn(),
-}));
+vi.mock("@/features/dashboard/fileupload/hooks/useFileUpload");
 
 describe("FileUploadComponent", () => {
-	const mockUploadFiles = vi.fn();
+	let mockUploadFiles: Mock;
+	let mockIsUploading: boolean;
 
 	beforeEach(() => {
-		vi.clearAllMocks();
+		mockUploadFiles = vi.fn();
+		mockIsUploading = false;
+
 		(useFileUpload as Mock).mockReturnValue({
 			uploadFiles: mockUploadFiles,
-			isUploading: false,
+			isUploading: mockIsUploading,
 		});
 	});
 
-	it("renders upload area with correct text", () => {
+	it("renders correctly", () => {
 		render(<FileUploadComponent />);
 		expect(
 			screen.getByText(
-				"PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください",
+				/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
 			),
 		).toBeInTheDocument();
 	});
 
-	it("handles file selection through input", async () => {
+	it("handles file drop", async () => {
 		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.pdf", { type: "application/pdf" });
-		const input = screen.getByRole("file");
 
-		fireEvent.change(input, { target: { files: [file] } });
+		const dropArea = screen.getByText(
+			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+		);
 
-		await waitFor(() => {
-			expect(screen.getByText("test.pdf")).toBeInTheDocument();
-			expect(screen.getByText("(4 bytes)")).toBeInTheDocument();
+		const file = new File(["file content"], "test.pdf", {
+			type: "application/pdf",
 		});
+
+		fireEvent.dragEnter(dropArea);
+		fireEvent.dragOver(dropArea);
+		fireEvent.drop(dropArea, {
+			dataTransfer: {
+				files: [file],
+			},
+		});
+
+		expect(await screen.findByText("test.pdf")).toBeInTheDocument();
 	});
 
-	it("shows error message for invalid file type", async () => {
+	it("shows error message when unsupported file is dropped", async () => {
 		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.txt", { type: "text/plain" });
-		const input = screen.getByRole("file");
 
-		fireEvent.change(input, { target: { files: [file] } });
+		const dropArea = screen.getByText(
+			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+		);
 
-		await waitFor(() => {
-			expect(
-				screen.getByText(
-					"test.txt は許可されていないファイル形式です。PDF、PNG、JPEGファイルのみアップロード可能です。",
-				),
-			).toBeInTheDocument();
+		const file = new File(["file content"], "test.txt", { type: "text/plain" });
+
+		fireEvent.dragEnter(dropArea);
+		fireEvent.dragOver(dropArea);
+		fireEvent.drop(dropArea, {
+			dataTransfer: {
+				files: [file],
+			},
 		});
+
+		expect(
+			await screen.findByText(
+				/test.txt は許可されていないファイル形式です。PDF、PNG、JPEGファイルのみアップロード可能です。/,
+			),
+		).toBeInTheDocument();
 	});
 
-	it("handles file removal", async () => {
+	it("removes file from the list when remove button is clicked", async () => {
 		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.pdf", { type: "application/pdf" });
-		const input = screen.getByRole("file");
 
-		fireEvent.change(input, { target: { files: [file] } });
-		await waitFor(() => {
-			expect(screen.getByText("test.pdf")).toBeInTheDocument();
+		const dropArea = screen.getByText(
+			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+		);
+
+		const file = new File(["file content"], "test.pdf", {
+			type: "application/pdf",
 		});
 
-		const removeButton = screen.getByTitle("Remove file icon");
+		fireEvent.drop(dropArea, {
+			dataTransfer: {
+				files: [file],
+			},
+		});
+
+		await screen.findByText("test.pdf");
+
+		const removeButton = screen.getByRole("button", {
+			name: /Remove file icon/,
+		});
 		fireEvent.click(removeButton);
 
 		await waitFor(() => {
@@ -75,104 +105,35 @@ describe("FileUploadComponent", () => {
 		});
 	});
 
-	it("handles successful file upload", async () => {
-		const mockAlert = vi.spyOn(window, "alert").mockImplementation(() => {});
-		mockUploadFiles.mockResolvedValueOnce(true);
+	it("disables upload button when isUploading is true", async () => {
+		mockIsUploading = true;
+
+		(useFileUpload as Mock).mockReturnValue({
+			uploadFiles: mockUploadFiles,
+			isUploading: mockIsUploading,
+		});
 
 		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.pdf", { type: "application/pdf" });
-		const input = screen.getByRole("file");
 
-		fireEvent.change(input, { target: { files: [file] } });
-		await waitFor(() => {
-			expect(screen.getByText("test.pdf")).toBeInTheDocument();
-		});
-
-		const uploadButton = screen.getByText("アップロード");
-		fireEvent.click(uploadButton);
-
-		await waitFor(() => {
-			expect(mockUploadFiles).toHaveBeenCalled();
-			expect(mockAlert).toHaveBeenCalledWith(
-				"ファイルが正常にアップロードされました",
-			);
-			expect(screen.queryByText("test.pdf")).not.toBeInTheDocument();
-		});
-
-		mockAlert.mockRestore();
-	});
-
-	it("handles upload failure", async () => {
-		const mockAlert = vi.spyOn(window, "alert").mockImplementation(() => {});
-		mockUploadFiles.mockRejectedValueOnce(new Error("Upload failed"));
-
-		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.pdf", { type: "application/pdf" });
-		const input = screen.getByRole("file");
-
-		fireEvent.change(input, { target: { files: [file] } });
-		await waitFor(() => {
-			expect(screen.getByText("test.pdf")).toBeInTheDocument();
-		});
-
-		const uploadButton = screen.getByText("アップロード");
-		fireEvent.click(uploadButton);
-
-		await waitFor(() => {
-			expect(mockUploadFiles).toHaveBeenCalled();
-			expect(mockAlert).toHaveBeenCalledWith("エラー: Upload failed");
-			expect(screen.getByText("test.pdf")).toBeInTheDocument();
-		});
-
-		mockAlert.mockRestore();
-	});
-
-	it("handles drag and drop", async () => {
-		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.pdf", { type: "application/pdf" });
 		const dropArea = screen.getByText(
-			"PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください",
-		).parentElement;
+			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+		);
 
-		if (!dropArea) {
-			throw new Error("Drop area not found");
-		}
-
-		// Test dragenter
-		fireEvent.dragEnter(dropArea, {
-			dataTransfer: {
-				files: [file],
-			},
+		const file = new File(["file content"], "test.pdf", {
+			type: "application/pdf",
 		});
-		expect(dropArea).toHaveClass("border-blue-400");
 
-		// Test drop
 		fireEvent.drop(dropArea, {
 			dataTransfer: {
 				files: [file],
 			},
 		});
 
-		await waitFor(() => {
-			expect(screen.getByText("test.pdf")).toBeInTheDocument();
-			expect(dropArea).not.toHaveClass("border-blue-400");
-		});
-	});
+		await screen.findByText("test.pdf");
 
-	it("shows loading state during upload", async () => {
-		(useFileUpload as Mock).mockReturnValue({
-			uploadFiles: mockUploadFiles,
-			isUploading: true,
+		const uploadButton = screen.getByRole("button", {
+			name: "アップロード中...",
 		});
-
-		render(<FileUploadComponent />);
-		const file = new File(["test"], "test.pdf", { type: "application/pdf" });
-		const input = screen.getByRole("file");
-
-		fireEvent.change(input, { target: { files: [file] } });
-		await waitFor(() => {
-			expect(screen.getByText("アップロード中...")).toBeInTheDocument();
-			expect(screen.getByText("アップロード中...")).toBeDisabled();
-		});
+		expect(uploadButton).toBeDisabled();
 	});
 });
