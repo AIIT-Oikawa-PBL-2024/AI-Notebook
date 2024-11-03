@@ -1,4 +1,4 @@
-import { ButtonWithIcon } from "@/features/dashboard/Button";
+import { ButtonWithIcon } from "@/features/dashboard/fileupload/Button";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
 import type React from "react";
 import { type ChangeEvent, type DragEvent, useRef, useState } from "react";
@@ -237,22 +237,14 @@ const FileUploadComponent: React.FC = () => {
 							</li>
 						))}
 					</ul>
-					<button
-						type="button"
-						onClick={handleUpload}
-						disabled={isUploading || files.length === 0}
-						className={`mt-4 px-4 py-2 text-white rounded flex items-center justify-center hover:bg-gray-300 ${
-							isUploading || files.length === 0
-								? "opacity-50 cursor-not-allowed"
-								: ""
-						}`}
-					>
-						{isUploading ? (
-							"アップロード中..."
-						) : (
-							<ButtonWithIcon>アップロード</ButtonWithIcon>
-						)}
-					</button>
+					<div className="mt-4">
+						<ButtonWithIcon
+							onClick={handleUpload}
+							disabled={isUploading || files.length === 0}
+						>
+							{isUploading ? "アップロード中..." : "アップロード"}
+						</ButtonWithIcon>
+					</div>
 				</div>
 			)}
 		</div>

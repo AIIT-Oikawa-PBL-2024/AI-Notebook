@@ -1,9 +1,9 @@
-// FileUpload.test.tsx
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import FileUploadComponent from "@/features/dashboard/fileupload/FileUpload";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
-import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+// FileUpload.test.tsx
+import React from "react";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/features/dashboard/fileupload/hooks/useFileUpload");
 

@@ -1,9 +1,9 @@
-// useFileUpload.test.ts
-import { renderHook, act } from "@testing-library/react";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
-import { useAuth } from "@/providers/AuthProvider";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
-import { vi, describe, it, expect, beforeEach, type Mock } from "vitest";
+import { useAuth } from "@/providers/AuthProvider";
+// useFileUpload.test.ts
+import { act, renderHook } from "@testing-library/react";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/providers/AuthProvider");
 vi.mock("@/hooks/useAuthFetch");
