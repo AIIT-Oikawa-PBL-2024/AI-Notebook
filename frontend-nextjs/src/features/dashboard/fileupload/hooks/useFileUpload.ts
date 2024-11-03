@@ -19,8 +19,8 @@ export const useFileUpload = (): UseFileUploadReturn => {
 	const authFetch = useAuthFetch();
 	const [isUploading, setIsUploading] = useState<boolean>(false);
 
-	const BACKEND_DEV_API_URL_SIGNEDURL = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/generate_upload_signed_url/`;
-	const BACKEND_DEV_API_URL_REGISTERFILES = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/register_files/`;
+	const BACKEND_DEV_API_URL_SIGNEDURL = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/generate_upload_signed_url`;
+	const BACKEND_DEV_API_URL_REGISTERFILES = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/files/register_files`;
 
 	const uploadFiles = async (files: FileInfo[]): Promise<boolean> => {
 		if (!user) {
