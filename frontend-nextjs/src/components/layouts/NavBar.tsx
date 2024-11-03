@@ -18,7 +18,6 @@ import {
 	Typography,
 } from "@material-tailwind/react";
 import Link from "next/link";
-import Link from "next/link";
 
 export default function NavBar() {
 	const { user } = useAuth();
@@ -87,15 +86,13 @@ export default function NavBar() {
 						AI練習問題
 					</ListItem>
 				</Link>
-				<Link href="/notes">
-					<Link href="/notebook">
+				<Link href="/notebook">
 					<ListItem>
-							<ListItemPrefix>
-								<PencilIcon className="h-5 w-5" />
-							</ListItemPrefix>
-							ノート
-						</ListItem>
-				</Link>
+						<ListItemPrefix>
+							<PencilIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ノート
+					</ListItem>
 				</Link>
 			</List>
 		</Card>
