@@ -88,6 +88,8 @@ const FileUploadComponent: React.FC = () => {
 			if (success) {
 				alert("ファイルが正常にアップロードされました");
 				setFiles([]);
+			} else {
+				alert("ファイルのアップロードに失敗しました");
 			}
 		} catch (error) {
 			alert(
