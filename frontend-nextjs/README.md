@@ -110,7 +110,7 @@ CTRL+Cで停止
 - `vitest.config.ts`にカバレッジレポートの設定を追加
 
 ## 手動でCloud Runへのデプロイ
-- 開発用の環境変数`.env.development.loval`と本番用の環境変数`.env.production.local`をサンプルファイルから作成
+- 開発用の環境変数`.env.development.local`と本番用の環境変数`.env.production.local`をサンプルファイルから作成
 - 手動デプロイ用のDockerコンテナをビルドしてプッシュ
   - `cd frontend-nextjs`
   - `docker build -t gcr.io/<PROJECT-ID>/<APP-NAME> --platform linux/amd64 -f Dockerfile.gcloud-nextjs .`
