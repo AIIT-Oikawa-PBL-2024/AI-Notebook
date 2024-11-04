@@ -170,7 +170,7 @@ async def test_generate_upload_signed_url(session: AsyncSession) -> None:
     ) as client:
         testfiles = ["test_file1.pdf", "test_file2.pdf"]
         response = await client.post(
-            f"/files/generate_upload_signed_url/",
+            f"/files/generate_upload_signed_url",
             headers=headers,
             json=testfiles,
         )

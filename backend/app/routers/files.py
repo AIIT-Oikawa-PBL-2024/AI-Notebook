@@ -177,7 +177,7 @@ async def delete_files(
 
 
 # 署名付きURLの生成
-@router.post("/generate_upload_signed_url/", response_model=dict)
+@router.post("/generate_upload_signed_url", response_model=dict)
 async def generate_upload_signed_url(
     files: list[str], uid: str = Depends(get_uid)
 ) -> dict:
