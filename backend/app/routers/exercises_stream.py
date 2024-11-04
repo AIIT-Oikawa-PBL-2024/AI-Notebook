@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # import app.schemas.exercises as exercises_schemas
 from app.database import get_db
 from app.utils.claude_request_stream import generate_content_stream
+from app.utils.user_auth import get_uid
 
 # ロギング設定
 logging.basicConfig(level=logging.INFO)
@@ -33,6 +34,7 @@ db_dependency = Depends(get_db)
 @router.post("/request_stream")
 async def request_content(
     files: list[str],
+    uid: str = Depends(get_uid),  # uidを追加
     db: AsyncSession = db_dependency,
 ) -> StreamingResponse:
     """

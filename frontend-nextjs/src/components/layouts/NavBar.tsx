@@ -24,7 +24,7 @@ export default function NavBar() {
 	const { signOutUser, error, isLoading } = useSignOut();
 
 	if (!user) {
-		return null; // ユーザーが存在しない場合は何も表示しない
+		return null;
 	}
 
 	return (
@@ -54,18 +54,22 @@ export default function NavBar() {
 				</div>
 			)}
 			<List className="mt-4">
-				<ListItem>
-					<ListItemPrefix>
-						<HomeIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					ホーム
-				</ListItem>
-				<ListItem>
-					<ListItemPrefix>
-						<FolderIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					ファイル選択
-				</ListItem>
+				<Link href="/">
+					<ListItem>
+						<ListItemPrefix>
+							<HomeIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ホーム
+					</ListItem>
+				</Link>
+				<Link href="/select-files">
+					<ListItem>
+						<ListItemPrefix>
+							<FolderIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ファイル選択
+					</ListItem>
+				</Link>
 				<Link href="/ai-output">
 					<ListItem>
 						<ListItemPrefix>
@@ -74,12 +78,14 @@ export default function NavBar() {
 						AI出力
 					</ListItem>
 				</Link>
-				<ListItem>
-					<ListItemPrefix>
-						<PencilSquareIcon className="h-5 w-5" />
-					</ListItemPrefix>
-					AI練習問題
-				</ListItem>
+				<Link href="/ai-exercise">
+					<ListItem>
+						<ListItemPrefix>
+							<PencilSquareIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI練習問題
+					</ListItem>
+				</Link>
 				<Link href="/notebook">
 					<ListItem>
 						<ListItemPrefix>
