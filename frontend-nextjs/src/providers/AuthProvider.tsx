@@ -19,6 +19,7 @@ import {
 } from "react";
 import type React from "react";
 
+// 認証コンテキストの型定義を拡張
 interface AuthContextType {
 	user: User | null;
 	idToken: string | null;
@@ -29,11 +30,14 @@ interface AuthContextType {
 	reAuthenticate: () => Promise<void>;
 }
 
+// 認証コンテキストの作成
 export const AuthContext = createContext<AuthContextType | undefined>(
 	undefined,
 );
 
+// 認証プロバイダーコンポーネント
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+	// ユーザーと IDトークンの状態管理
 	const [auth, setAuth] = useState<Auth | null>(null);
 	const [user, setUser] = useState<User | null>(null);
 	const [idToken, setIdToken] = useState<string | null>(null);
@@ -63,7 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 		try {
 			await signOut(auth);
-			setError("認証トークンの更新に失敗しました。再度サインインしてください");
 		} catch (error) {
 			console.error("Re-authentication failed:", error);
 			setError("再認証プロセスでエラーが発生しました。");
@@ -162,6 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	);
 }
 
+// カスタムフック: 認証コンテキストを使用するためのフック
 export function useAuth() {
 	const context = useContext(AuthContext);
 	if (context === undefined) {
