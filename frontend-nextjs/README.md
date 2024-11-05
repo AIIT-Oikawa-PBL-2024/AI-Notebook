@@ -108,3 +108,11 @@ CTRL+Cで停止
 ## CIの設定
 - `.github/workflows/pytest.yml`　→　`.github/workflows/ci.yml`に名前変更 
 - `vitest.config.ts`にカバレッジレポートの設定を追加
+
+## 手動でCloud Runへのデプロイ
+- 開発用の環境変数`.env.development.local`と本番用の環境変数`.env.production.local`をサンプルファイルから作成
+- 手動デプロイ用のDockerコンテナをビルドしてプッシュ
+  - `cd frontend-nextjs`
+  - `docker build -t gcr.io/<PROJECT-ID>/<APP-NAME> --platform linux/amd64 -f Dockerfile.gcloud-nextjs .`
+  - `docker push gcr.io/<PROJECT-ID>/<APP-NAME>`
+- Cloud Run コンソールで「新しいリビジョンの編集とデプロイ」→「コンテナイメージ」を選択

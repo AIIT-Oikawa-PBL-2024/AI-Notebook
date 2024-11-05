@@ -31,7 +31,7 @@ export default function NavBar() {
 		<Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
 			<div className="mb-2 p-4">
 				<Typography variant="h5" color="blue-gray">
-					AIノートブック
+					<Link href="/">AIノートブック</Link>
 				</Typography>
 			</div>
 			{user && (
@@ -86,7 +86,7 @@ export default function NavBar() {
 						AI練習問題
 					</ListItem>
 				</Link>
-				<Link href="/notes">
+				<Link href="/notebook">
 					<ListItem>
 						<ListItemPrefix>
 							<PencilIcon className="h-5 w-5" />
