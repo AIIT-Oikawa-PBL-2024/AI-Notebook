@@ -189,7 +189,7 @@ describe("SignInForm", () => {
 	it("入力フィールドが適切なautocomplete属性を持っている", () => {
 		render(<SignInForm />);
 		const emailInput = screen.getByLabelText("Email");
-		const passwordInput = screen.getByLabelText("Password");	
+		const passwordInput = screen.getByLabelText("Password");
 		expect(emailInput).toHaveAttribute("autoComplete", "email");
 		expect(passwordInput).toHaveAttribute("autoComplete", "current-password");
 	});
