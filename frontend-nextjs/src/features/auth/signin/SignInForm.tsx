@@ -111,6 +111,7 @@ export function SignInForm() {
 							size="lg"
 							type="email"
 							name="email"
+							autoComplete="email"  // メールアドレスの自動入力を有効にする
 							placeholder="name@mail.com"
 							className="!border-t-blue-gray-200 focus:!border-t-gray-900"
 							labelProps={{
@@ -139,6 +140,7 @@ export function SignInForm() {
 							className="!border-t-blue-gray-200 focus:!border-t-gray-900"
 							type={passwordShown ? "text" : "password"}
 							value={password}
+							autoComplete="current-password"  // パスワードの自動入力を有効にする
 							onChange={(e) => setPassword(e.target.value)}
 							icon={
 								<i
