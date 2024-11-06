@@ -98,3 +98,27 @@ async def delete_file_by_name_and_userid(
     except Exception as e:
         await db.rollback()
         raise e
+
+
+async def get_file_id_by_name_and_userid(
+    db: AsyncSession, file_name: str, uid: str
+) -> int | None:
+    """
+    ファイル名とユーザーIDからファイルIDを取得する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_name: 取得するファイルの名前
+    :type file_name: str
+    :param uid: ファイルを所有するユーザーのID
+    :type uid: str
+    :return: ファイルID、存在しない場合はNone
+    :rtype: int | None
+    """
+    result: Result = await db.execute(
+        select(files_models.File.id)
+        .filter(files_models.File.file_name == file_name)
+        .filter(files_models.File.user_id == uid)
+    )
+    file = result.scalar_one_or_none()
+    return file
