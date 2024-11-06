@@ -248,6 +248,7 @@ export function SignUpForm() {
 							className: "min-w-0",
 						}}
 						value={email}
+						autoComplete="email" // メールアドレスの自動入力を有効にする
 						onChange={handleEmailChange}
 					/>
 					{emailError && (
@@ -271,6 +272,7 @@ export function SignUpForm() {
 								className: "min-w-0",
 							}}
 							value={password}
+							autoComplete="new-password" // パスワードの自動入力を有効にする
 							onChange={(e) => setPassword(e.target.value)}
 						/>
 						<IconButton

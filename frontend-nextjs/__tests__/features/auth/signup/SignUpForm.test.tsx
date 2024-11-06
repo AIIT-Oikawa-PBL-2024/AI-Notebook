@@ -182,4 +182,15 @@ describe("SignUpForm", () => {
 		const signInLink = screen.getByText("サインインへ");
 		expect(signInLink).toHaveAttribute("href", "/signin");
 	});
+
+	it("入力フィールドが適切なautocomplete属性を持っている", () => {
+		render(<SignUpForm />);
+
+		// getByPlaceholderTextを使用して入力フィールドを特定
+		const emailInput = screen.getByPlaceholderText("name@mail.com");
+		const passwordInput = screen.getByPlaceholderText("********");
+
+		expect(emailInput).toHaveAttribute("autocomplete", "email");
+		expect(passwordInput).toHaveAttribute("autocomplete", "new-password");
+	});
 });
