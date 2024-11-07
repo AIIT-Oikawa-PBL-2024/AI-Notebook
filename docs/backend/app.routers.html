@@ -57,10 +57,7 @@
 <li><a class="reference internal" href="#app.routers.notes.update_note"><code class="docutils literal notranslate"><span class="pre">update_note()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-app.routers.outputs_stream">app.routers.outputs_stream module</a><ul>
-<li><a class="reference internal" href="#app.routers.outputs_stream.request_content"><code class="docutils literal notranslate"><span class="pre">request_content()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#app-routers-outputs-stream-module">app.routers.outputs_stream module</a></li>
 <li><a class="reference internal" href="#module-app.routers">Module contents</a></li>
 </ul>
 </li>
@@ -208,37 +205,8 @@
 </dd></dl>
 
 </section>
-<section id="module-app.routers.outputs_stream">
-<span id="app-routers-outputs-stream-module"></span><h2>app.routers.outputs_stream module<a class="headerlink" href="#module-app.routers.outputs_stream" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="app.routers.outputs_stream.request_content">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.routers.outputs_stream.</span></span><span class="sig-name descname"><span class="pre">request_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Depends(get_db)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">StreamingResponse</span></span></span><a class="reference internal" href="_modules/app/routers/outputs_stream.html#request_content"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.routers.outputs_stream.request_content" title="Link to this definition"></a></dt>
-<dd><p>ファイル名のリストを入力して、出力を生成するエンドポイントです。</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- ファイル名のリスト</p></li>
-<li><p><strong>db</strong> (<em>AsyncSession</em>) -- 非同期セッション</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ストリーミングレスポンス</p>
-</dd>
-<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-odd"><p>StreamingResponse</p>
-</dd>
-<dt class="field-even">例外<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>HTTPException 404</strong> -- 指定されたファイルが見つからない場合</p></li>
-<li><p><strong>HTTPException 400</strong> -- ファイル名の形式が無効な場合</p></li>
-<li><p><strong>HTTPException 500</strong> -- コンテンツの生成中にエラーが発生した場合、
-またはGoogle APIからエラーが返された場合、
-またはコンテンツのストリーミング中にエラーが発生した場合</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="app-routers-outputs-stream-module">
+<h2>app.routers.outputs_stream module<a class="headerlink" href="#app-routers-outputs-stream-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-app.routers">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.routers" title="Link to this heading"></a></h2>
