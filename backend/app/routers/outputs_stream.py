@@ -13,6 +13,7 @@ import app.cruds.outputs as outputs_cruds
 import app.schemas.outputs as outputs_schemas
 from app.database import get_db
 from app.utils.gemini_request_stream import generate_content_stream
+from app.utils.user_auth import get_uid
 
 # ロギング設定
 logging.basicConfig(level=logging.INFO)
@@ -32,8 +33,7 @@ db_dependency = Depends(get_db)
 
 @router.post("/request_stream")
 async def request_content(
-    files: list[str],
-    db: AsyncSession = db_dependency,
+    files: list[str], db: AsyncSession = db_dependency, uid: str = Depends(get_uid)
 ) -> StreamingResponse:
     """
     ファイル名のリストを入力して、出力を生成するエンドポイントです。
@@ -58,7 +58,7 @@ async def request_content(
 
     try:
         # ファイル名のリストを元に、コンテンツを生成
-        response = generate_content_stream(file_names)
+        response = generate_content_stream(file_names, uid)
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
