@@ -5,7 +5,6 @@ const STORAGE_KEY = "cached_output";
 const GENERATION_STATUS_KEY = "output_generation_status";
 
 export function useOutputGenerator() {
-	const fileNames = ["3_規範的なプロセスモデル.pdf"];
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [output, setOutput] = useState(() => {
@@ -34,6 +33,15 @@ export function useOutputGenerator() {
 		isGenerating.current = true;
 
 		try {
+			const selectedFiles = JSON.parse(
+				localStorage.getItem("selectedFiles") || "[]",
+			);
+			const title = localStorage.getItem("title");
+
+			if (!selectedFiles || !title) {
+				throw new Error("必要な情報が見つかりません");
+			}
+
 			setLoading(true);
 			const response = await authFetch(
 				`${process.env.NEXT_PUBLIC_BACKEND_HOST}/outputs/request_stream`,
@@ -42,7 +50,7 @@ export function useOutputGenerator() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(fileNames),
+					body: JSON.stringify(selectedFiles),
 				},
 			);
 
