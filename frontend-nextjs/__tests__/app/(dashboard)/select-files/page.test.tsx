@@ -5,22 +5,22 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
 import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Providers
+//Providers
 vi.mock("@/providers/AuthProvider", () => ({
 	useAuth: vi.fn(),
 }));
 
-// Hooks
+//Hooks
 vi.mock("@/hooks/useAuthFetch", () => ({
 	useAuthFetch: vi.fn(),
 }));
 
-// HOC
+//HOC
 vi.mock("@/utils/withAuth", () => ({
 	withAuth: (Component: React.ComponentType) => Component,
 }));
 
-// Navigation
+//Navigation
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({
 		push: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock("next/navigation", () => ({
 	}),
 }));
 
-// UI Components
+//UI Components
 vi.mock("@material-tailwind/react", () => ({
 	Alert: vi.fn(({ children }) => <div data-testid="alert">{children}</div>),
 	Button: vi.fn(({ children, onClick, disabled }) => (
