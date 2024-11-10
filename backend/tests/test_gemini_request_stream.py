@@ -81,7 +81,7 @@ async def test_generate_content_stream_success(
     )
 
     # テスト対象関数の実行(pdfファイル、pngファイルを指定)
-    result = generate_content_stream(["file1.pdf", "file2.png"])
+    result = generate_content_stream(["file1.pdf", "file2.png"], "test_user")
 
     accumulated_content = []
     async for content in result:
@@ -117,10 +117,12 @@ async def test_generate_content_stream_not_found(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(NotFound) as excinfo:
-        result = generate_content_stream(["non_existent_file.pdf"])
+        result = generate_content_stream(["non_existent_file.pdf"], "test_user")
         async for _ in result:
             pass
-    expected_error_message = "File non_existent_file.pdf does not exist in the bucket"
+    expected_error_message = (
+        "File test_user/non_existent_file.pdf does not exist in the bucket"
+    )
     assert expected_error_message in str(excinfo.value)
 
 
@@ -149,7 +151,7 @@ async def test_generate_content_stream_invalid_argument(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(InvalidArgument) as excinfo:
-        result = generate_content_stream(["invalid_file.txt"])
+        result = generate_content_stream(["invalid_file.txt"], "test_user")
         async for _ in result:
             pass
     assert "Invalid file format" in str(excinfo.value)
@@ -180,7 +182,7 @@ async def test_generate_content_stream_google_api_error(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(GoogleAPIError) as excinfo:
-        result = generate_content_stream(["file1.pdf"])
+        result = generate_content_stream(["file1.pdf"], "test_user")
         async for _ in result:
             pass
     assert "Google API error" in str(excinfo.value)
@@ -211,7 +213,7 @@ async def test_generate_content_stream_unexpected_error(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(Exception) as excinfo:
-        result = generate_content_stream(["file1.pdf"])
+        result = generate_content_stream(["file1.pdf"], "test_user")
         async for _ in result:
             pass
     assert "Unexpected error" in str(excinfo.value)
@@ -242,7 +244,7 @@ async def test_generate_content_stream_attribute_error(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(AttributeError) as excinfo:
-        result = generate_content_stream(["file1.pdf", "file2.png"])
+        result = generate_content_stream(["file1.pdf", "file2.png"], "test_user")
         async for _ in result:
             pass
     assert "Model attribute error" in str(excinfo.value)
@@ -273,7 +275,7 @@ async def test_generate_content_stream_type_error(
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(TypeError) as excinfo:
-        result = generate_content_stream(["file1.pdf", "file2.png"])
+        result = generate_content_stream(["file1.pdf", "file2.png"], "test_user")
         async for _ in result:
             pass
     assert "Type error in model generation" in str(excinfo.value)
