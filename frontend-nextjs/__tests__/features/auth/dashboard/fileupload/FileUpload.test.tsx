@@ -25,7 +25,7 @@ describe("FileUploadComponent", () => {
 		render(<FileUploadComponent />);
 		expect(
 			screen.getByText(
-				/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+				/PDF、PNG、JPEG、MP4、MP3、WAVファイルをドラッグ＆ドロップするか、クリックして選択してください/,
 			),
 		).toBeInTheDocument();
 	});
@@ -34,7 +34,7 @@ describe("FileUploadComponent", () => {
 		render(<FileUploadComponent />);
 
 		const dropArea = screen.getByText(
-			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+			/PDF、PNG、JPEG、MP4、MP3、WAVファイルをドラッグ＆ドロップするか、クリックして選択してください/,
 		);
 
 		const file = new File(["file content"], "test.pdf", {
@@ -56,7 +56,7 @@ describe("FileUploadComponent", () => {
 		render(<FileUploadComponent />);
 
 		const dropArea = screen.getByText(
-			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+			/PDF、PNG、JPEG、MP4、MP3、WAVファイルをドラッグ＆ドロップするか、クリックして選択してください/,
 		);
 
 		const file = new File(["file content"], "test.txt", { type: "text/plain" });
@@ -71,7 +71,7 @@ describe("FileUploadComponent", () => {
 
 		expect(
 			await screen.findByText(
-				/test.txt は許可されていないファイル形式です。PDF、PNG、JPEGファイルのみアップロード可能です。/,
+				/test.txt は許可されていないファイル形式です。PDF、PNG、JPEG、MP4、MP3、WAVファイルのみアップロード可能です。/,
 			),
 		).toBeInTheDocument();
 	});
@@ -80,7 +80,7 @@ describe("FileUploadComponent", () => {
 		render(<FileUploadComponent />);
 
 		const dropArea = screen.getByText(
-			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+			/PDF、PNG、JPEG、MP4、MP3、WAVファイルをドラッグ＆ドロップするか、クリックして選択してください/,
 		);
 
 		const file = new File(["file content"], "test.pdf", {
@@ -116,7 +116,7 @@ describe("FileUploadComponent", () => {
 		render(<FileUploadComponent />);
 
 		const dropArea = screen.getByText(
-			/PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください/,
+			/PDF、PNG、JPEG、MP4、MP3、WAVファイルをドラッグ＆ドロップするか、クリックして選択してください/,
 		);
 
 		const file = new File(["file content"], "test.pdf", {
