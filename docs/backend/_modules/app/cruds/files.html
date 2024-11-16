@@ -153,9 +153,7 @@
 
 <div class="viewcode-block" id="delete_file_by_name_and_userid">
 <a class="viewcode-back" href="../../../app.cruds.html#app.cruds.files.delete_file_by_name_and_userid">[ドキュメント]</a>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">delete_file_by_name_and_userid</span><span class="p">(</span>
-    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">delete_file_by_name_and_userid</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    指定されたファイル名とユーザーIDに基づいてファイルを削除します。</span>
 
@@ -168,26 +166,20 @@
 <span class="sd">    :return: None</span>
 <span class="sd">    :rtype: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="n">select</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">file_name</span> <span class="o">==</span> <span class="n">file_name</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">scalars</span><span class="p">():</span>
-            <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
-        <span class="k">raise</span> <span class="n">e</span></div>
+    <span class="n">result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">select</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">file_name</span> <span class="o">==</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">scalars</span><span class="p">():</span>
+        <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="get_file_id_by_name_and_userid">
 <a class="viewcode-back" href="../../../app.cruds.html#app.cruds.files.get_file_id_by_name_and_userid">[ドキュメント]</a>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">get_file_id_by_name_and_userid</span><span class="p">(</span>
-    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_file_id_by_name_and_userid</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ファイル名とユーザーIDからファイルIDを取得する関数</span>
 
