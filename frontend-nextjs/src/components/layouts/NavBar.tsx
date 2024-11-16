@@ -7,6 +7,7 @@ import {
 	DocumentCheckIcon,
 	FolderIcon,
 	HomeIcon,
+	ListBulletIcon,
 	PencilIcon,
 	PencilSquareIcon,
 } from "@heroicons/react/24/solid";
@@ -77,6 +78,14 @@ export default function NavBar() {
 							<ComputerDesktopIcon className="h-5 w-5" />
 						</ListItemPrefix>
 						AI出力
+					</ListItem>
+				</Link>
+				<Link href="/ai-exercise/select-exercises">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI練習問題リスト
 					</ListItem>
 				</Link>
 				<Link href="/ai-exercise/stream">
