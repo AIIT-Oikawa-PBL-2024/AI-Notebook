@@ -1,11 +1,11 @@
-import CreateExercisePage from "@/app/(dashboard)/ai-exercise/page";
-import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/ExerciseDisplay";
-import { useExerciseGenerator } from "@/features/dashboard/ai-exercise/useExerciseGenerator";
+import CreateExercisePage from "@/app/(dashboard)/ai-exercise/stream/page";
+import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/stream/ExerciseDisplay";
+import { useExerciseGenerator } from "@/features/dashboard/ai-exercise/stream/useExerciseGenerator";
 import { render, screen, waitFor } from "@testing-library/react";
 import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 
 // useExerciseGeneratorのモック
-vi.mock("@/features/dashboard/ai-exercise/useExerciseGenerator", () => ({
+vi.mock("@/features/dashboard/ai-exercise/stream/useExerciseGenerator", () => ({
 	useExerciseGenerator: vi.fn(),
 }));
 
@@ -15,7 +15,7 @@ vi.mock("@/utils/withAuth", () => ({
 }));
 
 // ExerciseDisplayのモック
-vi.mock("@/features/dashboard/ai-exercise/ExerciseDisplay", () => ({
+vi.mock("@/features/dashboard/ai-exercise/stream/ExerciseDisplay", () => ({
 	ExerciseDisplay: vi.fn(() => (
 		<div data-testid="exercise-display">Exercise Display</div>
 	)),

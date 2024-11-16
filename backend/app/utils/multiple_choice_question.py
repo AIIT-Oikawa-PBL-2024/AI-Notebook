@@ -3,7 +3,6 @@ import base64
 import io
 import logging
 import os
-from typing import AsyncGenerator
 
 import fitz
 from anthropic import AnthropicVertex
@@ -26,6 +25,116 @@ BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
 
 # ロギングの設定
 logging.basicConfig(level=logging.INFO)
+
+# ツールの設定
+tool_name = "print_multiple_choice_questions"
+
+description = """
+- あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
+- 複数のファイルは、ソフトウェア工学の解説スライドです。
+- 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。
+- "4択の選択問題"と"正解"と"解説"のセットを10問作成してください。
+- 以下のexapmleは参考例です。10問の中には、この例と同じ問題を含めないでください。
+- 以下のruleに従って作成してください。
+
+<example>
+question_1: ソフトウェア工学という言葉が初めて使われたのは、どの会議でしょうか？
+choice_1a: IEEE会議
+choice_1b: ACM会議
+choice_1c: NATO会議
+choice_1d: IFIP会議
+answer_1: choice_1c
+explanation_1: ソフトウェア工学という言葉は、1968年のNATO会議で初めて使用された。
+</example>
+
+<rule>
+- "4択の選択問題"と"正解"と"解説"のセットを10問作成してください。
+- 重要なキーワードを覚えられる良問を作成してください。
+- 簡単な問題、難しい問題をバランスよく混ぜた問題集にしてください。
+</rule>
+"""
+
+tool_definition = {
+    "name": "print_multiple_choice_questions",
+    "description": description,
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "questions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "question_id": {
+                            "type": "string",
+                            "description": "問題番号 (例: question_1)",
+                        },
+                        "question_text": {
+                            "type": "string",
+                            "description": "問題文",
+                        },
+                        "choices": {
+                            "type": "object",
+                            "properties": {
+                                "choice_a": {
+                                    "type": "string",
+                                    "description": "選択肢A",
+                                },
+                                "choice_b": {
+                                    "type": "string",
+                                    "description": "選択肢B",
+                                },
+                                "choice_c": {
+                                    "type": "string",
+                                    "description": "選択肢C",
+                                },
+                                "choice_d": {
+                                    "type": "string",
+                                    "description": "選択肢D",
+                                },
+                            },
+                            "required": [
+                                "choice_a",
+                                "choice_b",
+                                "choice_c",
+                                "choice_d",
+                            ],
+                        },
+                        "answer": {
+                            "type": "string",
+                            "description": "正解の選択肢ID (例: choice_1c)",
+                            "enum": [
+                                "choice_a",
+                                "choice_b",
+                                "choice_c",
+                                "choice_d",
+                            ],
+                        },
+                        "explanation": {
+                            "type": "string",
+                            "description": "解説文",
+                        },
+                    },
+                    "required": [
+                        "question_id",
+                        "question_text",
+                        "choices",
+                        "answer",
+                        "explanation",
+                    ],
+                },
+                "minItems": 10,
+                "maxItems": 10,
+            }
+        },
+        "required": ["questions"],
+    },
+}
+
+
+prompt = f"""
+{tool_name} ツールのみを利用すること。
+"""
 
 
 # Google Cloud Storageでファイルが存在するかチェック
@@ -88,26 +197,14 @@ async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
 
 
 # 複数のpdf, imageファイルを入力してコンテンツを生成
-async def generate_content_stream(
+async def generate_content_json(
     files: list[str],
     model_name: str = MODEL_NAME,
     bucket_name: str = BUCKET_NAME,
-) -> AsyncGenerator[str, None]:
-    print("generate_content_stream started")  # デバッグ用
+) -> dict:
+    print("generate_content_json started")  # デバッグ用
 
     image_files: list[dict] = []
-    prompt = """
-        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
-        - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。
-        - #instruction: 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。
-        - #style1: "4択の選択問題"を5問 + "穴埋め問題"を5問、合計10問出題してください。
-        - #style2: 200文字程度の"記述式問題"を3問出題して下さい。
-        - #style3: 最後に一括して"正解"と"解説"を箇条書き形式で表示してください。
-        - #style4: 記述式問題の正解は省略せず、"解答例"を表示してください。
-        - #condition1: 重要なキーワードを覚えられるような問題にしてください。
-        - #condition2: "表形式"は禁止します。"箇条書き"を使用してください。
-        - #format: タイトルを付けて、4000文字程度のMarkdownで出力してください。
-    """
 
     try:
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
@@ -153,8 +250,7 @@ async def generate_content_stream(
         content.append({"type": "text", "text": prompt})
         print("Added prompt to content")  # デバッグ用
 
-        print(f"Starting stream with model: {model_name}")  # デバッグ用
-        with client.messages.stream(
+        response = client.messages.create(
             max_tokens=4096,
             temperature=0.1,
             messages=[
@@ -164,11 +260,12 @@ async def generate_content_stream(
                 }
             ],
             model=model_name,
-        ) as stream:
-            for text in stream.text_stream:
-                yield text
+            tools=[tool_definition],  # type: ignore
+            tool_choice={"type": "tool", "name": tool_name},
+        )
 
-        print("generate_content_stream finished")  # デバッグ用
+        print("generate_content_json finished")  # デバッグ用
+        return response.to_dict()
 
     except AttributeError as e:
         logging.error(f"Model attribute error: {e}")
@@ -195,15 +292,13 @@ async def generate_content_stream(
 # テスト用のコード
 async def main() -> None:
     """
-    メイン関数。generate_content_stream関数をテストするためのコード
+    メイン関数。generate_content_json関数をテストするためのコード
     """
-    response: AsyncGenerator = generate_content_stream(
+    response: dict = await generate_content_json(
         # ["kougi_sample.png", "kougi_sample2.png"],
         ["1_ソフトウェア工学の誕生.pdf"]
     )
-
-    async for content in response:
-        print(content, end="")
+    print(response)
 
 
 if __name__ == "__main__":

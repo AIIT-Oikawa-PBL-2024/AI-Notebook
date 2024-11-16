@@ -7,9 +7,10 @@ class FileBase(BaseModel):
     """
     基本的なファイル情報を表すモデル。
 
-    Attributes:
-        file_name (str): ファイルの名前。
-        file_size (int): ファイルのサイズ。
+    :param file_name: ファイルの名前
+    :type file_name: str
+    :param file_size: ファイルのサイズ（バイト単位）
+    :type file_size: int
     """
 
     file_name: str
@@ -18,11 +19,12 @@ class FileBase(BaseModel):
 
 class FileCreate(FileBase):
     """
-    ファイル作成時の情報を表すモデル。
+    FileBaseクラスを継承したファイル作成を表すクラス。
 
-    Attributes:
-        user_id (str): ユーザーID。
-        created_at (datetime): 作成日時。
+    :param user_id: ユーザーID
+    :type user_id: str
+    :param created_at: 作成日時
+    :type created_at: datetime
     """
 
     user_id: str
@@ -31,12 +33,16 @@ class FileCreate(FileBase):
 
 class File(FileBase):
     """
-    作成されたファイルの情報を表すモデル。
+    FileBaseクラスを継承したファイル情報の取得を表すクラス。
 
-    Attributes:
-        id (int): ファイルのID。
-        user_id (str): ユーザーID。
-        created_at (datetime): 作成日時。
+    :param id: ファイルのID
+    :type id: int
+    :param user_id: ユーザーID
+    :type user_id: str
+    :param created_at: 作成日時
+    :type created_at: datetime
+    :param model_config: モデルの設定辞書
+    :type model_config: ConfigDict
     """
 
     id: int

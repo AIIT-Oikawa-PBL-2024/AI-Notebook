@@ -29,6 +29,14 @@ interface FileData {
 	user_id?: string;
 }
 
+// 選択問題関連のキャッシュキーを定数として定義
+const MULTI_CHOICE_CACHE_KEYS = {
+	QUESTION: "cached_multi_choice_question",
+	GENERATION_STATUS: "multi_choice_generation_status",
+	ANSWERS: "cached_answers",
+	RESULTS: "cached_results_state",
+};
+
 export default function FileSelectComponent() {
 	const router = useRouter();
 	const { user, error: authError, clearError, reAuthenticate } = useAuth();
@@ -140,7 +148,9 @@ export default function FileSelectComponent() {
 	}, []);
 
 	const createAiContent = useCallback(
-		async (type: "ai-output" | "ai-exercise") => {
+		async (
+			type: "ai-output" | "ai-exercise/stream" | "ai-exercise/multiple-choice",
+		) => {
 			if (!user) {
 				setError("認証が必要です");
 				return;
@@ -155,10 +165,16 @@ export default function FileSelectComponent() {
 			}
 
 			try {
-				// AI練習問題の場合は、既存のキャッシュをクリア
-				if (type === "ai-exercise") {
-					localStorage.removeItem("cached_exercise");
-					localStorage.removeItem("exercise_generation_status");
+				// キャッシュクリアの処理を問題タイプに応じて分岐
+				if (type === "ai-exercise/multiple-choice") {
+					// 選択問題関連のキャッシュをすべてクリア
+					for (const key of Object.values(MULTI_CHOICE_CACHE_KEYS)) {
+						localStorage.removeItem(key);
+					}
+				} else if (type === "ai-exercise/stream") {
+					// ストリーミング形式の問題用のキャッシュをクリア
+					localStorage.removeItem("cached_stream_exercise");
+					localStorage.removeItem("stream_exercise_generation_status");
 				}
 
 				// 選択されたファイルとタイトルを保存
@@ -405,11 +421,21 @@ export default function FileSelectComponent() {
 									</Button>
 									<Button
 										size="lg"
-										onClick={() => createAiContent("ai-exercise")}
+										onClick={() => createAiContent("ai-exercise/stream")}
 										className="flex-1"
 										disabled={loading}
 									>
 										AI練習問題
+									</Button>
+									<Button
+										size="lg"
+										onClick={() =>
+											createAiContent("ai-exercise/multiple-choice")
+										}
+										className="flex-1"
+										disabled={loading}
+									>
+										選択問題テスト
 									</Button>
 								</div>
 							)}

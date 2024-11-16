@@ -1,4 +1,4 @@
-import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/ExerciseDisplay";
+import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/stream/ExerciseDisplay";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 

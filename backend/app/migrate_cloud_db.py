@@ -6,6 +6,8 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import Base
+from app.models.exercises import Exercise  # noqa: F401
+from app.models.exercises_files import exercise_file  # noqa: F401
 from app.models.files import File  # noqa: F401
 from app.models.notes import Note  # noqa: F401
 from app.models.outputs import Output  # noqa: F401
