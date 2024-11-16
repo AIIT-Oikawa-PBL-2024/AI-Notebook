@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 import os
-import tempfile
 import unicodedata
 from typing import AsyncGenerator
 
@@ -56,30 +55,14 @@ def convert_mp4_to_mp3(bucket_name: str, file_name: str) -> bool:
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(file_name)
-    temp_dir = tempfile.gettempdir()
-    normalized_file_name = os.path.normpath(file_name)
-    if (
-        not normalized_file_name
-        or ".." in normalized_file_name
-        or normalized_file_name.startswith("/")
-    ):
-        raise ValueError("Invalid file name")
-    mp4_file_path = os.path.join(temp_dir, normalized_file_name)
-    os.makedirs(os.path.dirname(mp4_file_path), exist_ok=True)
+
+    mp4_base_name = os.path.basename(file_name)
+    mp4_file_path = f"/tmp/{mp4_base_name}"
     blob.download_to_filename(mp4_file_path)
 
     # MP4ファイルをMP3に変換
-    mp3_file_name = file_name.replace(".mp4", ".mp3")
-    normalized_mp3_file_name = os.path.normpath(mp3_file_name)
-    if (
-        not normalized_mp3_file_name
-        or ".." in normalized_mp3_file_name
-        or normalized_mp3_file_name.startswith("/")
-    ):
-        raise ValueError("Invalid file name")
-    mp3_file_path = os.path.join(temp_dir, normalized_mp3_file_name)
-    os.makedirs(os.path.dirname(mp3_file_path), exist_ok=True)
-    mp3_file_path = os.path.join(temp_dir, normalized_mp3_file_name)
+    mp3_base_name = mp4_base_name.replace(".mp4", ".mp3")
+    mp3_file_path = f"/tmp/{mp3_base_name}"
     (
         ffmpeg.input(mp4_file_path)
         .output(mp3_file_path, format="mp3", acodec="libmp3lame")
@@ -162,7 +145,6 @@ async def generate_content_stream(
                 elif file_name.endswith("mp4"):
                     # ファイルを音声ファイルに変換する
                     if convert_mp4_to_mp3(bucket_name, file_name):
-                        logging.info(f"File {file_name} is converted to MP3.")
                         # 音声ファイルに変換したファイルのURL
                         mp3_file_name = file_name.replace(".mp4", ".mp3")
                         mp3_file_url = f"gs://{bucket_name}/mp3/{mp3_file_name}"
