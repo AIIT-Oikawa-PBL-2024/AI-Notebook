@@ -18,8 +18,23 @@ const FileUploadComponent: React.FC = () => {
 	const { uploadFiles, isUploading } = useFileUpload();
 
 	const isAllowedFile = (file: File): boolean => {
-		const allowedTypes = ["application/pdf", "image/png", "image/jpeg"];
-		const allowedExtensions = [".pdf", ".png", ".jpg", ".jpeg"];
+		const allowedTypes = [
+			"application/pdf",
+			"image/png",
+			"image/jpeg",
+			"video/mp4",
+			"audio/mpeg",
+			"audio/wav",
+		];
+		const allowedExtensions = [
+			".pdf",
+			".png",
+			".jpg",
+			".jpeg",
+			".mp4",
+			".mp3",
+			".wav",
+		];
 		return (
 			allowedTypes.includes(file.type) ||
 			allowedExtensions.some((ext) => file.name.toLowerCase().endsWith(ext))
@@ -59,7 +74,7 @@ const FileUploadComponent: React.FC = () => {
 					return true;
 				}
 				setErrorMessage(
-					`${file.name} は許可されていないファイル形式です。PDF、PNG、JPEGファイルのみアップロード可能です。`,
+					`${file.name} は許可されていないファイル形式です。PDF、PNG、JPEG、MP4、MP3、WAVファイルのみアップロード可能です。`,
 				);
 				setTimeout(() => setErrorMessage(""), 5000);
 				return false;
@@ -174,7 +189,7 @@ const FileUploadComponent: React.FC = () => {
 					/>
 				</svg>
 				<p className="mt-2 text-sm text-gray-500">
-					PDF、PNG、JPEGファイルをドラッグ＆ドロップするか、クリックして選択してください
+					PDF、PNG、JPEG、MP4、MP3、WAVファイルをドラッグ＆ドロップするか、クリックして選択してください
 				</p>
 			</div>
 

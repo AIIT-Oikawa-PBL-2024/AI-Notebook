@@ -5,4 +5,4 @@ set -e
 poetry run python -m app.migrate_cloud_db
 
 # FastAPIサーバーを起動
-poetry run uvicorn app.main:app --host 0.0.0.0
+poetry run hypercorn app.main:app --bind 0.0.0.0
