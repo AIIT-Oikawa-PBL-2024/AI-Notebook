@@ -152,35 +152,67 @@ async def delete_files(
     :type uid: str
     :return: 削除結果の辞書
     :rtype: dict
+    :raises HTTPException: ファイルが見つからない場合は404、その他のエラーは500を返します
     """
-    try:
-        # ファイルをDBから削除
-        for file_name in files:
-            await files_cruds.delete_file_by_name_and_userid(db, file_name, uid)
+    response_data = {}
 
-        await db.commit()
+    try:
+        # Google Cloud Storageからファイルを削除
+        delete_result = await delete_files_from_gcs(files, uid)
+        response_data.update(delete_result)
+
+        # ファイルが見つからない場合は404エラーを返す
+        if not delete_result.get("success", False) and "が存在しません" in delete_result.get(
+            "failed_files", ""
+        ):
+            raise HTTPException(
+                status_code=404,
+                detail=delete_result["failed_files"],
+            )
+
+        # GCSでの削除が成功した場合のみ、DBからの削除を実行
+        if delete_result.get("success", False):
+            try:
+                # ファイルをDBから削除
+                for file_name in files:
+                    await files_cruds.delete_file_by_name_and_userid(db, file_name, uid)
+                await db.commit()
+
+            except Exception as e:
+                # DB削除でエラーが発生した場合
+                await db.rollback()
+                logging.error(f"DB削除エラー: {str(e)}", exc_info=True)
+                # レスポンスを更新して失敗を反映
+                response_data["success"] = False
+                if "failed_files" in response_data:
+                    if isinstance(response_data["failed_files"], list):
+                        response_data["failed_files"].append(f"DBエラー: {str(e)}")
+                    else:
+                        response_data["failed_files"] = [
+                            response_data["failed_files"],
+                            f"DBエラー: {str(e)}",
+                        ]
+                else:
+                    response_data["failed_files"] = [f"DBエラー: {str(e)}"]
+
+        return response_data
+
+    except HTTPException:
+        # 404エラーの再送出
+        raise
+
     except Exception as e:
-        await db.rollback()
+        # その他のエラー（GCS削除エラーなど）
+        logging.error(f"ファイル削除エラー: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"{file_name} ファイルの削除に失敗しました",
+            detail=f"ファイル削除中にエラーが発生しました: {str(e)}",
         ) from e
-
-    # ファイルをGoogle Cloud Storageから削除
-    response_data = {}
-    delete_result = await delete_files_from_gcs(files, uid)
-
-    response_data["success"] = delete_result.get("success", False)
-    response_data["success_files"] = delete_result.get("success_files", [])
-    response_data["failed_files"] = delete_result.get("failed_files", [])
-    return response_data
 
 
 # 署名付きURLの生成
 @router.post("/generate_upload_signed_url", response_model=dict)
-async def generate_upload_signed_url(
-    files: list[str], uid: str = Depends(get_uid)
-) -> dict:
+async def generate_upload_signed_url(files: list[str], uid: str = Depends(get_uid)) -> dict:
     """
     指定されたファイルリストに対してアップロード用の署名付きURLを生成します。
 

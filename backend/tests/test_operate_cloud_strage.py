@@ -71,9 +71,7 @@ async def test_upload_files_with_invalid_extension() -> None:
     invalid_files = []
     for file_name in invalid_file_names:
         dummy_content = b"dummy text content"  # ダミーのテキストコンテンツ
-        invalid_files.append(
-            UploadFile(file=io.BytesIO(dummy_content), filename=file_name)
-        )
+        invalid_files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_name))
 
     # post_files関数を直接呼び出す
     with pytest.raises(HTTPException) as exc_info:
@@ -150,9 +148,7 @@ async def test_upload_files_with_failure() -> None:
         # 結果の検証
         assert result["success"] == False
         assert len(result["success_files"]) == 0  # 成功したファイル数は0
-        assert (
-            "Upload failed" in result["failed_files"]
-        )  # 失敗したファイルのエラーメッセージを検証
+        assert "Upload failed" in result["failed_files"]  # 失敗したファイルのエラーメッセージを検証
 
 
 # NFD形式の日本語ファイル名のブロブ名がNFC形式に正規化されていることを確認するテスト
@@ -170,9 +166,7 @@ async def test_upload_files_nfc_normalization() -> None:
     uid = "test_user"
 
     # NFD形式（濁点が分離された形式）の日本語ファイル名
-    nfd_filename = (
-        "テスト" + "\u3099" + "ファイル.pdf"
-    )  # "テストゞファイル.pdf"のNFD形式
+    nfd_filename = "テスト" + "\u3099" + "ファイル.pdf"  # "テストゞファイル.pdf"のNFD形式
     nfc_filename = unicodedata.normalize("NFC", nfd_filename)
 
     # BytesIOでダミーファイルを作成
@@ -228,10 +222,11 @@ async def test_delete_files_from_gcs() -> None:
     # ユーザーID
     uid = "test_user"
 
+    # 通常の削除テスト
     # BytesIOでダミーファイルを作成してリクエストデータを作成
     files: list[UploadFile] = []
     for file_path in file_paths:
-        dummy_content = b"dummy pdf content"  # ダミーのPDFコンテンツ (必要に応じて変更)
+        dummy_content = b"dummy pdf content"  # ダミーのPDFコンテンツ
         files.append(UploadFile(file=io.BytesIO(dummy_content), filename=file_path))
 
     # ファイルをアップロード
@@ -243,21 +238,36 @@ async def test_delete_files_from_gcs() -> None:
         "AI-powered Code Review with LLM.pdf",
     ]
 
-    # ファイルの削除
+    # 正常系: ファイルの削除
     result = await delete_files_from_gcs(deletefiles, uid)
 
     # 結果の検証
     assert result["success"] == True
     assert len(result["success_files"]) == 2  # 削除に成功したファイル数を検証
 
-    # エラーハンドリングのテストケースを追加
+    # 異常系: Google API エラーのテスト
+    error_message = "Delete failed"
     with patch(
-        "google.cloud.storage.Blob.delete",
-        side_effect=GoogleAPIError("Delete failed"),
+        "google.cloud.storage.Bucket.blob",
+        return_value=MagicMock(
+            exists=MagicMock(return_value=True),
+            delete=MagicMock(side_effect=GoogleAPIError(error_message)),
+        ),
     ):
         result = await delete_files_from_gcs(deletefiles, uid)
         assert result["success"] == False
-        assert "Delete failed" in result["failed_files"]
+        expected_error = f"GCS API エラー - ファイル: test_user/5_アジャイルⅡ.pdf, エラーコード: unknown, 詳細: {error_message}"
+        assert expected_error in result["failed_files"]
+
+    # 異常系: ファイルが存在しない場合のテスト
+    with patch(
+        "google.cloud.storage.Bucket.blob",
+        return_value=MagicMock(exists=MagicMock(return_value=False)),
+    ):
+        result = await delete_files_from_gcs(deletefiles, uid)
+        assert result["success"] == False
+        expected_error = "ファイル test_user/5_アジャイルⅡ.pdf が存在しません"
+        assert expected_error in result["failed_files"]
 
 
 @pytest.mark.asyncio

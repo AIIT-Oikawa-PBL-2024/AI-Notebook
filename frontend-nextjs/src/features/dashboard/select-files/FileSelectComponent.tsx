@@ -1,5 +1,6 @@
 "use client";
 
+import FileTable from "@/features/dashboard/select-files/FileTableComponent";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {
@@ -8,7 +9,6 @@ import {
 	Card,
 	CardBody,
 	CardHeader,
-	Checkbox,
 	Input,
 	Spinner,
 	Typography,
@@ -30,11 +30,17 @@ interface FileData {
 }
 
 // 選択問題関連のキャッシュキーを定数として定義
-const MULTI_CHOICE_CACHE_KEYS = {
-	QUESTION: "cached_multi_choice_question",
-	GENERATION_STATUS: "multi_choice_generation_status",
-	ANSWERS: "cached_answers",
-	RESULTS: "cached_results_state",
+const CACHE_KEYS = {
+	MULTI_CHOICE: {
+		QUESTION: "cached_multi_choice_question",
+		GENERATION_STATUS: "multi_choice_generation_status",
+		ANSWERS: "cached_answers",
+		RESULTS: "cached_results_state",
+	},
+	STREAM_EXERCISE: {
+		EXERCISE: "cached_exercise",
+		GENERATION_STATUS: "exercise_generation_status",
+	},
 };
 
 export default function FileSelectComponent() {
@@ -165,16 +171,15 @@ export default function FileSelectComponent() {
 			}
 
 			try {
-				// キャッシュクリアの処理を問題タイプに応じて分岐
+				// キャッシュクリアの処理
 				if (type === "ai-exercise/multiple-choice") {
-					// 選択問題関連のキャッシュをすべてクリア
-					for (const key of Object.values(MULTI_CHOICE_CACHE_KEYS)) {
+					for (const key of Object.values(CACHE_KEYS.MULTI_CHOICE)) {
 						localStorage.removeItem(key);
 					}
 				} else if (type === "ai-exercise/stream") {
-					// ストリーミング形式の問題用のキャッシュをクリア
-					localStorage.removeItem("cached_stream_exercise");
-					localStorage.removeItem("stream_exercise_generation_status");
+					for (const key of Object.values(CACHE_KEYS.STREAM_EXERCISE)) {
+						localStorage.removeItem(key);
+					}
 				}
 
 				// 選択されたファイルとタイトルを保存
@@ -190,12 +195,11 @@ export default function FileSelectComponent() {
 	);
 
 	const resetAll = useCallback(() => {
-		setFiles([]);
+		setFiles((prevFiles) =>
+			prevFiles.map((file) => ({ ...file, select: false })),
+		);
 		setTitle("");
-		setError("");
-		setSuccess("");
-		clearError();
-	}, [clearError]);
+	}, []);
 
 	const handleSelectAll = useCallback((checked: boolean) => {
 		setFiles((prevFiles) =>
@@ -226,17 +230,11 @@ export default function FileSelectComponent() {
 	);
 
 	useEffect(() => {
-		const mounted = { current: true };
-
 		if (user) {
 			fetchFiles();
 		} else {
 			setFiles([]);
 		}
-
-		return () => {
-			mounted.current = false;
-		};
 	}, [user, fetchFiles]);
 
 	useEffect(() => {
@@ -310,75 +308,14 @@ export default function FileSelectComponent() {
 					)}
 
 					{!loading && files.length > 0 && (
-						<Card>
-							<table className="w-full min-w-max table-auto text-left">
-								<thead>
-									<tr>
-										<th className="border-b p-4">
-											<Checkbox
-												checked={areAllFilesSelected}
-												onChange={(e) => handleSelectAll(e.target.checked)}
-												disabled={loading}
-											/>
-										</th>
-										<th className="border-b p-4">
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												ファイル名
-											</Typography>
-										</th>
-										<th className="border-b p-4">
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												サイズ
-											</Typography>
-										</th>
-										<th className="border-b p-4">
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												作成日時
-											</Typography>
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									{files.map((file) => (
-										<tr key={file.file_name}>
-											<td className="p-4">
-												<Checkbox
-													checked={file.select}
-													onChange={(e) =>
-														handleSelect(file.file_name, e.target.checked)
-													}
-													disabled={loading}
-												/>
-											</td>
-											<td className="p-4">
-												<Typography variant="small">
-													{file.file_name}
-												</Typography>
-											</td>
-											<td className="p-4">
-												<Typography variant="small">
-													{file.file_size}
-												</Typography>
-											</td>
-											<td className="p-4">
-												<Typography variant="small">
-													{formatDate(file.created_at)}
-												</Typography>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</Card>
+						<FileTable
+							files={files}
+							loading={loading}
+							handleSelect={handleSelect}
+							handleSelectAll={handleSelectAll}
+							areAllFilesSelected={areAllFilesSelected}
+							formatDate={formatDate}
+						/>
 					)}
 
 					{!loading && files.length === 0 && (
