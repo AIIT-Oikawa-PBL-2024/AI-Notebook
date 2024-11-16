@@ -1,6 +1,6 @@
 "use client";
 
-import FileSelectComponent from "@/features/dashboard/select-files/SelectFiles";
+import FileSelectComponent from "@/features/dashboard/select-files/FileSelectComponent";
 import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 

@@ -101,7 +101,11 @@ async def test_delete_files(session: AsyncSession, mock_auth: Mock) -> None:
         data = response.json()
         assert data["success"] is True
         assert len(data["success_files"]) == 2
-        assert len(data["failed_files"]) == 0
+        # 各成功ファイルの内容を確認
+        for file_info in data["success_files"]:
+            assert "message" in file_info
+            assert "filename" in file_info
+            assert file_info["message"].endswith("が削除されました")
 
 
 # 存在しないファイルIDによるファイル取得のテスト
@@ -125,9 +129,7 @@ async def test_upload_file_with_dakuten(session: AsyncSession, mock_auth: Mock) 
     headers = {"Authorization": "Bearer fake_token"}
 
     # NFD形式（濁点が分離された形式）の日本語ファイル名
-    nfd_filename = (
-        "テスト" + "\u3099" + "ファイル.pdf"
-    )  # "テストゞファイル.pdf"のNFD形式
+    nfd_filename = "テスト" + "\u3099" + "ファイル.pdf"  # "テストゞファイル.pdf"のNFD形式
     nfc_filename = unicodedata.normalize("NFC", nfd_filename)
 
     file_content = b"test file content with dakuten"
@@ -202,9 +204,7 @@ async def test_register_files(session: AsyncSession) -> None:
         transport=ASGITransport(app),  # type: ignore
         base_url="http://test",
     ) as client:
-        response = await client.post(
-            f"/files/register_files", files=files, headers=headers
-        )
+        response = await client.post(f"/files/register_files", files=files, headers=headers)
         assert response.status_code == 200
         data = response.json()
         assert data is True

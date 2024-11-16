@@ -135,51 +135,64 @@ async def upload_files(ext_correct_files: list[UploadFile], uid: str) -> dict:
 async def delete_files_from_gcs(files: list[str], uid: str) -> dict:
     """
     Google Cloud Storageからファイルを削除します。
-
-    :param files: 削除するファイルのリスト
-    :type files: list[str]
-    :return: 削除の結果を示す辞書
-    :rtype: dict
     """
     success_files, failed_files = [], []
 
-    # 環境変数から認証情報を取得
     credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     bucket_name = os.getenv("BUCKET_NAME")
+
+    if not credentials or not bucket_name:
+        raise ValueError("必要な環境変数が設定されていません")
 
     client = storage.Client.from_service_account_json(credentials)
     bucket = storage.Bucket(client, bucket_name)
 
     for filename in files:
-        # ユーザーIDの検証
         if not uid or not uid.strip():
             raise ValueError("Invalid user ID")
 
-        # パスの正規化
         safe_uid = uid.strip().rstrip("/")
         normalized_blobname = unicodedata.normalize("NFC", f"{safe_uid}/{filename}")
         blob = bucket.blob(normalized_blobname)
 
         try:
+            # ファイルの存在確認を追加
+            if not blob.exists():
+                error_message = f"ファイル {normalized_blobname} が存在しません"
+                failed_files.append(error_message)
+                logging.warning(error_message)
+                continue
+
+            # メタデータを取得して詳細なログを残す
+            blob_metadata = blob.metadata if blob.metadata else {}
+            logging.info(
+                f"削除開始: {normalized_blobname}, メタデータ: {blob_metadata}"
+            )
+
             blob.delete()
             success_message = f"ファイル {normalized_blobname} が削除されました"
             success_files.append(
                 {"message": success_message, "filename": normalized_blobname}
             )
+            logging.info(success_message)
+
         except GoogleAPIError as e:
-            error_msg_part = (
-                f"ファイル {normalized_blobname} の削除中にエラーが発生しました: "
+            error_message = (
+                f"GCS API エラー - ファイル: {normalized_blobname}, "
+                f"エラーコード: {getattr(e, 'code', 'unknown')}, "
+                f"詳細: {str(e)}"
             )
-            error_message = error_msg_part + str(e)
             failed_files.append(error_message)
             logging.error(error_message)
+
         except Exception as e:
-            base_msg = "ファイルの削除中に予期しないエラーが発生しました: "
-            error_detail = str(e)
-            filename_msg = f"{normalized_blobname} "
-            error_message = filename_msg + base_msg + error_detail
+            error_message = (
+                f"予期しないエラー - ファイル: {normalized_blobname}, "
+                f"エラータイプ: {type(e).__name__}, "
+                f"詳細: {str(e)}"
+            )
             failed_files.append(error_message)
-            logging.error(error_message)
+            logging.error(error_message, exc_info=True)  # スタックトレースも記録
 
     if failed_files:
         error_details = "\n".join(failed_files)

@@ -71,9 +71,7 @@ async def get_file_by_id_and_user_id(
     return result.scalars().first()
 
 
-async def delete_file_by_name_and_userid(
-    db: AsyncSession, file_name: str, uid: str
-) -> None:
+async def delete_file_by_name_and_userid(db: AsyncSession, file_name: str, uid: str) -> None:
     """
     指定されたファイル名とユーザーIDに基づいてファイルを削除します。
 
@@ -86,23 +84,17 @@ async def delete_file_by_name_and_userid(
     :return: None
     :rtype: None
     """
-    try:
-        result: Result = await db.execute(
-            select(files_models.File)
-            .filter(files_models.File.file_name == file_name)
-            .filter(files_models.File.user_id == uid)
-        )
-        for file in result.scalars():
-            await db.delete(file)
-        await db.commit()
-    except Exception as e:
-        await db.rollback()
-        raise e
+    result: Result = await db.execute(
+        select(files_models.File)
+        .filter(files_models.File.file_name == file_name)
+        .filter(files_models.File.user_id == uid)
+    )
+    for file in result.scalars():
+        await db.delete(file)
+    await db.commit()
 
 
-async def get_file_id_by_name_and_userid(
-    db: AsyncSession, file_name: str, uid: str
-) -> int | None:
+async def get_file_id_by_name_and_userid(db: AsyncSession, file_name: str, uid: str) -> int | None:
     """
     ファイル名とユーザーIDからファイルIDを取得する関数
 
