@@ -4,6 +4,22 @@ app.models package
 Submodules
 ----------
 
+app.models.exercises module
+---------------------------
+
+.. automodule:: app.models.exercises
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+app.models.exercises\_files module
+----------------------------------
+
+.. automodule:: app.models.exercises_files
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.models.files module
 -----------------------
 

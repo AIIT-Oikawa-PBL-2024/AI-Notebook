@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.cruds.exercises &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=144c8c96"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/translations.js?v=91613774"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            AI-Notebook-backend
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">AI-Notebook-backend</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">app.cruds.exercises</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>app.cruds.exercises のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">select</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine</span> <span class="kn">import</span> <span class="n">Result</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">SQLAlchemyError</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.asyncio</span> <span class="kn">import</span> <span class="n">AsyncSession</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">selectinload</span>
+
+<span class="kn">import</span> <span class="nn">app.models.exercises</span> <span class="k">as</span> <span class="nn">exercises_models</span>
+<span class="kn">import</span> <span class="nn">app.models.files</span> <span class="k">as</span> <span class="nn">files_models</span>
+<span class="kn">import</span> <span class="nn">app.schemas.exercises</span> <span class="k">as</span> <span class="nn">exercises_schemas</span>
+
+
+<div class="viewcode-block" id="create_exercise">
+<a class="viewcode-back" href="../../../app.cruds.html#app.cruds.exercises.create_exercise">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">create_exercise</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">exercise_create</span><span class="p">:</span> <span class="n">exercises_schemas</span><span class="o">.</span><span class="n">ExerciseCreate</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    新しい練習問題を作成する関数。</span>
+<span class="sd">    ExerciseCreateスキーマには既にuser_idが含まれているため、追加のユーザーIDは不要です。</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :param exercise_create: 作成する練習問題の情報（user_idを含む）</span>
+<span class="sd">    :type exercise_create: exercises_schemas.ExerciseCreate</span>
+<span class="sd">    :return: 作成された練習問題の情報</span>
+<span class="sd">    :rtype: exercises_models.Exercise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ExerciseCreateからファイル名を取り出し、残りのデータでExerciseを作成</span>
+    <span class="n">exercise_data</span> <span class="o">=</span> <span class="n">exercise_create</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;file_names&quot;</span><span class="p">})</span>
+    <span class="n">exercise</span> <span class="o">=</span> <span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="p">(</span><span class="o">**</span><span class="n">exercise_data</span><span class="p">)</span>
+
+    <span class="c1"># 先にexerciseを保存してIDを取得</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">exercise</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="c1"># ファイル名からファイルを取得して関連付け</span>
+    <span class="k">if</span> <span class="n">exercise_create</span><span class="o">.</span><span class="n">file_names</span><span class="p">:</span>
+        <span class="n">files_result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">file_name</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">exercise_create</span><span class="o">.</span><span class="n">file_names</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">files_result</span><span class="o">.</span><span class="n">scalars</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">exercise</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">exercise</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exercise</span></div>
+
+
+
+<div class="viewcode-block" id="get_exercises_by_user">
+<a class="viewcode-back" href="../../../app.cruds.html#app.cruds.exercises.get_exercises_by_user">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_exercises_by_user</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">exercises_schemas</span><span class="o">.</span><span class="n">ExerciseRead</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーIDに基づいて練習問題を取得する関数。</span>
+<span class="sd">    関連するファイル情報も含めて取得し、作成日時の降順でソートします。</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :param user_id: ユーザーID（Firebase UID）</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :return: ユーザーに関連付けられた練習問題のリスト</span>
+<span class="sd">    :rtype: list[exercises_schemas.ExerciseRead]</span>
+<span class="sd">    :raises SQLAlchemyError: データベース操作中にエラーが発生した場合</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">selectinload</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">files</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">user_id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span>
+        <span class="p">)</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scalars</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">exercises_schemas</span><span class="o">.</span><span class="n">ExerciseRead</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">exercise</span><span class="p">)</span> <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">]</span>
+
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving exercises for user </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="get_exercise_by_id_and_user">
+<a class="viewcode-back" href="../../../app.cruds.html#app.cruds.exercises.get_exercise_by_id_and_user">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_exercise_by_id_and_user</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">exercise_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    練習問題IDとユーザーIDから特定の練習問題を取得する関数</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :param exercise_id: 取得する練習問題のID</span>
+<span class="sd">    :type exercise_id: int</span>
+<span class="sd">    :param user_id: ユーザーID（Firebase UID）</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :return: 練習問題の情報またはNone</span>
+<span class="sd">    :rtype: exercises_models.Exercise | None</span>
+<span class="sd">    :raises SQLAlchemyError: データベース操作中にエラーが発生した場合</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">selectinload</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">files</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">exercise_id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">user_id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">scalars</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving exercise </span><span class="si">{</span><span class="n">exercise_id</span><span class="si">}</span><span class="s2"> for user </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="delete_exercise_by_user">
+<a class="viewcode-back" href="../../../app.cruds.html#app.cruds.exercises.delete_exercise_by_user">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">delete_exercise_by_user</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">original_exercise</span><span class="p">:</span> <span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーIDと練習問題の情報から特定の練習問題を削除する関数</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :param original_exercise: 削除する練習問題の情報</span>
+<span class="sd">    :type original_exercise: exercises_models.Exercise</span>
+<span class="sd">    :param user_id: ユーザーID（Firebase UID）</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    :raises ValueError: 指定されたユーザーが練習問題の所有者でない場合</span>
+<span class="sd">    :raises SQLAlchemyError: データベース操作中にエラーが発生した場合</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># ユーザーIDの確認</span>
+        <span class="k">if</span> <span class="n">original_exercise</span><span class="o">.</span><span class="n">user_id</span> <span class="o">!=</span> <span class="n">user_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;User is not authorized to delete this exercise&quot;</span><span class="p">)</span>
+
+        <span class="c1"># cascade=Trueの設定により、中間テーブルのレコードも自動的に削除される</span>
+        <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">original_exercise</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error deleting exercise </span><span class="si">{</span><span class="n">original_exercise</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> for user </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="get_exercise_files_by_user">
+<a class="viewcode-back" href="../../../app.cruds.html#app.cruds.exercises.get_exercise_files_by_user">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_exercise_files_by_user</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">exercise_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ユーザーIDと練習問題IDから関連付けられたファイルを取得する関数</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :param exercise_id: 練習問題ID</span>
+<span class="sd">    :type exercise_id: int</span>
+<span class="sd">    :param user_id: ユーザーID（Firebase UID）</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :return: 関連付けられたファイルのリスト</span>
+<span class="sd">    :rtype: list[files_models.File]</span>
+<span class="sd">    :raises ValueError: 練習問題が見つからない場合、またはユーザーが権限を持っていない場合</span>
+<span class="sd">    :raises SQLAlchemyError: データベース操作中にエラーが発生した場合</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">select</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">selectinload</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">files</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">exercise_id</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercises_models</span><span class="o">.</span><span class="n">Exercise</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">user_id</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scalar_one_or_none</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">exercise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exercise with ID </span><span class="si">{</span><span class="n">exercise_id</span><span class="si">}</span><span class="s2"> not found for user </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">exercise</span><span class="o">.</span><span class="n">files</span>
+
+    <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving files for exercise </span><span class="si">{</span><span class="n">exercise_id</span><span class="si">}</span><span class="s2"> and user </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, OikawaPBL2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>app.models.files &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+  <title>app.models.exercises &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -59,7 +59,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
-      <li class="breadcrumb-item active">app.models.files</li>
+      <li class="breadcrumb-item active">app.models.exercises</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -68,51 +68,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>app.models.files のソースコード</h1><div class="highlight"><pre>
-<span></span><span class="c1"># app/models/file.py</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span>
+  <h1>app.models.exercises のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">TEXT</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">relationship</span>
 
 <span class="kn">from</span> <span class="nn">app.database</span> <span class="kn">import</span> <span class="n">Base</span>
 <span class="kn">from</span> <span class="nn">app.models.exercises_files</span> <span class="kn">import</span> <span class="n">exercise_file</span>
 
 
-<div class="viewcode-block" id="File">
-<a class="viewcode-back" href="../../../app.models.html#app.models.files.File">[ドキュメント]</a>
-<span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<div class="viewcode-block" id="Exercise">
+<a class="viewcode-back" href="../../../app.models.html#app.models.exercises.Exercise">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">Exercise</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ファイル情報を格納するためのSQLAlchemyモデルクラス。</span>
+<span class="sd">    出力データを表すクラス。</span>
 
-<span class="sd">    :param id: ファイルの一意の識別子</span>
+<span class="sd">    :param id: 出力のID</span>
 <span class="sd">    :type id: int</span>
-<span class="sd">    :param file_name: ファイルの名前</span>
-<span class="sd">    :type file_name: str</span>
-<span class="sd">    :param file_size: ファイルのサイズ（バイト単位）</span>
-<span class="sd">    :type file_size: int</span>
-<span class="sd">    :param user_id: ファイルを所有するユーザーのFirebase UID</span>
+<span class="sd">    :param user_id: ユーザーのID（Firebase UID）</span>
 <span class="sd">    :type user_id: str</span>
-<span class="sd">    :param created_at: ファイルの作成日時</span>
+<span class="sd">    :param response: 出力データ</span>
+<span class="sd">    :type response: str</span>
+<span class="sd">    :param created_at: 作成日時</span>
 <span class="sd">    :type created_at: datetime</span>
-<span class="sd">    :param exercises: このファイルに関連する練習問題のリスト</span>
-<span class="sd">    :type exercises: list[Exercise]</span>
+<span class="sd">    :param exercise_type: 練習問題の種類</span>
+<span class="sd">    :type exercise_type: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;files&quot;</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;exercises&quot;</span>
 
     <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">file_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">file_size</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">user_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
-        <span class="n">String</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>  <span class="c1"># Firebase UIDの最大長に合わせて調整</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">TEXT</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">created_at</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">exercise_type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># リレーションシップの定義</span>
-    <span class="n">exercises</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
-        <span class="s2">&quot;Exercise&quot;</span><span class="p">,</span>
-        <span class="n">secondary</span><span class="o">=</span><span class="n">exercise_file</span><span class="p">,</span>  <span class="c1"># 中間テーブルのオブジェクトを指定</span>
-        <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;files&quot;</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">exercise_file</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;exercises&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

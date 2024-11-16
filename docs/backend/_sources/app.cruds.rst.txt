@@ -4,6 +4,14 @@ app.cruds package
 Submodules
 ----------
 
+app.cruds.exercises module
+--------------------------
+
+.. automodule:: app.cruds.exercises
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.cruds.files module
 ----------------------
 

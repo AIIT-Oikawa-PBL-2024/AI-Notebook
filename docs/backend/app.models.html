@@ -47,9 +47,23 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">app.models package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-app.models.exercises">app.models.exercises module</a><ul>
+<li><a class="reference internal" href="#app.models.exercises.Exercise"><code class="docutils literal notranslate"><span class="pre">Exercise</span></code></a><ul>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.created_at"><code class="docutils literal notranslate"><span class="pre">Exercise.created_at</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.exercise_type"><code class="docutils literal notranslate"><span class="pre">Exercise.exercise_type</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.files"><code class="docutils literal notranslate"><span class="pre">Exercise.files</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.id"><code class="docutils literal notranslate"><span class="pre">Exercise.id</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.response"><code class="docutils literal notranslate"><span class="pre">Exercise.response</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.user_id"><code class="docutils literal notranslate"><span class="pre">Exercise.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.models.exercises_files">app.models.exercises_files module</a></li>
 <li><a class="reference internal" href="#module-app.models.files">app.models.files module</a><ul>
 <li><a class="reference internal" href="#app.models.files.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
 <li><a class="reference internal" href="#app.models.files.File.created_at"><code class="docutils literal notranslate"><span class="pre">File.created_at</span></code></a></li>
+<li><a class="reference internal" href="#app.models.files.File.exercises"><code class="docutils literal notranslate"><span class="pre">File.exercises</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.file_name"><code class="docutils literal notranslate"><span class="pre">File.file_name</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.file_size"><code class="docutils literal notranslate"><span class="pre">File.file_size</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
@@ -114,6 +128,60 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
+<section id="module-app.models.exercises">
+<span id="app-models-exercises-module"></span><h2>app.models.exercises module<a class="headerlink" href="#module-app.models.exercises" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.models.exercises.</span></span><span class="sig-name descname"><span class="pre">Exercise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models/exercises.html#Exercise"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.models.exercises.Exercise" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>出力データを表すクラス。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- 出力のID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーのID（Firebase UID）</p></li>
+<li><p><strong>response</strong> (<em>str</em>) -- 出力データ</p></li>
+<li><p><strong>created_at</strong> (<em>datetime</em>) -- 作成日時</p></li>
+<li><p><strong>exercise_type</strong> (<em>str</em>) -- 練習問題の種類</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#app.models.exercises.Exercise.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.exercise_type">
+<span class="sig-name descname"><span class="pre">exercise_type</span></span><a class="headerlink" href="#app.models.exercises.Exercise.exercise_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.files">
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#app.models.exercises.Exercise.files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.models.exercises.Exercise.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.response">
+<span class="sig-name descname"><span class="pre">response</span></span><a class="headerlink" href="#app.models.exercises.Exercise.response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#app.models.exercises.Exercise.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-app.models.exercises_files">
+<span id="app-models-exercises-files-module"></span><h2>app.models.exercises_files module<a class="headerlink" href="#module-app.models.exercises_files" title="Link to this heading"></a></h2>
+</section>
 <section id="module-app.models.files">
 <span id="app-models-files-module"></span><h2>app.models.files module<a class="headerlink" href="#module-app.models.files" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -129,12 +197,18 @@
 <li><p><strong>file_size</strong> (<em>int</em>) -- ファイルのサイズ（バイト単位）</p></li>
 <li><p><strong>user_id</strong> (<em>str</em>) -- ファイルを所有するユーザーのFirebase UID</p></li>
 <li><p><strong>created_at</strong> (<em>datetime</em>) -- ファイルの作成日時</p></li>
+<li><p><strong>exercises</strong> (<em>list</em><em>[</em><a class="reference internal" href="#app.models.exercises.Exercise" title="app.models.exercises.Exercise"><em>Exercise</em></a><em>]</em>) -- このファイルに関連する練習問題のリスト</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.models.files.File.created_at">
 <span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#app.models.files.File.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.files.File.exercises">
+<span class="sig-name descname"><span class="pre">exercises</span></span><a class="headerlink" href="#app.models.files.File.exercises" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

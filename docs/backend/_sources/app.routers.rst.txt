@@ -4,10 +4,10 @@ app.routers package
 Submodules
 ----------
 
-app.routers.exercises\_stream module
-------------------------------------
+app.routers.exercises module
+----------------------------
 
-.. automodule:: app.routers.exercises_stream
+.. automodule:: app.routers.exercises
    :members:
    :undoc-members:
    :show-inheritance:

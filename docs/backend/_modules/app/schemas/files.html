@@ -80,9 +80,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    基本的なファイル情報を表すモデル。</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        file_name (str): ファイルの名前。</span>
-<span class="sd">        file_size (int): ファイルのサイズ。</span>
+<span class="sd">    :param file_name: ファイルの名前</span>
+<span class="sd">    :type file_name: str</span>
+<span class="sd">    :param file_size: ファイルのサイズ（バイト単位）</span>
+<span class="sd">    :type file_size: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span>
@@ -94,11 +95,12 @@
 <a class="viewcode-back" href="../../../app.schemas.html#app.schemas.files.FileCreate">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">FileCreate</span><span class="p">(</span><span class="n">FileBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ファイル作成時の情報を表すモデル。</span>
+<span class="sd">    FileBaseクラスを継承したファイル作成を表すクラス。</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        user_id (str): ユーザーID。</span>
-<span class="sd">        created_at (datetime): 作成日時。</span>
+<span class="sd">    :param user_id: ユーザーID</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :param created_at: 作成日時</span>
+<span class="sd">    :type created_at: datetime</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -110,12 +112,16 @@
 <a class="viewcode-back" href="../../../app.schemas.html#app.schemas.files.File">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="n">FileBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    作成されたファイルの情報を表すモデル。</span>
+<span class="sd">    FileBaseクラスを継承したファイル情報の取得を表すクラス。</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        id (int): ファイルのID。</span>
-<span class="sd">        user_id (str): ユーザーID。</span>
-<span class="sd">        created_at (datetime): 作成日時。</span>
+<span class="sd">    :param id: ファイルのID</span>
+<span class="sd">    :type id: int</span>
+<span class="sd">    :param user_id: ユーザーID</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :param created_at: 作成日時</span>
+<span class="sd">    :type created_at: datetime</span>
+<span class="sd">    :param model_config: モデルの設定辞書</span>
+<span class="sd">    :type model_config: ConfigDict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>

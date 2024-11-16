@@ -78,10 +78,10 @@
 <a class="viewcode-back" href="../../../app.schemas.html#app.schemas.outputs.OutputBase">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">OutputBase</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    OutputBaseクラスは、出力のベースモデルです。</span>
+<span class="sd">    出力のベースモデル。</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        output (str): 出力の文字列です。</span>
+<span class="sd">    :param output: 出力の文字列</span>
+<span class="sd">    :type output: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">output</span><span class="p">:</span> <span class="nb">str</span></div>
@@ -92,7 +92,7 @@
 <a class="viewcode-back" href="../../../app.schemas.html#app.schemas.outputs.OutputCreate">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">OutputCreate</span><span class="p">(</span><span class="n">OutputBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    OutputCreateクラスは、OutputBaseクラスを継承した出力データの作成を表します。</span>
+<span class="sd">    OutputBaseクラスを継承した出力データの作成を表すクラス。</span>
 
 <span class="sd">    :param user_id: ユーザーID</span>
 <span class="sd">    :type user_id: str</span>
@@ -105,12 +105,11 @@
 
 
 
-<span class="c1"># 学習帳作成時のレスポンス</span>
 <div class="viewcode-block" id="Output">
 <a class="viewcode-back" href="../../../app.schemas.html#app.schemas.outputs.Output">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="n">OutputCreate</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Output クラスは OutputCreate クラスを継承しています。</span>
+<span class="sd">    OutputCreateクラスを継承した出力データの取得を表すクラス。</span>
 
 <span class="sd">    :param id: 出力のID</span>
 <span class="sd">    :type id: int</span>

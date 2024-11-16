@@ -47,10 +47,19 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">app.cruds package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-app.cruds.exercises">app.cruds.exercises module</a><ul>
+<li><a class="reference internal" href="#app.cruds.exercises.create_exercise"><code class="docutils literal notranslate"><span class="pre">create_exercise()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.exercises.delete_exercise_by_user"><code class="docutils literal notranslate"><span class="pre">delete_exercise_by_user()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.exercises.get_exercise_by_id_and_user"><code class="docutils literal notranslate"><span class="pre">get_exercise_by_id_and_user()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.exercises.get_exercise_files_by_user"><code class="docutils literal notranslate"><span class="pre">get_exercise_files_by_user()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.exercises.get_exercises_by_user"><code class="docutils literal notranslate"><span class="pre">get_exercises_by_user()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-app.cruds.files">app.cruds.files module</a><ul>
 <li><a class="reference internal" href="#app.cruds.files.create_file"><code class="docutils literal notranslate"><span class="pre">create_file()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.files.delete_file_by_name_and_userid"><code class="docutils literal notranslate"><span class="pre">delete_file_by_name_and_userid()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.files.get_file_by_id_and_user_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id_and_user_id()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.files.get_file_id_by_name_and_userid"><code class="docutils literal notranslate"><span class="pre">get_file_id_by_name_and_userid()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.files.get_files_by_user_id"><code class="docutils literal notranslate"><span class="pre">get_files_by_user_id()</span></code></a></li>
 </ul>
 </li>
@@ -103,6 +112,132 @@
 <h1>app.cruds package<a class="headerlink" href="#app-cruds-package" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-app.cruds.exercises">
+<span id="app-cruds-exercises-module"></span><h2>app.cruds.exercises module<a class="headerlink" href="#module-app.cruds.exercises" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.exercises.create_exercise">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.exercises.</span></span><span class="sig-name descname"><span class="pre">create_exercise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise_create</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.exercises.ExerciseCreate" title="app.schemas.exercises.ExerciseCreate"><span class="pre">ExerciseCreate</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise" title="app.models.exercises.Exercise"><span class="pre">Exercise</span></a></span></span><a class="reference internal" href="_modules/app/cruds/exercises.html#create_exercise"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.exercises.create_exercise" title="Link to this definition"></a></dt>
+<dd><p>新しい練習問題を作成する関数。
+ExerciseCreateスキーマには既にuser_idが含まれているため、追加のユーザーIDは不要です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>exercise_create</strong> (<em>exercises_schemas.ExerciseCreate</em>) -- 作成する練習問題の情報（user_idを含む）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>作成された練習問題の情報</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>exercises_models.Exercise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.exercises.delete_exercise_by_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.exercises.</span></span><span class="sig-name descname"><span class="pre">delete_exercise_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_exercise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise" title="app.models.exercises.Exercise"><span class="pre">Exercise</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/exercises.html#delete_exercise_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.exercises.delete_exercise_by_user" title="Link to this definition"></a></dt>
+<dd><p>ユーザーIDと練習問題の情報から特定の練習問題を削除する関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>original_exercise</strong> (<em>exercises_models.Exercise</em>) -- 削除する練習問題の情報</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> -- 指定されたユーザーが練習問題の所有者でない場合</p></li>
+<li><p><strong>SQLAlchemyError</strong> -- データベース操作中にエラーが発生した場合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.exercises.get_exercise_by_id_and_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.exercises.</span></span><span class="sig-name descname"><span class="pre">get_exercise_by_id_and_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise" title="app.models.exercises.Exercise"><span class="pre">Exercise</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/exercises.html#get_exercise_by_id_and_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.exercises.get_exercise_by_id_and_user" title="Link to this definition"></a></dt>
+<dd><p>練習問題IDとユーザーIDから特定の練習問題を取得する関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>exercise_id</strong> (<em>int</em>) -- 取得する練習問題のID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>練習問題の情報またはNone</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>exercises_models.Exercise | None</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SQLAlchemyError</strong> -- データベース操作中にエラーが発生した場合</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.exercises.get_exercise_files_by_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.exercises.</span></span><span class="sig-name descname"><span class="pre">get_exercise_files_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/exercises.html#get_exercise_files_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.exercises.get_exercise_files_by_user" title="Link to this definition"></a></dt>
+<dd><p>ユーザーIDと練習問題IDから関連付けられたファイルを取得する関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>exercise_id</strong> (<em>int</em>) -- 練習問題ID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>関連付けられたファイルのリスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[files_models.File]</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> -- 練習問題が見つからない場合、またはユーザーが権限を持っていない場合</p></li>
+<li><p><strong>SQLAlchemyError</strong> -- データベース操作中にエラーが発生した場合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.exercises.get_exercises_by_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.exercises.</span></span><span class="sig-name descname"><span class="pre">get_exercises_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.exercises.ExerciseRead" title="app.schemas.exercises.ExerciseRead"><span class="pre">ExerciseRead</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/exercises.html#get_exercises_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.exercises.get_exercises_by_user" title="Link to this definition"></a></dt>
+<dd><p>ユーザーIDに基づいて練習問題を取得する関数。
+関連するファイル情報も含めて取得し、作成日時の降順でソートします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>ユーザーに関連付けられた練習問題のリスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[exercises_schemas.ExerciseRead]</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SQLAlchemyError</strong> -- データベース操作中にエラーが発生した場合</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-app.cruds.files">
 <span id="app-cruds-files-module"></span><h2>app.cruds.files module<a class="headerlink" href="#module-app.cruds.files" title="Link to this heading"></a></h2>
@@ -165,6 +300,27 @@
 </dd>
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>files_models.File | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.files.get_file_id_by_name_and_userid">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">get_file_id_by_name_and_userid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#get_file_id_by_name_and_userid"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.get_file_id_by_name_and_userid" title="Link to this definition"></a></dt>
+<dd><p>ファイル名とユーザーIDからファイルIDを取得する関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>file_name</strong> (<em>str</em>) -- 取得するファイルの名前</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ファイルを所有するユーザーのID</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>ファイルID、存在しない場合はNone</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | None</p>
 </dd>
 </dl>
 </dd></dl>

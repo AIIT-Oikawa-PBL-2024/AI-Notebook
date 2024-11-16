@@ -20,6 +20,14 @@ app.utils.gemini\_request\_stream module
    :undoc-members:
    :show-inheritance:
 
+app.utils.multiple\_choice\_question module
+-------------------------------------------
+
+.. automodule:: app.utils.multiple_choice_question
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.utils.operate\_cloud\_storage module
 ----------------------------------------
 

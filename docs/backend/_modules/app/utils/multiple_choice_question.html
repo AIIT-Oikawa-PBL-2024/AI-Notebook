@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>app.utils.claude_request_stream &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+  <title>app.utils.multiple_choice_question &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -59,7 +59,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
-      <li class="breadcrumb-item active">app.utils.claude_request_stream</li>
+      <li class="breadcrumb-item active">app.utils.multiple_choice_question</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -68,13 +68,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>app.utils.claude_request_stream のソースコード</h1><div class="highlight"><pre>
+  <h1>app.utils.multiple_choice_question のソースコード</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span>
 
 <span class="kn">import</span> <span class="nn">fitz</span>
 <span class="kn">from</span> <span class="nn">anthropic</span> <span class="kn">import</span> <span class="n">AnthropicVertex</span>
@@ -98,10 +97,120 @@
 <span class="c1"># ロギングの設定</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
+<span class="c1"># ツールの設定</span>
+<span class="n">tool_name</span> <span class="o">=</span> <span class="s2">&quot;print_multiple_choice_questions&quot;</span>
+
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">- あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
+<span class="s2">- 複数のファイルは、ソフトウェア工学の解説スライドです。</span>
+<span class="s2">- 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。</span>
+<span class="s2">- &quot;4択の選択問題&quot;と&quot;正解&quot;と&quot;解説&quot;のセットを10問作成してください。</span>
+<span class="s2">- 以下のexapmleは参考例です。10問の中には、この例と同じ問題を含めないでください。</span>
+<span class="s2">- 以下のruleに従って作成してください。</span>
+
+<span class="s2">&lt;example&gt;</span>
+<span class="s2">question_1: ソフトウェア工学という言葉が初めて使われたのは、どの会議でしょうか？</span>
+<span class="s2">choice_1a: IEEE会議</span>
+<span class="s2">choice_1b: ACM会議</span>
+<span class="s2">choice_1c: NATO会議</span>
+<span class="s2">choice_1d: IFIP会議</span>
+<span class="s2">answer_1: choice_1c</span>
+<span class="s2">explanation_1: ソフトウェア工学という言葉は、1968年のNATO会議で初めて使用された。</span>
+<span class="s2">&lt;/example&gt;</span>
+
+<span class="s2">&lt;rule&gt;</span>
+<span class="s2">- &quot;4択の選択問題&quot;と&quot;正解&quot;と&quot;解説&quot;のセットを10問作成してください。</span>
+<span class="s2">- 重要なキーワードを覚えられる良問を作成してください。</span>
+<span class="s2">- 簡単な問題、難しい問題をバランスよく混ぜた問題集にしてください。</span>
+<span class="s2">&lt;/rule&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">tool_definition</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;print_multiple_choice_questions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+    <span class="s2">&quot;input_schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;question_id&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;問題番号 (例: question_1)&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;question_text&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;問題文&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;choice_a&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;選択肢A&quot;</span><span class="p">,</span>
+                                <span class="p">},</span>
+                                <span class="s2">&quot;choice_b&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;選択肢B&quot;</span><span class="p">,</span>
+                                <span class="p">},</span>
+                                <span class="s2">&quot;choice_c&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;選択肢C&quot;</span><span class="p">,</span>
+                                <span class="p">},</span>
+                                <span class="s2">&quot;choice_d&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;選択肢D&quot;</span><span class="p">,</span>
+                                <span class="p">},</span>
+                            <span class="p">},</span>
+                            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;choice_a&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;choice_b&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;choice_c&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;choice_d&quot;</span><span class="p">,</span>
+                            <span class="p">],</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;正解の選択肢ID (例: choice_1c)&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;choice_a&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;choice_b&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;choice_c&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;choice_d&quot;</span><span class="p">,</span>
+                            <span class="p">],</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;解説文&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;question_id&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;question_text&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;choices&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;answer&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;explanation&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;minItems&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                <span class="s2">&quot;maxItems&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2"> ツールのみを利用すること。</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
 
 <span class="c1"># Google Cloud Storageでファイルが存在するかチェック</span>
 <div class="viewcode-block" id="check_file_exists">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.check_file_exists">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.multiple_choice_question.check_file_exists">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">check_file_exists</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Google Cloud Storageで指定されたバケット内のファイルが存在するかどうかを確認</span>
@@ -119,7 +228,7 @@
 
 <span class="c1"># GCSのファイル読み込み</span>
 <div class="viewcode-block" id="read_file">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.read_file">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.multiple_choice_question.read_file">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Google Cloud Storageからファイルを読み込み、base64エンコードされた文字列として返す</span>
@@ -141,7 +250,7 @@
 
 <span class="c1"># pdfからテキスト抽出</span>
 <div class="viewcode-block" id="extract_text_from_pdf">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.extract_text_from_pdf">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.multiple_choice_question.extract_text_from_pdf">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">extract_text_from_pdf</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    指定されたPDFファイルからテキストを抽出して返す</span>
@@ -168,28 +277,16 @@
 
 
 <span class="c1"># 複数のpdf, imageファイルを入力してコンテンツを生成</span>
-<div class="viewcode-block" id="generate_content_stream">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.generate_content_stream">[ドキュメント]</a>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_content_stream</span><span class="p">(</span>
+<div class="viewcode-block" id="generate_content_json">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.multiple_choice_question.generate_content_json">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_content_json</span><span class="p">(</span>
     <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL_NAME</span><span class="p">,</span>
     <span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BUCKET_NAME</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_stream started&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_json started&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
 
     <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
-<span class="s2">        - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。</span>
-<span class="s2">        - #instruction: 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。</span>
-<span class="s2">        - #style1: &quot;4択の選択問題&quot;を5問 + &quot;穴埋め問題&quot;を5問、合計10問出題してください。</span>
-<span class="s2">        - #style2: 200文字程度の&quot;記述式問題&quot;を3問出題して下さい。</span>
-<span class="s2">        - #style3: 最後に一括して&quot;正解&quot;と&quot;解説&quot;を箇条書き形式で表示してください。</span>
-<span class="s2">        - #style4: 記述式問題の正解は省略せず、&quot;解答例&quot;を表示してください。</span>
-<span class="s2">        - #condition1: 重要なキーワードを覚えられるような問題にしてください。</span>
-<span class="s2">        - #condition2: &quot;表形式&quot;は禁止します。&quot;箇条書き&quot;を使用してください。</span>
-<span class="s2">        - #format: タイトルを付けて、4000文字程度のMarkdownで出力してください。</span>
-<span class="s2">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">AnthropicVertex</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">REGION</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">PROJECT_ID</span><span class="p">)</span>
@@ -235,8 +332,7 @@
         <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">})</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added prompt to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting stream with model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-        <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">max_tokens</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
             <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
@@ -246,11 +342,12 @@
                 <span class="p">}</span>
             <span class="p">],</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
-        <span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">stream</span><span class="o">.</span><span class="n">text_stream</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">text</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">tool_definition</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="n">tool_choice</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">tool_name</span><span class="p">},</span>
+        <span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_stream finished&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_json finished&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 
     <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model attribute error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -277,18 +374,16 @@
 
 <span class="c1"># テスト用のコード</span>
 <div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.main">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.multiple_choice_question.main">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    メイン関数。generate_content_stream関数をテストするためのコード</span>
+<span class="sd">    メイン関数。generate_content_json関数をテストするためのコード</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">AsyncGenerator</span> <span class="o">=</span> <span class="n">generate_content_stream</span><span class="p">(</span>
+    <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="k">await</span> <span class="n">generate_content_json</span><span class="p">(</span>
         <span class="c1"># [&quot;kougi_sample.png&quot;, &quot;kougi_sample2.png&quot;],</span>
         <span class="p">[</span><span class="s2">&quot;1_ソフトウェア工学の誕生.pdf&quot;</span><span class="p">]</span>
     <span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
 
 
 

@@ -181,6 +181,33 @@
         <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
         <span class="k">raise</span> <span class="n">e</span></div>
 
+
+
+<div class="viewcode-block" id="get_file_id_by_name_and_userid">
+<a class="viewcode-back" href="../../../app.cruds.html#app.cruds.files.get_file_id_by_name_and_userid">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_file_id_by_name_and_userid</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">AsyncSession</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイル名とユーザーIDからファイルIDを取得する関数</span>
+
+<span class="sd">    :param db: データベースセッション</span>
+<span class="sd">    :type db: AsyncSession</span>
+<span class="sd">    :param file_name: 取得するファイルの名前</span>
+<span class="sd">    :type file_name: str</span>
+<span class="sd">    :param uid: ファイルを所有するユーザーのID</span>
+<span class="sd">    :type uid: str</span>
+<span class="sd">    :return: ファイルID、存在しない場合はNone</span>
+<span class="sd">    :rtype: int | None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">select</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">file_name</span> <span class="o">==</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files_models</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">scalar_one_or_none</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">file</span></div>
+
 </pre></div>
 
            </div>
