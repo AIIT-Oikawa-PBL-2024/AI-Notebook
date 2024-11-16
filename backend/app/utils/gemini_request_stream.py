@@ -57,13 +57,19 @@ def convert_mp4_to_mp3(bucket_name: str, file_name: str) -> bool:
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(file_name)
     temp_dir = tempfile.gettempdir()
-    mp4_file_path = os.path.join(temp_dir, file_name)
+    normalized_file_name = os.path.normpath(file_name)
+    if not normalized_file_name.startswith(temp_dir):
+        raise ValueError("Invalid file name")
+    mp4_file_path = os.path.join(temp_dir, normalized_file_name)
     os.makedirs(os.path.dirname(mp4_file_path), exist_ok=True)
     blob.download_to_filename(mp4_file_path)
 
     # MP4ファイルをMP3に変換
     mp3_file_name = file_name.replace(".mp4", ".mp3")
-    mp3_file_path = os.path.join(temp_dir, mp3_file_name)
+    normalized_mp3_file_name = os.path.normpath(mp3_file_name)
+    if not normalized_mp3_file_name.startswith(temp_dir):
+        raise ValueError("Invalid file name")
+    mp3_file_path = os.path.join(temp_dir, normalized_mp3_file_name)
     os.makedirs(os.path.dirname(mp3_file_path), exist_ok=True)
     mp3_file_path = f"/tmp/{file_name.replace('.mp4', '.mp3')}"
     (
