@@ -155,6 +155,13 @@ async def generate_content_stream(
                         # 音声ファイルのパートを作成
                         mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
                         mp3_files.append(mp3_file)
+                    else:
+                        logging.error(
+                            f"Failed to convert {file_name} to mp3 format."
+                        )
+                        raise InternalServerError(
+                            f"Failed to convert {file_name} to mp3 format."
+                        )
                 elif file_name.endswith("mp3"):
                     # 音声ファイルのURL
                     mp3_file_url = f"gs://{bucket_name}/{file_name}"
