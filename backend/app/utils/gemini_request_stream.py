@@ -57,12 +57,16 @@ def convert_mp4_to_mp3(bucket_name: str, file_name: str) -> bool:
     blob = bucket.blob(file_name)
 
     mp4_base_name = os.path.basename(file_name)
-    mp4_file_path = f"/tmp/{mp4_base_name}"
+    mp4_file_path = os.path.normpath(f"/tmp/{mp4_base_name}")
+    if not mp4_file_path.startswith("/tmp/"):
+        raise ValueError("Invalid file path")
     blob.download_to_filename(mp4_file_path)
 
     # MP4ファイルをMP3に変換
     mp3_base_name = mp4_base_name.replace(".mp4", ".mp3")
-    mp3_file_path = f"/tmp/{mp3_base_name}"
+    mp3_file_path = os.path.normpath(f"/tmp/{mp3_base_name}")
+    if not mp3_file_path.startswith("/tmp/"):
+        raise ValueError("Invalid file path")
     (
         ffmpeg.input(mp4_file_path)
         .output(mp3_file_path, format="mp3", acodec="libmp3lame")
