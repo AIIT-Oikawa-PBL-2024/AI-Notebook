@@ -1,6 +1,9 @@
+# app/models/file.py
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.database import Base
+from app.models.exercises_files import exercise_file
 
 
 class File(Base):
@@ -17,6 +20,8 @@ class File(Base):
     :type user_id: str
     :param created_at: ファイルの作成日時
     :type created_at: datetime
+    :param exercises: このファイルに関連する練習問題のリスト
+    :type exercises: list[Exercise]
     """
 
     __tablename__ = "files"
@@ -28,3 +33,10 @@ class File(Base):
         String(128), nullable=False, index=True
     )  # Firebase UIDの最大長に合わせて調整
     created_at = Column(DateTime, nullable=False)
+
+    # リレーションシップの定義
+    exercises = relationship(
+        "Exercise",
+        secondary=exercise_file,  # 中間テーブルのオブジェクトを指定
+        back_populates="files",
+    )

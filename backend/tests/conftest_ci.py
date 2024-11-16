@@ -3,12 +3,14 @@ from typing import AsyncGenerator, Generator
 import pytest
 from dotenv import load_dotenv
 from sqlalchemy import delete, select
+from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from httpx import ASGITransport, AsyncClient
 from app.database import Base, get_db
 from app.main import app
 from app.models.files import File
 from app.models.outputs import Output
+from app.models.exercises import Exercise
 from unittest.mock import Mock, patch
 from fastapi import Request
 from fastapi.security import HTTPAuthorizationCredentials
@@ -48,23 +50,70 @@ app.dependency_overrides[get_db] = override_get_db
 
 
 # データベースのセットアップとクリーンアップを行うフィクスチャ
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function", autouse=True)
 async def setup_and_teardown_database() -> AsyncGenerator[AsyncSession, None]:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    print("\n=== Starting Database Setup ===")  # デバッグ用
 
+    try:
+        # まず既存のテーブルを削除
+        async with engine.begin() as conn:
+            print("Dropping existing tables...")  # デバッグ用
+            await conn.run_sync(Base.metadata.drop_all)
+            print("Existing tables dropped successfully")  # デバッグ用
+    except Exception as e:
+        print(f"Error dropping tables: {e}")  # デバッグ用
+        pass
+
+    try:
+        # テーブルを作成
+        async with engine.begin() as conn:
+            print("Creating database tables...")  # デバッグ用
+            await conn.run_sync(Base.metadata.create_all)
+            print("Database tables created successfully")  # デバッグ用
+
+            # テーブル一覧を確認
+            result = await conn.execute(text("SHOW TABLES"))
+            tables = result.fetchall()
+            print("Created tables:", tables)  # デバッグ用
+
+            # exercisesテーブルの構造を確認
+            result = await conn.execute(text("DESCRIBE exercises"))
+            structure = result.fetchall()
+            print("Exercises table structure:", structure)  # デバッグ用
+    except Exception as e:
+        print(f"Error creating tables: {e}")
+        raise
+
+    print("Creating test session...")  # デバッグ用
     async with TestingSessionLocal() as session:
-        await session.execute(delete(File))
-        await session.commit()
+        # 全てのクリーンアップを1つのトランザクションで実行
+        try:
+            print("Cleaning up existing data...")  # デバッグ用
+            await session.execute(delete(Exercise))
+            await session.execute(delete(Output))
+            await session.execute(delete(File))
+            await session.commit()
+            print("Data cleanup successful")  # デバッグ用
+        except Exception as e:
+            await session.rollback()
+            print(f"Error during cleanup: {e}")
+            raise
 
-        await session.execute(delete(Output))
-        await session.commit()
-
+        print("Setup complete - yielding session")  # デバッグ用
         yield session
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    print("Test finished - starting cleanup")  # デバッグ用
+    try:
+        async with engine.begin() as conn:
+            print("Dropping tables in cleanup...")  # デバッグ用
+            await conn.run_sync(Base.metadata.drop_all)
+            print("Cleanup complete")  # デバッグ用
+    except Exception as e:
+        print(f"Error during final cleanup: {e}")  # デバッグ用
+        pass
+
     await engine.dispose()
+    print("=== Database Setup and Cleanup Finished ===")  # デバッグ用
 
 
 # テスト用ユーザーIDを提供するフィクスチャ
@@ -95,9 +144,7 @@ def generate_test_token(uid: str = "test_user") -> str:
 
 
 # 認証をモックする関数
-def mock_authenticate_request(
-    request: Request, credentials: HTTPAuthorizationCredentials
-) -> None:
+def mock_authenticate_request(request: Request, credentials: HTTPAuthorizationCredentials) -> None:
     request.state.uid = "test_user"
     return None
 
@@ -120,9 +167,7 @@ dummy_firebase_credentials = {
 # 環境変数をモック
 @pytest.fixture(autouse=True)
 def mock_env_vars() -> Generator:
-    with patch.dict(
-        os.environ, {"FIREBASE_CREDENTIALS": str(dummy_firebase_credentials)}
-    ):
+    with patch.dict(os.environ, {"FIREBASE_CREDENTIALS": str(dummy_firebase_credentials)}):
         yield
 
 

@@ -5,10 +5,10 @@ from pydantic import BaseModel, ConfigDict
 
 class OutputBase(BaseModel):
     """
-    OutputBaseクラスは、出力のベースモデルです。
+    出力のベースモデル。
 
-    Attributes:
-        output (str): 出力の文字列です。
+    :param output: 出力の文字列
+    :type output: str
     """
 
     output: str
@@ -16,7 +16,7 @@ class OutputBase(BaseModel):
 
 class OutputCreate(OutputBase):
     """
-    OutputCreateクラスは、OutputBaseクラスを継承した出力データの作成を表します。
+    OutputBaseクラスを継承した出力データの作成を表すクラス。
 
     :param user_id: ユーザーID
     :type user_id: str
@@ -28,10 +28,9 @@ class OutputCreate(OutputBase):
     created_at: datetime
 
 
-# 学習帳作成時のレスポンス
 class Output(OutputCreate):
     """
-    Output クラスは OutputCreate クラスを継承しています。
+    OutputCreateクラスを継承した出力データの取得を表すクラス。
 
     :param id: 出力のID
     :type id: int

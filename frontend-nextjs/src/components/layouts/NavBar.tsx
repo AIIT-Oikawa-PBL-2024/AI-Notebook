@@ -4,8 +4,10 @@ import { useSignOut } from "@/hooks/useSignOut";
 import { useAuth } from "@/providers/AuthProvider";
 import {
 	ComputerDesktopIcon,
+	DocumentCheckIcon,
 	FolderIcon,
 	HomeIcon,
+	ListBulletIcon,
 	PencilIcon,
 	PencilSquareIcon,
 } from "@heroicons/react/24/solid";
@@ -78,12 +80,28 @@ export default function NavBar() {
 						AI出力
 					</ListItem>
 				</Link>
-				<Link href="/ai-exercise">
+				<Link href="/ai-exercise/select-exercises">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI練習問題リスト
+					</ListItem>
+				</Link>
+				<Link href="/ai-exercise/stream">
 					<ListItem>
 						<ListItemPrefix>
 							<PencilSquareIcon className="h-5 w-5" />
 						</ListItemPrefix>
 						AI練習問題
+					</ListItem>
+				</Link>
+				<Link href="/ai-exercise/multiple-choice">
+					<ListItem>
+						<ListItemPrefix>
+							<DocumentCheckIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						選択問題テスト
 					</ListItem>
 				</Link>
 				<Link href="/notebook">

@@ -43,7 +43,7 @@ mypy = "^1.10.0"
 exclude = [
     ".ruff_cache"
 ]
-line-length = 88
+line-length = 100
 indent-width = 4
 target-version = "py311"
 
