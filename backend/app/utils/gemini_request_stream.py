@@ -146,7 +146,7 @@ async def generate_content_stream(
                     # imageファイルのパートを作成
                     image_file = Part.from_uri(image_file_uri, mime_type="image/png")
                     image_files.append(image_file)
-                elif file_name.endswith("mp4"):
+                elif file_name.endswith(".mp4"):
                     # ファイルを音声ファイルに変換する
                     if convert_mp4_to_mp3(bucket_name, file_name):
                         # 音声ファイルに変換したファイルのURL
@@ -156,19 +156,17 @@ async def generate_content_stream(
                         mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
                         mp3_files.append(mp3_file)
                     else:
-                        logging.error(
-                            f"Failed to convert {file_name} to mp3 format."
-                        )
+                        logging.error(f"Failed to convert {file_name} to mp3 format.")
                         raise InternalServerError(
                             f"Failed to convert {file_name} to mp3 format."
                         )
-                elif file_name.endswith("mp3"):
+                elif file_name.endswith(".mp3"):
                     # 音声ファイルのURL
                     mp3_file_url = f"gs://{bucket_name}/{file_name}"
                     # 音声ファイルのパートを作成
                     mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
                     mp3_files.append(mp3_file)
-                elif file_name.endswith("wav"):
+                elif file_name.endswith(".wav"):
                     # 音声ファイルのURL
                     wav_file_url = f"gs://{bucket_name}/{file_name}"
                     # 音声ファイルのパートを作成
