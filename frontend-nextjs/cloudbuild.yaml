@@ -8,9 +8,22 @@ steps:
         "gcr.io/$PROJECT_ID/nextjs-app",
         "--build-arg",
         "NEXT_PUBLIC_FIREBASE_API_KEY=$$NEXT_PUBLIC_FIREBASE_API_KEY",
+        "NEXT_PUBLIC_FIREBASE_APP_ID=$$NEXT_PUBLIC_FIREBASE_APP_ID",
+        "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+        "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+        "NEXT_PUBLIC_FIREBASE_PROJECT_ID=$$NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+        "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
         "./frontend-nextjs",
       ]
-    secretEnv: ["NEXT_PUBLIC_FIREBASE_API_KEY"]
+    secretEnv:
+      [
+        "NEXT_PUBLIC_FIREBASE_API_KEY",
+        "NEXT_PUBLIC_FIREBASE_APP_ID",
+        "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+        "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+        "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+        "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
+      ]
 
   # ビルドしたイメージを Container Registry にプッシュ
   - name: "gcr.io/cloud-builders/docker"
@@ -22,7 +35,7 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "ai-notebook-frontend-nextjs"
+      - "nextjs-service"
       - "--image"
       - "gcr.io/$PROJECT_ID/nextjs-app"
       - "--region"
@@ -31,8 +44,26 @@ steps:
       - "managed"
       - "--set-env-vars"
       - "NEXT_PUBLIC_FIREBASE_API_KEY=$$NEXT_PUBLIC_FIREBASE_API_KEY"
+      - "--set-env-vars"
+      - "NEXT_PUBLIC_FIREBASE_APP_ID=$$NEXT_PUBLIC_FIREBASE_APP_ID"
+      - "--set-env-vars"
+      - "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
+      - "--set-env-vars"
+      - "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
+      - "--set-env-vars"
+      - "NEXT_PUBLIC_FIREBASE_PROJECT_ID=$$NEXT_PUBLIC_FIREBASE_PROJECT_ID"
+      - "--set-env-vars"
+      - "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
       - "--allow-unauthenticated" # 公開アクセスを許可する場合
-    secretEnv: ["NEXT_PUBLIC_FIREBASE_API_KEY"]
+    secretEnv:
+      [
+        "NEXT_PUBLIC_FIREBASE_API_KEY",
+        "NEXT_PUBLIC_FIREBASE_APP_ID",
+        "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+        "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+        "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+        "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
+      ]
 
 # ビルドログを保存するバケットを指定
 options:
@@ -46,3 +77,13 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/NEXT_PUBLIC_FIREBASE_API_KEY/versions/latest
       env: "NEXT_PUBLIC_FIREBASE_API_KEY"
+    - versionName: projects/$PROJECT_ID/secrets/NEXT_PUBLIC_FIREBASE_APP_ID/versions/latest
+      env: "NEXT_PUBLIC_FIREBASE_APP_ID"
+    - versionName: projects/$PROJECT_ID/secrets/NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN/versions/latest
+      env: "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
+    - versionName: projects/$PROJECT_ID/secrets/NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID/versions/latest
+      env: "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
+    - versionName: projects/$PROJECT_ID/secrets/NEXT_PUBLIC_FIREBASE_PROJECT_ID/versions/latest
+      env: "NEXT_PUBLIC_FIREBASE_PROJECT_ID"
+    - versionName: projects/$PROJECT_ID/secrets/NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET/versions/latest
+      env: "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
