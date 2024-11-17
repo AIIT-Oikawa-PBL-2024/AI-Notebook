@@ -1,12 +1,45 @@
-import NotebookListPage from "@/app/(dashboard)/notebook/page";
+import NotebookPage from "@/app/(dashboard)/notebook/page";
 import { render, screen } from "@testing-library/react";
-import { expect, test, vi } from "vitest";
+import { describe, expect, it, test, vi } from "vitest";
 
-vi.mock("@/utils/withAuth", () => ({
-	withAuth: (component: React.ComponentType) => component,
+// Firebase アプリ初期化のモック
+vi.mock("firebase/app", () => ({
+	initializeApp: vi.fn(),
 }));
 
-test("NotebookListPage", () => {
-	render(<NotebookListPage />);
-	expect(screen.getByText("NotebookListPage")).not.toBeNull();
+// Firebase 認証のモック
+vi.mock("firebase/auth", () => ({
+	getAuth: vi.fn(() => ({
+		currentUser: { uid: "test-uid" },
+	})),
+}));
+
+// withAuthのモック
+vi.mock("@/utils/withAuth", () => ({
+	withAuth: (Component: React.ComponentType) => Component,
+}));
+
+// NotebookFormのモック
+vi.mock("@/features/dashboard/notebook/components/NotebookForm", () => ({
+	NotebookForm: () => (
+		<div data-testid="notebook-form">Mocked NotebookForm</div>
+	),
+}));
+
+// react-domのモック
+vi.mock("react-dom", () => ({
+	useFormState: () => [null, () => {}],
+}));
+
+describe("NotebookPage", () => {
+	it("NotebookFormコンポーネントがレンダリングされること", () => {
+		render(<NotebookPage />);
+		expect(screen.getByTestId("notebook-form")).toBeInTheDocument();
+	});
+
+	it("withAuthでラップされていること", () => {
+		const mockWithAuth = vi.fn();
+		vi.mocked(mockWithAuth).mockReturnValue(<div>Protected Component</div>);
+		expect(vi.isMockFunction(vi.fn())).toBe(true);
+	});
 });

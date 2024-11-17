@@ -5,5 +5,12 @@
 		"editor.defaultFormatter": "biomejs.biome" // フォーマッターの指定
 	},
 	"reactSnippets.settings.importReactOnTop": false,
-	"css.customData": [".vscode/css_custom_data.json"]
+	"css.customData": [".vscode/css_custom_data.json"],
+	// Intellisense to TipTap objects
+	"tailwindCSS.experimental.classRegex": [
+	  "class:\\s*?[\"'`]([^\"'`]*).*?,"
+	],
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
 }
