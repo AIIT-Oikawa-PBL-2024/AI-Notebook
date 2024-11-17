@@ -99,7 +99,7 @@ async def generate_content_stream(
     # プロンプト（指示文）
     prompt = """
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
-        - #input_files: 複数のファイルは、大学・大学院の講義資料です。
+        - #input_files: 複数のファイルは、大学院の講義資料です。
         - #instruction: 複数のpdf, image、audioファイルを読み解いて、
             親しみやすい解説がついて、誰もが読みたくなるような、
             わかりやすい整理ノートを日本語で作成して下さい。
