@@ -112,7 +112,7 @@ jobs:
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
   
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         version: 'latest'
   
@@ -175,7 +175,7 @@ jobs:
 
     # Node.jsとpnpmのセットアップ
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
