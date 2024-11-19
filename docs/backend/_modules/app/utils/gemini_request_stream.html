@@ -76,6 +76,7 @@
 <span class="kn">import</span> <span class="nn">unicodedata</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span>
 
+<span class="kn">import</span> <span class="nn">ffmpeg</span>
 <span class="kn">import</span> <span class="nn">vertexai</span>
 <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span> <span class="nn">google.api_core.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
@@ -122,6 +123,44 @@
 
 
 
+<span class="c1"># MP4のファイルをMP3に変換してGCSに保存</span>
+<div class="viewcode-block" id="convert_mp4_to_mp3">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_request_stream.convert_mp4_to_mp3">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="c1"># GCSからファイルを取得</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+    <span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">)</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">blob</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+    <span class="n">mp4_base_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">mp4_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/tmp/</span><span class="si">{</span><span class="n">mp4_base_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mp4_file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/tmp/&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid file path&quot;</span><span class="p">)</span>
+    <span class="n">blob</span><span class="o">.</span><span class="n">download_to_filename</span><span class="p">(</span><span class="n">mp4_file_path</span><span class="p">)</span>
+
+    <span class="c1"># MP4ファイルをMP3に変換</span>
+    <span class="n">mp3_base_name</span> <span class="o">=</span> <span class="n">mp4_base_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">,</span> <span class="s2">&quot;.mp3&quot;</span><span class="p">)</span>
+    <span class="n">mp3_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/tmp/</span><span class="si">{</span><span class="n">mp3_base_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mp3_file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/tmp/&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid file path&quot;</span><span class="p">)</span>
+    <span class="p">(</span>
+        <span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">mp4_file_path</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">mp3_file_path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mp3&quot;</span><span class="p">,</span> <span class="n">acodec</span><span class="o">=</span><span class="s2">&quot;libmp3lame&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># MP3ファイルをGCSにアップロード</span>
+    <span class="n">upload_file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;mp3/</span><span class="si">{</span><span class="n">file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.mp3&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">mp3_blob</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">blob</span><span class="p">(</span><span class="n">upload_file_name</span><span class="p">)</span>
+    <span class="n">mp3_blob</span><span class="o">.</span><span class="n">upload_from_filename</span><span class="p">(</span><span class="n">mp3_file_path</span><span class="p">)</span>
+
+    <span class="c1"># 一時ファイルを削除</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">mp4_file_path</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">mp3_file_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mp3_blob</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+
 <span class="c1"># 複数のPDF, imageファイルを入力してコンテンツを生成</span>
 <div class="viewcode-block" id="generate_content_stream">
 <a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_request_stream.generate_content_stream">[ドキュメント]</a>
@@ -134,12 +173,15 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">GenerationResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
     <span class="n">pdf_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mp3_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">wav_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># プロンプト（指示文）</span>
     <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
-<span class="s2">        - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。</span>
-<span class="s2">        - #instruction: 複数のpdf, imageファイルを読み解いて、親しみやすい解説がついて、</span>
-<span class="s2">            誰もが読みたくなるような、わかりやすい整理ノートを日本語で作成して下さい。</span>
+<span class="s2">        - #input_files: 複数のファイルは、大学院の講義資料です。</span>
+<span class="s2">        - #instruction: 複数のpdf, image、audioファイルを読み解いて、</span>
+<span class="s2">            親しみやすい解説がついて、誰もが読みたくなるような、</span>
+<span class="s2">            わかりやすい整理ノートを日本語で作成して下さい。</span>
 <span class="s2">            imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。</span>
 <span class="s2">        - #style: ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、</span>
 <span class="s2">            強調表示などのスタイルを追加してください。</span>
@@ -183,14 +225,40 @@
                     <span class="c1"># imageファイルのパートを作成</span>
                     <span class="n">image_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">image_file_uri</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;image/png&quot;</span><span class="p">)</span>
                     <span class="n">image_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">):</span>
+                    <span class="c1"># ファイルを音声ファイルに変換する</span>
+                    <span class="k">if</span> <span class="n">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+                        <span class="c1"># 音声ファイルに変換したファイルのURL</span>
+                        <span class="n">mp3_file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">,</span> <span class="s2">&quot;.mp3&quot;</span><span class="p">)</span>
+                        <span class="n">mp3_file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/mp3/</span><span class="si">{</span><span class="n">mp3_file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="c1"># 音声ファイルのパートを作成</span>
+                        <span class="n">mp3_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">mp3_file_url</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;audio/mp3&quot;</span><span class="p">)</span>
+                        <span class="n">mp3_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mp3_file</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">InternalServerError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp3&quot;</span><span class="p">):</span>
+                    <span class="c1"># 音声ファイルのURL</span>
+                    <span class="n">mp3_file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="c1"># 音声ファイルのパートを作成</span>
+                    <span class="n">mp3_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">mp3_file_url</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;audio/mp3&quot;</span><span class="p">)</span>
+                    <span class="n">mp3_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mp3_file</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.wav&quot;</span><span class="p">):</span>
+                    <span class="c1"># 音声ファイルのURL</span>
+                    <span class="n">wav_file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="c1"># 音声ファイルのパートを作成</span>
+                    <span class="n">wav_file</span> <span class="o">=</span> <span class="n">Part</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="n">wav_file_url</span><span class="p">,</span> <span class="n">mime_type</span><span class="o">=</span><span class="s2">&quot;audio/wav&quot;</span><span class="p">)</span>
+                    <span class="n">wav_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wav_file</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Invalid file format: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">. &quot;</span>
-                        <span class="o">+</span> <span class="s2">&quot;Only PDF and image files are supported.&quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot;Only PDF and image and audio files are supported.&quot;</span>
                     <span class="p">)</span>
                     <span class="k">raise</span> <span class="n">InvalidArgument</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Invalid file format: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">. &quot;</span>
-                        <span class="o">+</span> <span class="s2">&quot;Only PDF and image files are supported.&quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot;Only PDF and image and audio files are supported.&quot;</span>
                     <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
@@ -216,7 +284,7 @@
         <span class="n">model</span> <span class="o">=</span> <span class="n">GenerativeModel</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
 
         <span class="c1"># コンテンツリストを作成</span>
-        <span class="n">contents</span> <span class="o">=</span> <span class="n">pdf_files</span> <span class="o">+</span> <span class="n">image_files</span> <span class="o">+</span> <span class="p">[</span><span class="n">prompt</span><span class="p">]</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="n">pdf_files</span> <span class="o">+</span> <span class="n">image_files</span> <span class="o">+</span> <span class="n">mp3_files</span> <span class="o">+</span> <span class="n">wav_files</span> <span class="o">+</span> <span class="p">[</span><span class="n">prompt</span><span class="p">]</span>
 
         <span class="c1"># 同期関数を非同期にラップする</span>
         <span class="n">sync_response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span>
