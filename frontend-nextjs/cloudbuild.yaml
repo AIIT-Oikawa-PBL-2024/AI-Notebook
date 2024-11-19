@@ -1,6 +1,7 @@
 steps:
   # Docker イメージをビルド
   - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args:
       [
         "build",
@@ -32,10 +33,12 @@ steps:
 
   # ビルドしたイメージを Container Registry にプッシュ
   - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args: ["push", "gcr.io/$PROJECT_ID/nextjs-app"]
 
   # Cloud Run にデプロイ
   - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
     id: "deploy-cloud-run"
     args:
       - "run"
