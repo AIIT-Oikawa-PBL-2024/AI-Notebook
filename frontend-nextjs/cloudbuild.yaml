@@ -40,7 +40,7 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "ai-notebooke"
+      - "ai-notebook"
       - "--image"
       - "gcr.io/$PROJECT_ID/nextjs-app"
       - "--region"
