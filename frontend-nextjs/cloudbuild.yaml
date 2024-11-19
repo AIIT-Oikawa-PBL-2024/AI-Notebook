@@ -39,7 +39,6 @@ steps:
 
   # Cloud Run にデプロイ
   - name: "gcr.io/cloud-builders/gcloud"
-    entrypoint: "bash"
     id: "deploy-cloud-run"
     args:
       - "-c"
