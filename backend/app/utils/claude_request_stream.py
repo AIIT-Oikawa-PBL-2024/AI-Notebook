@@ -98,7 +98,7 @@ async def generate_content_stream(
     image_files: list[dict] = []
     prompt = """
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
-        - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。
+        - #input_files: 複数のファイルは、大学院の講義資料です。
         - #instruction: 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。
         - #style1: "4択の選択問題"を5問 + "穴埋め問題"を5問、合計10問出題してください。
         - #style2: 200文字程度の"記述式問題"を3問出題して下さい。

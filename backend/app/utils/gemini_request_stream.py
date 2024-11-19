@@ -5,6 +5,7 @@ import os
 import unicodedata
 from typing import AsyncGenerator
 
+import ffmpeg
 import vertexai
 from dotenv import load_dotenv
 from google.api_core.exceptions import (
@@ -48,6 +49,41 @@ def check_file_exists(bucket_name: str, file_name: str) -> bool:
     return blob.exists()
 
 
+# MP4のファイルをMP3に変換してGCSに保存
+def convert_mp4_to_mp3(bucket_name: str, file_name: str) -> bool:
+    # GCSからファイルを取得
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(file_name)
+
+    mp4_base_name = os.path.basename(file_name)
+    mp4_file_path = os.path.normpath(f"/tmp/{mp4_base_name}")
+    if not mp4_file_path.startswith("/tmp/"):
+        raise ValueError("Invalid file path")
+    blob.download_to_filename(mp4_file_path)
+
+    # MP4ファイルをMP3に変換
+    mp3_base_name = mp4_base_name.replace(".mp4", ".mp3")
+    mp3_file_path = os.path.normpath(f"/tmp/{mp3_base_name}")
+    if not mp3_file_path.startswith("/tmp/"):
+        raise ValueError("Invalid file path")
+    (
+        ffmpeg.input(mp4_file_path)
+        .output(mp3_file_path, format="mp3", acodec="libmp3lame")
+        .run()
+    )
+
+    # MP3ファイルをGCSにアップロード
+    upload_file_name = f'mp3/{file_name.replace(".mp4", ".mp3")}'
+    mp3_blob = bucket.blob(upload_file_name)
+    mp3_blob.upload_from_filename(mp3_file_path)
+
+    # 一時ファイルを削除
+    os.remove(mp4_file_path)
+    os.remove(mp3_file_path)
+    return mp3_blob.exists()
+
+
 # 複数のPDF, imageファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
@@ -58,12 +94,15 @@ async def generate_content_stream(
 ) -> AsyncGenerator[GenerationResponse, None]:
     pdf_files: list[Part] = []
     image_files: list[Part] = []
+    mp3_files: list[Part] = []
+    wav_files: list[Part] = []
     # プロンプト（指示文）
     prompt = """
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
-        - #input_files: 複数のファイルは、ソフトウェア工学の解説スライドです。
-        - #instruction: 複数のpdf, imageファイルを読み解いて、親しみやすい解説がついて、
-            誰もが読みたくなるような、わかりやすい整理ノートを日本語で作成して下さい。
+        - #input_files: 複数のファイルは、大学院の講義資料です。
+        - #instruction: 複数のpdf, image、audioファイルを読み解いて、
+            親しみやすい解説がついて、誰もが読みたくなるような、
+            わかりやすい整理ノートを日本語で作成して下さい。
             imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。
         - #style: ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、
             強調表示などのスタイルを追加してください。
@@ -107,14 +146,40 @@ async def generate_content_stream(
                     # imageファイルのパートを作成
                     image_file = Part.from_uri(image_file_uri, mime_type="image/png")
                     image_files.append(image_file)
+                elif file_name.endswith(".mp4"):
+                    # ファイルを音声ファイルに変換する
+                    if convert_mp4_to_mp3(bucket_name, file_name):
+                        # 音声ファイルに変換したファイルのURL
+                        mp3_file_name = file_name.replace(".mp4", ".mp3")
+                        mp3_file_url = f"gs://{bucket_name}/mp3/{mp3_file_name}"
+                        # 音声ファイルのパートを作成
+                        mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
+                        mp3_files.append(mp3_file)
+                    else:
+                        logging.error(f"Failed to convert {file_name} to mp3 format.")
+                        raise InternalServerError(
+                            f"Failed to convert {file_name} to mp3 format."
+                        )
+                elif file_name.endswith(".mp3"):
+                    # 音声ファイルのURL
+                    mp3_file_url = f"gs://{bucket_name}/{file_name}"
+                    # 音声ファイルのパートを作成
+                    mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
+                    mp3_files.append(mp3_file)
+                elif file_name.endswith(".wav"):
+                    # 音声ファイルのURL
+                    wav_file_url = f"gs://{bucket_name}/{file_name}"
+                    # 音声ファイルのパートを作成
+                    wav_file = Part.from_uri(wav_file_url, mime_type="audio/wav")
+                    wav_files.append(wav_file)
                 else:
                     logging.error(
                         f"Invalid file format: {file_name}. "
-                        + "Only PDF and image files are supported."
+                        + "Only PDF and image and audio files are supported."
                     )
                     raise InvalidArgument(
                         f"Invalid file format: {file_name}. "
-                        + "Only PDF and image files are supported."
+                        + "Only PDF and image and audio files are supported."
                     )
             else:
                 logging.error(
@@ -140,7 +205,7 @@ async def generate_content_stream(
         model = GenerativeModel(model_name=model_name)
 
         # コンテンツリストを作成
-        contents = pdf_files + image_files + [prompt]
+        contents = pdf_files + image_files + mp3_files + wav_files + [prompt]
 
         # 同期関数を非同期にラップする
         sync_response = await asyncio.to_thread(
