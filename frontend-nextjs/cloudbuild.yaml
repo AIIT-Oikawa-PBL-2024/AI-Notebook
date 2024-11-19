@@ -4,22 +4,8 @@ steps:
     entrypoint: "bash"
     args:
       [
-        "build",
-        "-t",
-        "gcr.io/$PROJECT_ID/nextjs-app",
-        "--build-arg",
-        "NEXT_PUBLIC_FIREBASE_API_KEY=$$NEXT_PUBLIC_FIREBASE_API_KEY",
-        "--build-arg",
-        "NEXT_PUBLIC_FIREBASE_APP_ID=$$NEXT_PUBLIC_FIREBASE_APP_ID",
-        "--build-arg",
-        "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
-        "--build-arg",
-        "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
-        "--build-arg",
-        "NEXT_PUBLIC_FIREBASE_PROJECT_ID=$$NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-        "--build-arg",
-        "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
-        "./frontend-nextjs",
+        "-c",
+        "docker build -t gcr.io/$PROJECT_ID/nextjs-app --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=$$NEXT_PUBLIC_FIREBASE_API_KEY --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=$$NEXT_PUBLIC_FIREBASE_APP_ID --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=$$NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$$NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=$$NEXT_PUBLIC_FIREBASE_PROJECT_ID --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=$$NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ./frontend-nextjs",
       ]
     secretEnv:
       [
@@ -34,7 +20,7 @@ steps:
   # ビルドしたイメージを Container Registry にプッシュ
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
-    args: ["push", "gcr.io/$PROJECT_ID/nextjs-app"]
+    args: ["-c", "docker push gcr.io/$PROJECT_ID/nextjs-app"]
 
   # Cloud Run にデプロイ
   - name: "gcr.io/cloud-builders/gcloud"
