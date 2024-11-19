@@ -4,6 +4,7 @@ steps:
     entrypoint: "bash"
     args:
       [
+        "-c",
         "build",
         "-t",
         "gcr.io/$PROJECT_ID/nextjs-app",
@@ -41,6 +42,7 @@ steps:
     entrypoint: "bash"
     id: "deploy-cloud-run"
     args:
+      - "-c"
       - "run"
       - "deploy"
       - "ai-notebook"
