@@ -3,6 +3,7 @@ import base64
 import io
 import logging
 import os
+import unicodedata
 from typing import AsyncGenerator
 
 import fitz
@@ -13,6 +14,9 @@ from google.api_core.exceptions import (
     InternalServerError,
 )
 from google.cloud import storage
+
+from app.utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
+from app.utils.gemini_extract_text_from_audio import extract_text_from_audio
 
 # 環境変数を読み込む
 load_dotenv()
@@ -90,6 +94,7 @@ async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
 # 複数のpdf, imageファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
+    uid: str,
     model_name: str = MODEL_NAME,
     bucket_name: str = BUCKET_NAME,
 ) -> AsyncGenerator[str, None]:
@@ -113,12 +118,19 @@ async def generate_content_stream(
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
         extracted_text = ""  # 初期化
         for file_name in files:
-            print(f"Processing file: {file_name}")  # デバッグ用
+            # ブロブ名を正規化
+            if file_name:
+                # ユーザーIDの検証
+                if not uid or not uid.strip():
+                    raise ValueError("Invalid user ID")
+
+                # パスの正規化
+                safe_uid = uid.strip().rstrip("/")
+                file_name = unicodedata.normalize("NFC", f"{safe_uid}/{file_name}")
+                print(f"Processing file: {file_name}")  # デバッグ用
             if await check_file_exists(bucket_name, file_name):
                 print(f"File {file_name} exists in bucket {bucket_name}")  # デバッグ用
-                if file_name.lower().endswith(
-                    (".png", ".jpg", ".jpeg", ".gif", "webp")
-                ):
+                if file_name.lower().endswith((".png", ".jpg", ".jpeg", ".gif", "webp")):
                     print(f"Reading image file: {file_name}")  # デバッグ用
                     image_file = await read_file(bucket_name, file_name)
                     file_extension = file_name.split(".")[-1].lower()
@@ -137,6 +149,19 @@ async def generate_content_stream(
                     print(f"Extracting text from PDF: {file_name}")  # デバッグ用
                     extracted_text = await extract_text_from_pdf(bucket_name, file_name)
                     print(f"Extracted text length: {len(extracted_text)}")  # デバッグ用
+                if file_name.lower().endswith(".mp4"):
+                    # ファイルを音声ファイルに変換する
+                    logging.info(f"Converting {file_name} to mp3 format.")
+                    if convert_mp4_to_mp3(bucket_name, file_name):
+                        print(f"Successfully converted {file_name} to mp3 format.")
+                        extracted_text = extract_text_from_audio(bucket_name, file_name)
+                        print(f"テキストに変換：{extracted_text}")
+                    else:
+                        logging.error(f"Failed to convert {file_name} to mp3 format.")
+                        raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
+                if file_name.lower().endswith(".mp3") or file_name.lower().endswith(".wav"):
+                    extracted_text = extract_text_from_audio(bucket_name, file_name)
+                    print(f"テキストに変換：{extracted_text}")
 
         print(f"Total image files processed: {len(image_files)}")  # デバッグ用
 
@@ -199,7 +224,8 @@ async def main() -> None:
     """
     response: AsyncGenerator = generate_content_stream(
         # ["kougi_sample.png", "kougi_sample2.png"],
-        ["1_ソフトウェア工学の誕生.pdf"]
+        ["1_ソフトウェア工学の誕生.pdf"],
+        "test_uid",
     )
 
     async for content in response:
