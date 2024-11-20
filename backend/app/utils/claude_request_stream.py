@@ -176,7 +176,7 @@ async def generate_content_stream(
             print("Added extracted text to content")  # デバッグ用
 
         content.append({"type": "text", "text": prompt})
-        print("Added prompt to content")  # デバッグ用
+        print(f"contents: {content}")
 
         print(f"Starting stream with model: {model_name}")  # デバッグ用
         with client.messages.stream(

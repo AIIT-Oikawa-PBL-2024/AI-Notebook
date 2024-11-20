@@ -166,6 +166,7 @@ async def generate_content_stream(
 
         # コンテンツリストを作成
         contents = pdf_files + image_files + mp3_files + wav_files + [prompt]
+        print(f"contents: {contents}")
 
         # 同期関数を非同期にラップする
         sync_response = await asyncio.to_thread(
