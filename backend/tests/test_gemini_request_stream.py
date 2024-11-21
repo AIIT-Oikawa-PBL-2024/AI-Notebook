@@ -60,16 +60,8 @@ async def test_generate_content_stream_success(
         :rtype: Generator
         """
         responses = [
-            {
-                "candidates": [
-                    {"content": {"parts": [{"text": "Sample content part 1"}]}}
-                ]
-            },
-            {
-                "candidates": [
-                    {"content": {"parts": [{"text": "Sample content part 2"}]}}
-                ]
-            },
+            {"candidates": [{"content": {"parts": [{"text": "Sample content part 1"}]}}]},
+            {"candidates": [{"content": {"parts": [{"text": "Sample content part 2"}]}}]},
         ]
         for response in responses:
             yield response
@@ -120,9 +112,7 @@ async def test_generate_content_stream_not_found(
         result = generate_content_stream(["non_existent_file.pdf"], "test_user")
         async for _ in result:
             pass
-    expected_error_message = (
-        "File test_user/non_existent_file.pdf does not exist in the bucket"
-    )
+    expected_error_message = "File test_user/non_existent_file.pdf does not exist in the bucket"
     assert expected_error_message in str(excinfo.value)
 
 
@@ -207,9 +197,7 @@ async def test_generate_content_stream_unexpected_error(
     """
     # フィクスチャを適用
     mock_env_vars
-    mock_GenerativeModel.return_value.generate_content.side_effect = Exception(
-        "Unexpected error"
-    )
+    mock_GenerativeModel.return_value.generate_content.side_effect = Exception("Unexpected error")
 
     # テスト対象関数の実行とエラーハンドリングの確認
     with pytest.raises(Exception) as excinfo:
