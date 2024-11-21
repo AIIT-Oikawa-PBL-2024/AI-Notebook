@@ -81,7 +81,7 @@ jobs:
         DB_USER: "root"
 
     - name: Install Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
@@ -93,7 +93,7 @@ jobs:
         poetry config virtualenvs.create true --local
         poetry config virtualenvs.in-project true --local
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       name: Define a cache for the virtual environment based on the dependencies lock file
       with:
         path: ./backend/.venv
@@ -112,7 +112,7 @@ jobs:
         poetry run mypy --exclude 'app/db' ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
   
     - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
       with:
         version: 'latest'
   
@@ -145,77 +145,6 @@ jobs:
           title: Backend Coverage Report
           pytest-coverage-path: backend/pytest-coverage.txt
           junitxml-path: backend/pytest.xml
-
-  ci-frontend:
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    permissions:
-      pull-requests: write
-      contents: write
-      id-token: write
-    defaults:
-      run:
-        working-directory: ./frontend
-
-    env:
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}      
-      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-      REGION: ${{ secrets.REGION }}
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
-    - name: Install poetry
-      uses: abatilo/actions-poetry@v2
-
-    - name: Setup a local virtual environment (if no poetry.toml file)
-      run: |
-        poetry config virtualenvs.create true --local
-        poetry config virtualenvs.in-project true --local
-
-    - uses: actions/cache@v3
-      name: Define a cache for the virtual environment based on the dependencies lock file
-      with:
-        path: ./frontend/.venv
-        key: venv-${{ hashFiles('poetry.lock') }}
-
-    - name: Install the project dependencies
-      run: |
-        poetry install --no-root
-          
-    - name: Lint with Ruff
-      run: |
-        poetry run ruff check ./app --output-format=github         
-      
-    - name: Lint with Mypy
-      run: |
-        poetry run mypy ./app --config-file pyproject.toml --ignore-missing-imports --no-namespace-packages
-      
-    - name: Test with pytest
-      run: |
-        set -euo pipefail        
-        poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
-      continue-on-error: false
-      env:
-        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
-
-    - name: Pytest coverage comment
-      uses: MishaKav/pytest-coverage-comment@main     
-      with:
-          coverage-path-prefix: frontend/
-          title: Frontend Coverage Report
-          pytest-coverage-path: frontend/pytest-coverage.txt
-          junitxml-path: frontend/pytest.xml   
  
   ci-frontend-nextjs:
     runs-on: ubuntu-latest
@@ -246,7 +175,7 @@ jobs:
 
     # Node.jsとpnpmのセットアップ
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
