@@ -14,19 +14,28 @@ interface ExerciseDisplayProps {
 	loading: boolean;
 	error: string;
 	exercise: string;
+	title: string;
 }
 
 export function ExerciseDisplay({
 	loading,
 	error,
 	exercise,
+	title,
 }: ExerciseDisplayProps) {
 	return (
 		<Card className="w-full">
 			<CardHeader className="mb-4 grid h-28 place-items-center border-b border-gray-200">
-				<Typography variant="h3" className="text-gray-900">
-					AI 練習問題
-				</Typography>
+				<div className="flex flex-col items-center gap-2">
+					<Typography variant="h3" className="text-gray-900">
+						AI 練習問題
+					</Typography>
+					{title && (
+						<Typography variant="h5" className="text-gray-700">
+							{title}
+						</Typography>
+					)}
+				</div>
 			</CardHeader>
 			<CardBody className="flex flex-col gap-4">
 				{error ? (

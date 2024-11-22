@@ -40,7 +40,7 @@ db_dependency = Depends(get_db)
 
 @router.post("/request_stream")
 async def request_content(
-    files: list[str],
+    request: exercises_schemas.ExerciseRequest,
     uid: str = Depends(get_uid),
     db: AsyncSession = db_dependency,
 ) -> StreamingResponse:
@@ -54,6 +54,8 @@ async def request_content(
 
     :param files: コンテンツ生成のために必要なファイル名のリスト
     :type files: list[str]
+    :param title: コンテンツのタイトル
+    :type title: str
     :param uid: 現在のユーザーのID（Firebase UID）
     :type uid: str
     :param db: 非同期データベースセッション
@@ -62,13 +64,13 @@ async def request_content(
     :rtype: StreamingResponse
     :raises HTTPException: コンテンツ生成中に予期せぬエラーが発生した場合
     """
-    logging.info(f"Requesting content generation for files: {files} by user: {uid}")
+    logging.info(f"Requesting content generation for files: {request.files} by user: {uid}")
 
     # ユーザーIDとファイル名から関連するファイルIDを取得
     file_ids = []
     missing_files = []
 
-    for file_name in files:
+    for file_name in request.files:
         try:
             logging.info(f"Attempting to retrieve file ID for file_name: {file_name}")
             file_id = await get_file_id_by_name_and_userid(db, file_name, uid)
@@ -97,7 +99,7 @@ async def request_content(
     # コンテンツ生成ストリームの開始
     try:
         logging.info("Starting content generation stream...")
-        response = generate_content_stream(files)
+        response = generate_content_stream(request.files)
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
@@ -157,6 +159,7 @@ async def request_content(
             try:
                 logging.info("Saving final content to database.")
                 exercise = exercises_models.Exercise(
+                    title=request.title,
                     response=final_content,
                     user_id=uid,
                     created_at=datetime.now(JST),
@@ -187,7 +190,7 @@ async def request_content(
 
 @router.post("/multiple_choice")
 async def request_choice_question_json(
-    files: list[str],
+    request: exercises_schemas.ExerciseRequest,
     uid: str = Depends(get_uid),
     db: AsyncSession = db_dependency,
 ) -> dict:
@@ -196,6 +199,8 @@ async def request_choice_question_json(
 
     :param files: 選択問題生成のためのファイル名リスト
     :type files: list[str]
+    :param title: 選択問題のタイトル
+    :type title: str
     :param uid: 現在のユーザーのID（Firebase UID）
     :type uid: str
     :param db: 非同期データベースセッション
@@ -204,13 +209,13 @@ async def request_choice_question_json(
     :rtype: dict
     :raises HTTPException: 生成中にエラーが発生した場合
     """
-    logging.info(f"Requesting content generation for files: {files}")
+    logging.info(f"Requesting content generation for files: {request.files}")
 
     # ユーザーIDとファイル名から関連するファイルIDを取得
     file_ids = []
     missing_files = []
 
-    for file_name in files:
+    for file_name in request.files:
         try:
             logging.info(f"Attempting to retrieve file ID for file_name: {file_name}")
             file_id = await get_file_id_by_name_and_userid(db, file_name, uid)
@@ -237,7 +242,7 @@ async def request_choice_question_json(
         )
 
     try:
-        response = await generate_content_json(files)
+        response = await generate_content_json(request.files)
         logging.info(f"Generated response: {response}")
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
@@ -270,6 +275,7 @@ async def request_choice_question_json(
             logging.info("Saving final content to database.")
             # Exerciseインスタンスを作成し、exerciseファイルの関連付けは直接行う
             exercise = exercises_models.Exercise(
+                title=request.title,
                 response=json.dumps(response),
                 user_id=uid,
                 created_at=datetime.now(JST),

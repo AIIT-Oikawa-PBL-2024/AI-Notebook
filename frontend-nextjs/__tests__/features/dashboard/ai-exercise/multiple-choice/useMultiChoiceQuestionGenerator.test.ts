@@ -1,6 +1,15 @@
 import { useMultiChoiceQuestionGenerator } from "@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator";
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
 
 // モックの型定義
 const mockAuthFetch = vi.fn();
@@ -35,6 +44,16 @@ const mockExerciseResponse = {
 		},
 	],
 };
+
+// 警告を抑制
+const originalConsoleError = console.error;
+beforeAll(() => {
+	console.error = vi.fn();
+});
+
+afterAll(() => {
+	console.error = originalConsoleError;
+});
 
 describe("useMultiChoiceQuestionGenerator", () => {
 	beforeEach(() => {
