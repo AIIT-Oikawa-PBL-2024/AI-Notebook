@@ -19,15 +19,18 @@ class Exercise(Base):
     :type created_at: datetime
     :param exercise_type: 練習問題の種類
     :type exercise_type: str
+    :param title: 練習問題のタイトル
+    :type title: str
     """
 
     __tablename__ = "exercises"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(String(128), nullable=False, index=True)
+    title = Column(String(100), nullable=False)
     response = Column(TEXT, nullable=False)
     created_at = Column(DateTime, nullable=False)
     exercise_type = Column(String(128), nullable=False)
+    user_id = Column(String(128), nullable=False, index=True)
 
     # リレーションシップの定義
     files = relationship("File", secondary=exercise_file, back_populates="exercises")

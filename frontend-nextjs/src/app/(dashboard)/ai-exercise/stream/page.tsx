@@ -6,11 +6,17 @@ import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 
 const CreateExercisePage: NextPage = () => {
-	const { loading, error, exercise, resetExercise } = useExerciseGenerator();
+	const { loading, error, exercise, title, resetExercise } =
+		useExerciseGenerator();
 
 	return (
 		<div className="container mx-auto p-4">
-			<ExerciseDisplay loading={loading} error={error} exercise={exercise} />
+			<ExerciseDisplay
+				loading={loading}
+				error={error}
+				exercise={exercise}
+				title={title}
+			/>
 			{!loading && exercise && (
 				<button
 					type="button"

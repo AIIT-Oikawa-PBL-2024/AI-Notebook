@@ -45,7 +45,14 @@ vi.mock("@material-tailwind/react", () => ({
 describe("ExerciseDisplay", () => {
 	// ローディング状態のテスト
 	it("displays spinner when loading and no error", () => {
-		render(<ExerciseDisplay loading={true} error="" exercise="" />);
+		render(
+			<ExerciseDisplay
+				loading={true}
+				error=""
+				exercise=""
+				title="Test Title"
+			/>,
+		);
 		expect(screen.getByTestId("spinner")).toBeDefined();
 	});
 
@@ -53,7 +60,12 @@ describe("ExerciseDisplay", () => {
 	it("displays error message when there is an error", () => {
 		const errorMessage = "テストエラーメッセージ";
 		render(
-			<ExerciseDisplay loading={false} error={errorMessage} exercise="" />,
+			<ExerciseDisplay
+				loading={false}
+				error={errorMessage}
+				exercise=""
+				title="Test Title"
+			/>,
 		);
 		expect(screen.getByTestId("alert")).toBeDefined();
 		expect(screen.getByText(errorMessage)).toBeDefined();
@@ -74,7 +86,12 @@ describe("ExerciseDisplay", () => {
     `;
 
 		render(
-			<ExerciseDisplay loading={false} error="" exercise={exerciseContent} />,
+			<ExerciseDisplay
+				loading={false}
+				error=""
+				exercise={exerciseContent}
+				title="Test Title"
+			/>,
 		);
 
 		// 見出しのテスト
@@ -93,14 +110,28 @@ describe("ExerciseDisplay", () => {
 
 	// エラーがある場合はスピナーを表示しないことをテスト
 	it("does not show spinner when there is an error", () => {
-		render(<ExerciseDisplay loading={true} error="エラー" exercise="" />);
+		render(
+			<ExerciseDisplay
+				loading={true}
+				error="エラー"
+				exercise=""
+				title="Test Title"
+			/>,
+		);
 		expect(screen.queryByTestId("spinner")).toBeNull();
 		expect(screen.getByTestId("alert")).toBeDefined();
 	});
 
 	// コンポーネントの基本構造のテスト
 	it("renders with correct structure", () => {
-		render(<ExerciseDisplay loading={false} error="" exercise="" />);
+		render(
+			<ExerciseDisplay
+				loading={false}
+				error=""
+				exercise=""
+				title="Test Title"
+			/>,
+		);
 		expect(screen.getByTestId("card")).toBeDefined();
 		expect(screen.getByTestId("card-header")).toBeDefined();
 		expect(screen.getByTestId("card-body")).toBeDefined();
@@ -109,7 +140,14 @@ describe("ExerciseDisplay", () => {
 
 	// 空の状態のテスト
 	it("renders empty state correctly", () => {
-		render(<ExerciseDisplay loading={false} error="" exercise="" />);
+		render(
+			<ExerciseDisplay
+				loading={false}
+				error=""
+				exercise=""
+				title="Test Title"
+			/>,
+		);
 		expect(screen.queryByTestId("spinner")).toBeNull();
 		expect(screen.queryByTestId("alert")).toBeNull();
 		expect(screen.getByTestId("card-body")).toBeDefined();

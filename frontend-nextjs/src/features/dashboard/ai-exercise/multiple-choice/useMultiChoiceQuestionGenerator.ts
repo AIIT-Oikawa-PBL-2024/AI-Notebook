@@ -81,7 +81,10 @@ export function useMultiChoiceQuestionGenerator() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(selectedFiles),
+					body: JSON.stringify({
+						files: selectedFiles,
+						title: title,
+					}),
 				},
 			);
 
