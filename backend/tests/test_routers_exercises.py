@@ -73,7 +73,11 @@ async def test_request_content_stream_file_not_found(mock_get_file_id: Mock) -> 
     transport = ASGITransport(app=app)  # type: ignore
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post("/exercises/request_stream", json=["file1.pdf"], headers=headers)
+        response = await ac.post(
+            "/exercises/request_stream",
+            json={"files": ["file1.pdf"], "title": "ファイル分析課題"},
+            headers=headers,
+        )
     assert response.status_code == 404
     assert "指定されたファイルの一部がデータベースに存在しません" in response.text
 
@@ -107,7 +111,9 @@ async def test_request_content_stream_gcs_not_found(
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/exercises/request_stream", json=["missing_file.pdf"], headers=headers
+            "/exercises/request_stream",
+            json={"files": ["file111111.pdf"], "title": "ファイル分析課題"},
+            headers=headers,
         )
 
     assert response.status_code == 404
@@ -143,7 +149,9 @@ async def test_request_content_stream_invalid_filename(
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/exercises/request_stream", json=["invalid/file/name.pdf"], headers=headers
+            "/exercises/request_stream",
+            json={"files": ["invalid/file/name.pdf"], "title": "テスト"},
+            headers=headers,
         )
 
     assert response.status_code == 400
@@ -178,7 +186,11 @@ async def test_request_content_stream_google_api_error(
     transport = ASGITransport(app=app)  # type: ignore
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post("/exercises/request_stream", json=["file1.pdf"], headers=headers)
+        response = await ac.post(
+            "/exercises/request_stream",
+            json={"files": ["file1.pdf"], "title": "タイトル"},
+            headers=headers,
+        )
 
     assert response.status_code == 500
     assert "Google APIからエラーが返されました" in response.text
@@ -198,7 +210,11 @@ async def test_request_content_stream_file_id_error(
     transport = ASGITransport(app=app)  # type: ignore
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post("/exercises/request_stream", json=["file1.pdf"], headers=headers)
+        response = await ac.post(
+            "/exercises/request_stream",
+            json={"files": ["file1.pdf"], "title": "タイトル"},
+            headers=headers,
+        )
 
     assert response.status_code == 500
     assert "データベースからファイル情報を取得する際にエラーが発生しました" in response.text
@@ -241,7 +257,9 @@ async def test_multiple_choice_success(
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/exercises/multiple_choice", json=["test_file.pdf"], headers=headers
+            "/exercises/multiple_choice",
+            json={"files": ["test_file.pdf"], "title": "タイトル"},
+            headers=headers,
         )
 
     # アサーション
@@ -277,6 +295,7 @@ async def test_list_exercises_success(
     exercises = []
     for i in range(3):
         exercise = Exercise(
+            title=f"test_title_{i}",
             response=json.dumps({"test": f"response_{i}"}),
             user_id="test_user",
             created_at=datetime.now(timezone(timedelta(hours=9))),
@@ -301,6 +320,7 @@ async def test_list_exercises_success(
     assert len(response_data) == 3
     for exercise in response_data:
         assert "id" in exercise
+        assert "title" in exercise
         assert "response" in exercise
         assert "user_id" in exercise
         assert "created_at" in exercise
@@ -317,6 +337,7 @@ async def test_get_exercise_success(
     """
     # テストデータの作成
     exercise = Exercise(
+        title="test_title",
         response=json.dumps({"test": "response"}),
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
@@ -338,6 +359,7 @@ async def test_get_exercise_success(
     assert response_data["id"] == exercise.id
     assert response_data["user_id"] == "test_user"
     assert response_data["exercise_type"] == "multiple_choice"
+    assert response_data["title"] == "test_title"
 
 
 # 選択問題削除の正常系テスト
@@ -350,6 +372,7 @@ async def test_delete_exercise_success(
     """
     # テストデータの作成
     exercise = Exercise(
+        title="test_title",
         response=json.dumps({"test": "response"}),
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),

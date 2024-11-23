@@ -31,6 +31,7 @@ interface File {
 
 interface Exercise {
 	id: number;
+	title: string;
 	response: string;
 	exercise_type: string;
 	user_id: string;
@@ -38,7 +39,12 @@ interface Exercise {
 	files: File[];
 }
 
-type SortField = "exercise_type" | "created_at" | "response" | "files";
+type SortField =
+	| "exercise_type"
+	| "created_at"
+	| "response"
+	| "files"
+	| "title";
 type SortDirection = "asc" | "desc";
 
 export default function ExerciseSelectComponent() {
@@ -159,6 +165,7 @@ export default function ExerciseSelectComponent() {
 				if (!debouncedSearchTerm) return true;
 				const searchLower = debouncedSearchTerm.toLowerCase();
 				return (
+					exercise.title.toLowerCase().includes(searchLower) ||
 					exercise.exercise_type.toLowerCase().includes(searchLower) ||
 					exercise.response.toLowerCase().includes(searchLower) ||
 					exercise.files.some((file) =>
@@ -171,6 +178,8 @@ export default function ExerciseSelectComponent() {
 				const direction = sortConfig.direction === "asc" ? 1 : -1;
 
 				switch (sortConfig.field) {
+					case "title":
+						return direction * a.title.localeCompare(b.title);
 					case "exercise_type":
 						return direction * a.exercise_type.localeCompare(b.exercise_type);
 					case "created_at":
@@ -224,10 +233,10 @@ export default function ExerciseSelectComponent() {
 
 		switch (selectedExercise.exercise_type) {
 			case "multiple_choice":
-				router.push("/multiple-choice-page");
+				router.push(`/ai-exercise/multiple-choice/${selectedExerciseId}`);
 				break;
 			case "stream":
-				router.push("/stream-page");
+				router.push(`/ai-exercise/stream/${selectedExerciseId}`);
 				break;
 			default:
 				alert("このタイプのルーティングは未対応です。");
@@ -284,6 +293,21 @@ export default function ExerciseSelectComponent() {
 							<thead>
 								<tr>
 									<th className="border-b p-4">Select</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("title")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none"
+											>
+												タイトル
+											</Typography>
+											<span>{getSortIcon("title")}</span>
+										</button>
+									</th>
 									<th className="border-b p-4">
 										<button
 											type="button"
@@ -357,12 +381,26 @@ export default function ExerciseSelectComponent() {
 											/>
 										</td>
 										<td className="p-4">
-											<Typography variant="small" className="font-normal">
-												{getExerciseTypeLabel(exercise.exercise_type)}
+											<Typography
+												variant="small"
+												className="font-normal break-words text-xs"
+											>
+												{exercise.title}
 											</Typography>
 										</td>
 										<td className="p-4">
-											<Typography variant="small" className="font-normal">
+											<Typography
+												variant="small"
+												className="font-normal break-words text-xs"
+											>
+												{getExerciseTypeLabel(exercise.exercise_type)}
+											</Typography>
+										</td>
+										<td className="p-4 max-w-[200px]">
+											<Typography
+												variant="small"
+												className="font-normal break-words text-xs"
+											>
 												{exercise.files
 													.map((file) => file.file_name)
 													.join(", ")}
@@ -376,14 +414,17 @@ export default function ExerciseSelectComponent() {
 											>
 												<Typography
 													variant="small"
-													className="font-normal max-w-xs whitespace-pre-wrap"
+													className="font-normal max-w-xs whitespace-pre-wrap text-xs"
 												>
 													{truncateResponse(exercise.response)}
 												</Typography>
 											</button>
 										</td>
 										<td className="p-4">
-											<Typography variant="small" className="font-normal">
+											<Typography
+												variant="small"
+												className="font-normal text-xs"
+											>
 												{formatDate(exercise.created_at)}
 											</Typography>
 										</td>

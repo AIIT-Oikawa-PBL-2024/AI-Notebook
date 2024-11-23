@@ -42,6 +42,7 @@ def sample_exercise_create(sample_datetime: datetime) -> exercises_schemas.Exerc
         exercise_type="python",
         created_at=sample_datetime,
         file_names=["test1.py", "test2.py"],
+        title="サンプル練習問題",  # タイトルを追加
     )
 
 
@@ -54,6 +55,7 @@ def sample_exercise(sample_datetime: datetime) -> exercises_models.Exercise:
         response="def add(a, b):\n    return a + b",
         exercise_type="python",
         created_at=sample_datetime,
+        title="サンプル練習問題",  # タイトルを追加
     )
 
 
@@ -99,6 +101,7 @@ async def test_create_exercise_success(
     assert result.response == sample_exercise_create.response
     assert result.user_id == sample_exercise_create.user_id
     assert result.exercise_type == sample_exercise_create.exercise_type
+    assert result.title == sample_exercise_create.title  # タイトルの検証を追加
 
 
 @pytest.mark.asyncio
@@ -123,6 +126,7 @@ async def test_get_exercises_by_user_success(
     assert exercise_read.user_id == sample_exercise.user_id
     assert exercise_read.exercise_type == sample_exercise.exercise_type
     assert exercise_read.created_at == sample_exercise.created_at
+    assert exercise_read.title == sample_exercise.title  # タイトルの検証を追加
 
 
 @pytest.mark.asyncio

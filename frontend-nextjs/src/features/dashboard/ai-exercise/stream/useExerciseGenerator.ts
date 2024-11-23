@@ -13,6 +13,12 @@ export function useExerciseGenerator() {
 		}
 		return "";
 	});
+	const [title, setTitle] = useState(() => {
+		if (typeof window !== "undefined") {
+			return localStorage.getItem("title") || "";
+		}
+		return "";
+	});
 	const authFetch = useAuthFetch();
 	const isGenerating = useRef(false);
 
@@ -36,13 +42,15 @@ export function useExerciseGenerator() {
 			const selectedFiles = JSON.parse(
 				localStorage.getItem("selectedFiles") || "[]",
 			);
-			const title = localStorage.getItem("title");
+			const storedTitle = localStorage.getItem("title");
 
-			if (!selectedFiles || !title) {
+			if (!selectedFiles || !storedTitle) {
 				throw new Error("必要な情報が見つかりません");
 			}
 
+			setTitle(storedTitle); // タイトルの状態を更新
 			setLoading(true);
+
 			const response = await authFetch(
 				`${process.env.NEXT_PUBLIC_BACKEND_HOST}/exercises/request_stream`,
 				{
@@ -50,7 +58,10 @@ export function useExerciseGenerator() {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(selectedFiles),
+					body: JSON.stringify({
+						files: selectedFiles,
+						title: title,
+					}),
 				},
 			);
 
@@ -81,7 +92,7 @@ export function useExerciseGenerator() {
 			setLoading(false);
 			isGenerating.current = false;
 		}
-	}, [authFetch, exercise]); // exercise を依存配列に含める（ステータスチェックに使用）
+	}, [authFetch, exercise, title]); // exercise と title を依存配列に含める（ステータスチェックに使用）
 
 	useEffect(() => {
 		generateExercise();
@@ -96,5 +107,5 @@ export function useExerciseGenerator() {
 		isGenerating.current = false;
 	}, []);
 
-	return { loading, error, exercise, resetExercise };
+	return { loading, error, exercise, title, resetExercise };
 }

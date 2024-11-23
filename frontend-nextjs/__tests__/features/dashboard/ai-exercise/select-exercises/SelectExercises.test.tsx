@@ -38,6 +38,7 @@ vi.mock("@/hooks/useAuthFetch", () => ({
 const mockExercises = [
 	{
 		id: 1,
+		title: "選択問題1",
 		exercise_type: "multiple_choice",
 		response: JSON.stringify({
 			content: [
@@ -62,6 +63,7 @@ const mockExercises = [
 	},
 	{
 		id: 2,
+		title: "総合問題1",
 		exercise_type: "stream",
 		response: JSON.stringify({
 			content: [
@@ -122,8 +124,8 @@ describe("ExerciseSelectComponent", () => {
 
 		// データが読み込まれるのを待つ
 		await waitFor(() => {
-			expect(screen.getByText("選択問題")).toBeInTheDocument();
-			expect(screen.getByText("総合問題")).toBeInTheDocument();
+			expect(screen.getByText("選択問題1")).toBeInTheDocument();
+			expect(screen.getByText("総合問題1")).toBeInTheDocument();
 		});
 	});
 
@@ -134,16 +136,16 @@ describe("ExerciseSelectComponent", () => {
 
 		// データ読み込み待ち
 		await waitFor(() => {
-			expect(screen.getByText("選択問題")).toBeInTheDocument();
+			expect(screen.getByText("選択問題1")).toBeInTheDocument();
 		});
 
 		// 検索実行
-		fireEvent.change(searchInput, { target: { value: "stream" } });
+		fireEvent.change(searchInput, { target: { value: "総合" } });
 
 		// 検索結果の確認（デバウンス待ち）
 		await waitFor(() => {
-			expect(screen.queryByText("選択問題")).not.toBeInTheDocument();
-			expect(screen.getByText("総合問題")).toBeInTheDocument();
+			expect(screen.queryByText("選択問題1")).not.toBeInTheDocument();
+			expect(screen.getByText("総合問題1")).toBeInTheDocument();
 		});
 	});
 
@@ -152,17 +154,28 @@ describe("ExerciseSelectComponent", () => {
 
 		// データ読み込み待ち
 		await waitFor(() => {
-			expect(screen.getByText("選択問題")).toBeInTheDocument();
+			expect(screen.getByText("選択問題1")).toBeInTheDocument();
 		});
 
 		// 選択問題のラジオボタンを特定して選択
 		const rows = screen.getAllByRole("row");
 		const multipleChoiceRow = Array.from(rows).find((row) =>
-			row.textContent?.includes("選択問題"),
+			row.textContent?.includes("選択問題1"),
 		);
-		const radioButton = multipleChoiceRow?.querySelector(
+
+		// ラジオボタンを見つけて選択
+		if (!multipleChoiceRow) {
+			throw new Error("選択問題の行が見つかりません");
+		}
+
+		const radioButton = multipleChoiceRow.querySelector(
 			'input[type="radio"]',
 		) as HTMLInputElement;
+
+		if (!radioButton) {
+			throw new Error("ラジオボタンが見つかりません");
+		}
+
 		fireEvent.click(radioButton);
 
 		// 遷移ボタンをクリック
@@ -170,14 +183,16 @@ describe("ExerciseSelectComponent", () => {
 		fireEvent.click(navigateButton);
 
 		// 正しいページに遷移することを確認
-		expect(mockRouter.push).toHaveBeenCalledWith("/multiple-choice-page");
+		expect(mockRouter.push).toHaveBeenCalledWith(
+			`/ai-exercise/multiple-choice/${mockExercises[0].id}`,
+		);
 	});
 
 	it("ソート機能が正しく動作すること", async () => {
 		render(<ExerciseSelectComponent />);
 
 		await waitFor(() => {
-			expect(screen.getByText("選択問題")).toBeInTheDocument();
+			expect(screen.getByText("選択問題1")).toBeInTheDocument();
 		});
 
 		// 問題の種類でソート
@@ -186,16 +201,22 @@ describe("ExerciseSelectComponent", () => {
 
 		// ソート後のデータ順序を確認（昇順）
 		await waitFor(() => {
-			const rows = screen.getAllByRole("cell");
-			expect(rows[1]).toHaveTextContent("選択問題");
+			const cells = screen.getAllByRole("cell");
+			const titleCells = cells.filter((cell) =>
+				cell.textContent?.includes("問題"),
+			);
+			expect(titleCells[0]).toHaveTextContent("選択問題1");
 		});
 
 		// もう一度クリックして降順に
 		fireEvent.click(typeSort);
 
 		await waitFor(() => {
-			const rows = screen.getAllByRole("cell");
-			expect(rows[1]).toHaveTextContent("総合問題");
+			const cells = screen.getAllByRole("cell");
+			const titleCells = cells.filter((cell) =>
+				cell.textContent?.includes("問題"),
+			);
+			expect(titleCells[0]).toHaveTextContent("総合問題1");
 		});
 	});
 
@@ -203,7 +224,7 @@ describe("ExerciseSelectComponent", () => {
 		render(<ExerciseSelectComponent />);
 
 		await waitFor(() => {
-			expect(screen.getByText("選択問題")).toBeInTheDocument();
+			expect(screen.getByText("選択問題1")).toBeInTheDocument();
 		});
 
 		// 内容をクリックしてモーダルを開く

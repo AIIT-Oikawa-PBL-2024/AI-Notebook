@@ -1,6 +1,6 @@
 "use client";
 
-import { useMultiChoiceQuestionGenerator } from "@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator";
+import { useGetMultiChoiceQuestion } from "@/features/dashboard/ai-exercise/multiple-choice/useGetMultiChoiceQuestion";
 import {
 	Alert,
 	Button,
@@ -21,9 +21,19 @@ type ResultState = {
 	skippedQuestions: string[];
 };
 
-export const MultipleChoiceQuestions = () => {
-	const { loading, error, exercise, resetExercise, clearCache } =
-		useMultiChoiceQuestionGenerator();
+interface Props {
+	exerciseId?: string;
+}
+
+export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
+	const {
+		loading,
+		error,
+		exercise,
+		parsedResponse,
+		resetExercise,
+		clearCache,
+	} = useGetMultiChoiceQuestion(exerciseId);
 
 	const [selectedAnswers, setSelectedAnswers] = useState<
 		Record<string, string>
@@ -97,7 +107,11 @@ export const MultipleChoiceQuestions = () => {
 		);
 	}
 
-	if (!exercise?.content[0]?.input?.questions) {
+	if (
+		!exercise ||
+		!parsedResponse ||
+		!parsedResponse.content?.[0]?.input?.questions
+	) {
 		return (
 			<div className="container mx-auto p-4">
 				<Alert color="amber" className="mb-4">
@@ -115,7 +129,8 @@ export const MultipleChoiceQuestions = () => {
 		);
 	}
 
-	const questions = exercise.content[0].input.questions;
+	const questions = parsedResponse.content[0].input.questions;
+	const title = exercise.title;
 
 	const clearAnswerCache = () => {
 		localStorage.removeItem(ANSWERS_STORAGE_KEY);
@@ -148,11 +163,6 @@ export const MultipleChoiceQuestions = () => {
 		clearAnswerCache();
 		// ページトップへスムーズにスクロール
 		window.scrollTo({ top: 0, behavior: "smooth" });
-	};
-
-	const handleCompleteReset = () => {
-		clearCache();
-		clearAnswerCache();
 	};
 
 	const handleRetryIncorrect = () => {
@@ -191,9 +201,6 @@ export const MultipleChoiceQuestions = () => {
 	const displayQuestions = retryMode
 		? questions.filter((q) => !skippedQuestions.includes(q.question_id))
 		: questions;
-
-	const title =
-		typeof window !== "undefined" ? localStorage.getItem("title") : "";
 
 	return (
 		<div className="container mx-auto p-4 max-w-4xl">
@@ -343,9 +350,6 @@ export const MultipleChoiceQuestions = () => {
 							)}
 							<Button onClick={handleReset} color="blue">
 								{retryMode ? "最初からやり直す" : "もう一度挑戦する"}
-							</Button>
-							<Button onClick={handleCompleteReset} color="red">
-								新しい問題を生成
 							</Button>
 						</div>
 					</div>
