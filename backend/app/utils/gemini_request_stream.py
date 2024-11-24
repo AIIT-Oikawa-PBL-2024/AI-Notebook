@@ -5,7 +5,6 @@ import os
 import unicodedata
 from typing import AsyncGenerator
 
-import ffmpeg
 import vertexai
 from dotenv import load_dotenv
 from google.api_core.exceptions import (
@@ -21,6 +20,8 @@ from vertexai.generative_models import (
     GenerativeModel,
     Part,
 )
+
+from app.utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
 
 # 環境変数を読み込む
 load_dotenv()
@@ -47,41 +48,6 @@ def check_file_exists(bucket_name: str, file_name: str) -> bool:
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(file_name)
     return blob.exists()
-
-
-# MP4のファイルをMP3に変換してGCSに保存
-def convert_mp4_to_mp3(bucket_name: str, file_name: str) -> bool:
-    # GCSからファイルを取得
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(file_name)
-
-    mp4_base_name = os.path.basename(file_name)
-    mp4_file_path = os.path.normpath(f"/tmp/{mp4_base_name}")
-    if not mp4_file_path.startswith("/tmp/"):
-        raise ValueError("Invalid file path")
-    blob.download_to_filename(mp4_file_path)
-
-    # MP4ファイルをMP3に変換
-    mp3_base_name = mp4_base_name.replace(".mp4", ".mp3")
-    mp3_file_path = os.path.normpath(f"/tmp/{mp3_base_name}")
-    if not mp3_file_path.startswith("/tmp/"):
-        raise ValueError("Invalid file path")
-    (
-        ffmpeg.input(mp4_file_path)
-        .output(mp3_file_path, format="mp3", acodec="libmp3lame")
-        .run()
-    )
-
-    # MP3ファイルをGCSにアップロード
-    upload_file_name = f'mp3/{file_name.replace(".mp4", ".mp3")}'
-    mp3_blob = bucket.blob(upload_file_name)
-    mp3_blob.upload_from_filename(mp3_file_path)
-
-    # 一時ファイルを削除
-    os.remove(mp4_file_path)
-    os.remove(mp3_file_path)
-    return mp3_blob.exists()
 
 
 # 複数のPDF, imageファイルを入力してコンテンツを生成
@@ -157,9 +123,7 @@ async def generate_content_stream(
                         mp3_files.append(mp3_file)
                     else:
                         logging.error(f"Failed to convert {file_name} to mp3 format.")
-                        raise InternalServerError(
-                            f"Failed to convert {file_name} to mp3 format."
-                        )
+                        raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
                 elif file_name.endswith(".mp3"):
                     # 音声ファイルのURL
                     mp3_file_url = f"gs://{bucket_name}/{file_name}"
@@ -182,12 +146,8 @@ async def generate_content_stream(
                         + "Only PDF and image and audio files are supported."
                     )
             else:
-                logging.error(
-                    f"File {file_name} does not exist in the bucket {bucket_name}."
-                )
-                raise NotFound(
-                    f"File {file_name} does not exist in the bucket {bucket_name}."
-                )
+                logging.error(f"File {file_name} does not exist in the bucket {bucket_name}.")
+                raise NotFound(f"File {file_name} does not exist in the bucket {bucket_name}.")
         logging.info(f"Files: {pdf_files + image_files} are read.")
 
     except InternalServerError as e:

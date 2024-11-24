@@ -52,16 +52,12 @@ async def test_check_file_exists(mock_storage_client: Mock) -> None:
     mock_bucket.blob.return_value = mock_blob
     mock_storage_client.return_value.bucket.return_value = mock_bucket
 
-    result = await claude_request_stream.check_file_exists(
-        "test-bucket-name", "test-file.pdf"
-    )
+    result = await claude_request_stream.check_file_exists("test-bucket-name", "test-file.pdf")
     assert result == True
 
     # bucket.blob(file_name).exists()の戻り値をFalseに設定
     mock_blob.exists.return_value = False
-    result = await claude_request_stream.check_file_exists(
-        "test-bucket-name", "test-file.pdf"
-    )
+    result = await claude_request_stream.check_file_exists("test-bucket-name", "test-file.pdf")
     assert result == False
 
 
@@ -114,9 +110,7 @@ async def test_extract_text_from_pdf(mock_storage_client: Mock) -> None:
 
 
 # モック版の generate_content_stream 関数
-async def mock_generate_content_stream(
-    files: list, model: str, bucket: str
-) -> AsyncGenerator:
+async def mock_generate_content_stream(files: list, model: str, bucket: str) -> AsyncGenerator:
     yield "Mock generated content part 1."
     yield "Mock generated content part 2."
 
@@ -131,9 +125,7 @@ async def test_generate_content_stream() -> None:
         new=mock_generate_content_stream,
     ):
         # テスト対象の関数を呼び出し
-        content_stream = mock_generate_content_stream(
-            files, "test_model", "test_bucket"
-        )
+        content_stream = mock_generate_content_stream(files, "test_model", "test_bucket")
 
         result = []
         async for part in content_stream:
@@ -153,14 +145,12 @@ async def test_generate_content_stream() -> None:
 async def test_generate_content_stream_attribute_error() -> None:
     files = ["test_document.pdf"]
 
-    with patch(
-        "app.utils.claude_request_stream.AnthropicVertex"
-    ) as MockAnthropicVertex:
+    with patch("app.utils.claude_request_stream.AnthropicVertex") as MockAnthropicVertex:
         instance = MockAnthropicVertex.return_value
         instance.messages.stream.side_effect = AttributeError("Model attribute error")
 
         with pytest.raises(AttributeError, match="Model attribute error"):
-            async for _ in claude_request_stream.generate_content_stream(files):
+            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
                 pass
 
 
@@ -168,16 +158,12 @@ async def test_generate_content_stream_attribute_error() -> None:
 async def test_generate_content_stream_type_error() -> None:
     files = ["test_document.pdf"]
 
-    with patch(
-        "app.utils.claude_request_stream.AnthropicVertex"
-    ) as MockAnthropicVertex:
+    with patch("app.utils.claude_request_stream.AnthropicVertex") as MockAnthropicVertex:
         instance = MockAnthropicVertex.return_value
-        instance.messages.stream.side_effect = TypeError(
-            "Type error in model generation"
-        )
+        instance.messages.stream.side_effect = TypeError("Type error in model generation")
 
         with pytest.raises(TypeError, match="Type error in model generation"):
-            async for _ in claude_request_stream.generate_content_stream(files):
+            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
                 pass
 
 
@@ -185,16 +171,12 @@ async def test_generate_content_stream_type_error() -> None:
 async def test_generate_content_stream_internal_server_error() -> None:
     files = ["test_document.pdf"]
 
-    with patch(
-        "app.utils.claude_request_stream.AnthropicVertex"
-    ) as MockAnthropicVertex:
+    with patch("app.utils.claude_request_stream.AnthropicVertex") as MockAnthropicVertex:
         instance = MockAnthropicVertex.return_value
-        instance.messages.stream.side_effect = InternalServerError(
-            "Internal server error"
-        )
+        instance.messages.stream.side_effect = InternalServerError("Internal server error")
 
         with pytest.raises(InternalServerError, match="Internal server error"):
-            async for _ in claude_request_stream.generate_content_stream(files):
+            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
                 pass
 
 
@@ -202,14 +184,12 @@ async def test_generate_content_stream_internal_server_error() -> None:
 async def test_generate_content_stream_google_api_error() -> None:
     files = ["test_document.pdf"]
 
-    with patch(
-        "app.utils.claude_request_stream.AnthropicVertex"
-    ) as MockAnthropicVertex:
+    with patch("app.utils.claude_request_stream.AnthropicVertex") as MockAnthropicVertex:
         instance = MockAnthropicVertex.return_value
         instance.messages.stream.side_effect = GoogleAPIError("Google API error")
 
         with pytest.raises(GoogleAPIError, match="Google API error"):
-            async for _ in claude_request_stream.generate_content_stream(files):
+            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
                 pass
 
 
@@ -217,12 +197,10 @@ async def test_generate_content_stream_google_api_error() -> None:
 async def test_generate_content_stream_unexpected_error() -> None:
     files = ["test_document.pdf"]
 
-    with patch(
-        "app.utils.claude_request_stream.AnthropicVertex"
-    ) as MockAnthropicVertex:
+    with patch("app.utils.claude_request_stream.AnthropicVertex") as MockAnthropicVertex:
         instance = MockAnthropicVertex.return_value
         instance.messages.stream.side_effect = Exception("Unexpected error")
 
         with pytest.raises(Exception, match="Unexpected error"):
-            async for _ in claude_request_stream.generate_content_stream(files):
+            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
                 pass
