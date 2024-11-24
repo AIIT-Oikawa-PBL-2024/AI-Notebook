@@ -54,7 +54,7 @@ export const useExerciseDelete = ({
 
 				// 削除成功時の処理
 				onSuccess?.();
-				router.refresh(); // App Router のストレージを更新
+				router.refresh(); // App Router のキャッシュを更新
 			} catch (err) {
 				const errorMessage =
 					err instanceof Error ? err.message : "予期せぬエラーが発生しました。";
