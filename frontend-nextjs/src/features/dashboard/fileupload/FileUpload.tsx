@@ -171,7 +171,7 @@ const FileUploadComponent: React.FC = () => {
 					ref={fileInputRef}
 					type="file"
 					multiple
-					accept=".pdf,.png,.jpg,.jpeg"
+					accept=".pdf,.png,.jpg,.jpeg,.mp4,.mp3,.wav"
 					onChange={handleChange}
 					className="hidden"
 				/>

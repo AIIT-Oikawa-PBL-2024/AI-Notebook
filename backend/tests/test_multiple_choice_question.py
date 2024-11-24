@@ -16,6 +16,7 @@ MOCK_BUCKET_NAME = "test-bucket"
 MOCK_PROJECT_ID = "test-project"
 MOCK_REGION = "europe-west1"
 MOCK_MODEL_NAME = "claude-3-sonnet-20240620"  # 実際のモデル名のフォーマットに合わせる
+MOCK_UID = "test_user"
 
 # Mock response from Anthropic API
 MOCK_ANTHROPIC_RESPONSE = {
@@ -111,13 +112,12 @@ async def test_generate_content_json_internal_server_error(
 
     with patch("app.utils.multiple_choice_question.AnthropicVertex") as mock_anthropic:
         mock_instance = mock_anthropic.return_value
-        mock_instance.messages.create.side_effect = InternalServerError(
-            "Internal Server Error"
-        )
+        mock_instance.messages.create.side_effect = InternalServerError("Internal Server Error")
 
         with pytest.raises(InternalServerError):
             await generate_content_json(
                 files=["test.pdf"],
+                uid=MOCK_UID,
                 model_name=MOCK_MODEL_NAME,
                 bucket_name=MOCK_BUCKET_NAME,
             )
@@ -158,9 +158,7 @@ async def test_read_file(
     """Test read_file function"""
     mock_client, mock_blob = mock_storage_client
     test_content = b"test content"
-    mock_blob.open.return_value.__aenter__.return_value.read = AsyncMock(
-        return_value=test_content
-    )
+    mock_blob.open.return_value.__aenter__.return_value.read = AsyncMock(return_value=test_content)
 
     result = await read_file(MOCK_BUCKET_NAME, "test.txt")
 
@@ -198,7 +196,10 @@ async def test_generate_content_json_pdf(
         )
 
         result = await generate_content_json(
-            files=["test.pdf"], model_name=MOCK_MODEL_NAME, bucket_name=MOCK_BUCKET_NAME
+            files=["test.pdf"],
+            uid=MOCK_UID,
+            model_name=MOCK_MODEL_NAME,
+            bucket_name=MOCK_BUCKET_NAME,
         )
 
         assert result == MOCK_ANTHROPIC_RESPONSE
@@ -215,9 +216,7 @@ async def test_generate_content_json_image(
     mock_client, mock_blob = mock_storage_client
     mock_blob.exists.return_value = True
     test_content = b"test image content"
-    mock_blob.open.return_value.__aenter__.return_value.read = AsyncMock(
-        return_value=test_content
-    )
+    mock_blob.open.return_value.__aenter__.return_value.read = AsyncMock(return_value=test_content)
 
     with patch("app.utils.multiple_choice_question.AnthropicVertex") as mock_anthropic:
         mock_instance = mock_anthropic.return_value
@@ -226,7 +225,10 @@ async def test_generate_content_json_image(
         )
 
         result = await generate_content_json(
-            files=["test.png"], model_name=MOCK_MODEL_NAME, bucket_name=MOCK_BUCKET_NAME
+            files=["test.png"],
+            uid=MOCK_UID,
+            model_name=MOCK_MODEL_NAME,
+            bucket_name=MOCK_BUCKET_NAME,
         )
 
         assert result == MOCK_ANTHROPIC_RESPONSE
@@ -245,6 +247,7 @@ async def test_generate_content_json_file_not_found(
     with pytest.raises(Exception):
         await generate_content_json(
             files=["nonexistent.pdf"],
+            uid=MOCK_UID,
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -260,5 +263,8 @@ async def test_generate_content_json_google_api_error(
 
     with pytest.raises(GoogleAPIError):
         await generate_content_json(
-            files=["test.pdf"], model_name=MOCK_MODEL_NAME, bucket_name=MOCK_BUCKET_NAME
+            files=["test.pdf"],
+            uid=MOCK_UID,
+            model_name=MOCK_MODEL_NAME,
+            bucket_name=MOCK_BUCKET_NAME,
         )
