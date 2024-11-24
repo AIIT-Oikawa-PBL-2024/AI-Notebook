@@ -53,7 +53,7 @@ describe("useSignOut", () => {
 			configurable: true,
 		});
 
-		// キャッシュのモック
+		// ストレージのモック
 		Object.defineProperty(window, "caches", {
 			value: {
 				keys: vi.fn().mockResolvedValue(["test-cache"]),
@@ -144,7 +144,7 @@ describe("useSignOut", () => {
 		});
 
 		expect(consoleSpy).toHaveBeenCalledWith(
-			"キャッシュのクリアに失敗しました:",
+			"ストレージのクリアに失敗しました:",
 			expect.any(Error),
 		);
 		expect(mockPush).toHaveBeenCalledWith("/signin");

@@ -10,7 +10,7 @@ export const useSignOut = () => {
 	const router = useRouter();
 
 	const clearSessionAndCache = useCallback(async () => {
-		// ローカルストレージをクリア（Firebaseトークンを含む）
+		// ローカルストレージをクリア
 		localStorage.clear();
 		// セッションストレージをクリア
 		sessionStorage.clear();
@@ -30,7 +30,7 @@ export const useSignOut = () => {
 					await caches.delete(key);
 				}
 			} catch (err) {
-				console.error("キャッシュのクリアに失敗しました:", err);
+				console.error("ストレージのクリアに失敗しました:", err);
 			}
 		}
 	}, []);

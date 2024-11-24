@@ -83,7 +83,7 @@ export function useGetMultiChoiceQuestion(id?: string) {
 		// 初期化済み、かつ生成中の場合は早期リターン
 		if (hasInitialized.current || isGenerating.current) return;
 
-		// id がない場合のキャッシュチェック
+		// id がない場合のストレージチェック
 		if (!id) {
 			const generationStatus = localStorage.getItem(GENERATION_STATUS_KEY);
 			const cached = localStorage.getItem(STORAGE_KEY);

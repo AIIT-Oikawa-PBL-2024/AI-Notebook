@@ -118,9 +118,9 @@ export function useMultiChoiceQuestionGenerator() {
 		isGenerating.current = false;
 	}, []);
 
-	// 選択問題のキャッシュをクリア（完全な初期状態に）
+	// 選択問題のストレージをクリア（完全な初期状態に）
 	const clearCache = useCallback(() => {
-		// 選択問題関連のキャッシュのみ削除
+		// 選択問題関連のストレージのみ削除
 		localStorage.removeItem(STORAGE_KEY);
 		localStorage.removeItem(GENERATION_STATUS_KEY);
 		// 状態のリセット
@@ -130,7 +130,7 @@ export function useMultiChoiceQuestionGenerator() {
 		isGenerating.current = false;
 	}, []);
 
-	// キャッシュの確認
+	// ストレージの確認
 	const checkCache = useCallback(() => {
 		const cache = {
 			exercise: localStorage.getItem(STORAGE_KEY),
@@ -144,7 +144,7 @@ export function useMultiChoiceQuestionGenerator() {
 		error,
 		exercise,
 		resetExercise, // 問題のリセット（再生成のトリガー）
-		clearCache, // 選択問題のキャッシュのみクリア
-		checkCache, // キャッシュ確認
+		clearCache, // 選択問題のストレージのみクリア
+		checkCache, // ストレージ確認
 	};
 }

@@ -78,7 +78,7 @@ describe("useMultiChoiceQuestionGenerator", () => {
 		expect(result.current.loading).toBe(true);
 	});
 
-	it("キャッシュされた問題が存在する場合はそれを使用すること", () => {
+	it("ストレージされた問題が存在する場合はそれを使用すること", () => {
 		localStorage.setItem(
 			"cached_multi_choice_question",
 			JSON.stringify(mockExerciseResponse),
@@ -187,7 +187,7 @@ describe("useMultiChoiceQuestionGenerator", () => {
 		expect(localStorage.getItem("multi_choice_generation_status")).toBeNull();
 	});
 
-	it("checkCacheが正しくキャッシュ状態を返すこと", () => {
+	it("checkCacheが正しくストレージ状態を返すこと", () => {
 		// 初期状態を設定
 		localStorage.setItem(
 			"cached_multi_choice_question",

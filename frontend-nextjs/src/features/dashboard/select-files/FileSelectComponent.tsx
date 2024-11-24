@@ -29,8 +29,8 @@ interface FileData {
 	user_id?: string;
 }
 
-// 選択問題関連のキャッシュキーを定数として定義
-const CACHE_KEYS = {
+// 選択問題関連のストレージキーを定数として定義
+const STORAGE_KEYS = {
 	MULTI_CHOICE: {
 		QUESTION: "cached_multi_choice_question",
 		GENERATION_STATUS: "multi_choice_generation_status",
@@ -139,15 +139,17 @@ export default function FileSelectComponent() {
 			}
 
 			try {
-				// キャッシュクリアの処理
+				// ストレージクリアの処理
 				if (type === "ai-exercise/multiple-choice") {
-					for (const key of Object.values(CACHE_KEYS.MULTI_CHOICE)) {
+					for (const key of Object.values(STORAGE_KEYS.MULTI_CHOICE)) {
 						localStorage.removeItem(key);
 					}
 				} else if (type === "ai-exercise/stream") {
-					for (const key of Object.values(CACHE_KEYS.STREAM_EXERCISE)) {
+					for (const key of Object.values(STORAGE_KEYS.STREAM_EXERCISE)) {
 						localStorage.removeItem(key);
 					}
+				} else if (type === "ai-output") {
+					localStorage.removeItem("cached_output");
 				}
 
 				// 選択されたファイルとタイトルを保存
