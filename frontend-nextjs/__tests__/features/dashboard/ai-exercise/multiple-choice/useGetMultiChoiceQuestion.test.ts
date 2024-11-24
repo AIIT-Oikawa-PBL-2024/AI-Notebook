@@ -81,8 +81,8 @@ describe("useGetMultiChoiceQuestion", () => {
 		vi.unstubAllEnvs();
 	});
 
-	it("キャッシュデータが利用可能な場合、それを使用して初期化される", () => {
-		// キャッシュデータを設定
+	it("ストレージデータが利用可能な場合、それを使用して初期化される", () => {
+		// ストレージデータを設定
 		mockLocalStorage.setItem(
 			"cached_multi_choice_question",
 			JSON.stringify(mockExercise),
@@ -96,7 +96,7 @@ describe("useGetMultiChoiceQuestion", () => {
 		expect(result.current.error).toBe("");
 	});
 
-	it("キャッシュデータが存在しない場合、新しい問題を生成する", async () => {
+	it("ストレージデータが存在しない場合、新しい問題を生成する", async () => {
 		mockFetch.mockResolvedValueOnce({
 			ok: true,
 			json: () => Promise.resolve(mockExercise),
@@ -145,7 +145,7 @@ describe("useGetMultiChoiceQuestion", () => {
 		expect(result.current.error).toBe(mockError.message);
 	});
 
-	it("キャッシュを正しくクリアする", async () => {
+	it("ストレージを正しくクリアする", async () => {
 		mockLocalStorage.setItem(
 			"cached_multi_choice_question",
 			JSON.stringify(mockExercise),

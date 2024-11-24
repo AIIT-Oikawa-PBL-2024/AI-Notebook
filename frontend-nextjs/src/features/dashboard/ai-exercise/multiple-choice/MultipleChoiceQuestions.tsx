@@ -90,7 +90,7 @@ export const MultipleChoiceQuestions = () => {
 						再試行
 					</Button>
 					<Button onClick={clearCache} color="gray">
-						キャッシュをクリア
+						ストレージをクリア
 					</Button>
 				</div>
 			</div>
@@ -108,7 +108,7 @@ export const MultipleChoiceQuestions = () => {
 						再試行
 					</Button>
 					<Button onClick={clearCache} color="gray">
-						キャッシュをクリア
+						ストレージをクリア
 					</Button>
 				</div>
 			</div>

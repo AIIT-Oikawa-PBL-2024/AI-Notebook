@@ -22,7 +22,7 @@ export const useSignOut = () => {
 			document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
 		}
 
-		// アプリケーションキャッシュをクリア
+		// アプリケーションストレージをクリア
 		if ("caches" in window) {
 			try {
 				const keys = await caches.keys();
@@ -30,7 +30,7 @@ export const useSignOut = () => {
 					await caches.delete(key);
 				}
 			} catch (err) {
-				console.error("キャッシュのクリアに失敗しました:", err);
+				console.error("ストレージのクリアに失敗しました:", err);
 			}
 		}
 	}, []);
