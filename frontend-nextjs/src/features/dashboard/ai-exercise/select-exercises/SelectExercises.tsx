@@ -1,5 +1,6 @@
 "use client";
 
+import { useExerciseDelete } from "@/features/dashboard/ai-exercise/select-exercises/useExerciseDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {
@@ -243,6 +244,27 @@ export default function ExerciseSelectComponent() {
 		}
 	}, [selectedExerciseId, exercises, router]);
 
+	const { deleteExercise, isDeleting } = useExerciseDelete({
+		onSuccess: () => {
+			setSelectedExerciseId(null);
+			fetchExercises();
+		},
+		onError: (errorMessage) => {
+			setError(errorMessage);
+		},
+	});
+
+	const handleDelete = async () => {
+		if (!selectedExerciseId) {
+			alert("アイテムを選択してください。");
+			return;
+		}
+
+		if (window.confirm("選択した問題を削除してもよろしいですか？")) {
+			await deleteExercise(selectedExerciseId);
+		}
+	};
+
 	return (
 		<div className="container mx-auto p-4">
 			<Card>
@@ -251,6 +273,7 @@ export default function ExerciseSelectComponent() {
 						AI練習問題リスト
 					</Typography>
 				</CardHeader>
+
 				<CardBody className="flex flex-col gap-4">
 					{error && (
 						<Alert variant="gradient" color="red" onClose={() => setError("")}>
@@ -279,6 +302,18 @@ export default function ExerciseSelectComponent() {
 							disabled={!selectedExerciseId}
 						>
 							選択した問題ページを開く
+						</button>
+						<button
+							type="button"
+							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
+								selectedExerciseId && !isDeleting
+									? "bg-blue-gray-800 hover:bg-blue-gray-600"
+									: "bg-gray-400 cursor-not-allowed"
+							}`}
+							onClick={handleDelete}
+							disabled={!selectedExerciseId || isDeleting}
+						>
+							{isDeleting ? "削除中..." : "選択した問題を削除"}
 						</button>
 					</div>
 

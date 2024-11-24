@@ -1,6 +1,7 @@
 "use client";
 
 import FileTable from "@/features/dashboard/select-files/FileTableComponent";
+import { useFileDelete } from "@/features/dashboard/select-files/useFileDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {
@@ -18,7 +19,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 const BACKEND_HOST = process.env.NEXT_PUBLIC_BACKEND_HOST;
 const BACKEND_API_URL_GET_FILES = `${BACKEND_HOST}/files/`;
-const BACKEND_API_URL_DELETE_FILES = `${BACKEND_HOST}/files/delete_files`;
 
 interface FileData {
 	file_name: string;
@@ -94,56 +94,24 @@ export default function FileSelectComponent() {
 		}
 	}, [user, clearError, handleAuthError, authFetch]);
 
-	const deleteSelectedFiles = useCallback(async () => {
-		if (!user) {
-			setError("認証が必要です");
-			return;
+	const {
+		loading: deleteLoading,
+		error: deleteError,
+		success: deleteSuccess,
+		deleteSelectedFiles,
+		clearSuccess,
+		clearError: clearDeleteError,
+	} = useFileDelete(fetchFiles);
+
+	const handleDeleteSelectedFiles = useCallback(async () => {
+		const isConfirmed = window.confirm(
+			"選択したファイルを削除してもよろしいですか？",
+		);
+
+		if (isConfirmed) {
+			await deleteSelectedFiles(files);
 		}
-
-		const selectedFiles = files
-			.filter((file) => file.select)
-			.map((file) => file.file_name);
-		if (selectedFiles.length === 0) {
-			setError("削除するファイルを選択してください");
-			return;
-		}
-
-		setLoading(true);
-		setError("");
-
-		try {
-			const response = await authFetch(BACKEND_API_URL_DELETE_FILES, {
-				method: "DELETE",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(selectedFiles),
-			});
-
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || "ファイルの削除に失敗しました");
-			}
-
-			const result = await response.json();
-			if (result.success) {
-				setSuccess("選択したファイルを削除しました");
-				await fetchFiles();
-				clearError();
-			} else {
-				setError(
-					result.failed_files?.length
-						? `削除に失敗したファイル: ${result.failed_files.join(", ")}`
-						: "ファイルの削除に失敗しました",
-				);
-			}
-		} catch (err: unknown) {
-			await handleAuthError(err as { message: string });
-		} finally {
-			setLoading(false);
-		}
-	}, [files, fetchFiles, user, clearError, handleAuthError, authFetch]);
+	}, [deleteSelectedFiles, files]);
 
 	const handleSelect = useCallback((fileName: string, checked: boolean) => {
 		setFiles((prevFiles) =>
@@ -266,38 +234,49 @@ export default function FileSelectComponent() {
 					<div className="flex gap-4">
 						<Button
 							onClick={fetchFiles}
-							disabled={loading}
+							disabled={loading || deleteLoading}
 							className="flex items-center gap-2"
 						>
-							{loading && <Spinner className="h-4 w-4" />}
+							{(loading || deleteLoading) && <Spinner className="h-4 w-4" />}
 							ファイル更新
 						</Button>
-						<Button variant="outlined" onClick={resetAll} disabled={loading}>
+						<Button
+							variant="outlined"
+							onClick={resetAll}
+							disabled={loading || deleteLoading}
+						>
 							リセット
 						</Button>
 						<Button
-							onClick={deleteSelectedFiles}
-							disabled={!isAnyFileSelected || loading}
+							onClick={handleDeleteSelectedFiles}
+							disabled={!isAnyFileSelected || loading || deleteLoading}
 						>
 							選択項目を削除
 						</Button>
 					</div>
 
-					{error && (
+					{(error || deleteError) && (
 						<Alert
 							variant="gradient"
 							onClose={() => {
 								setError("");
+								clearDeleteError();
 								clearError();
 							}}
 						>
-							{error}
+							{error || deleteError}
 						</Alert>
 					)}
 
 					{success && (
 						<Alert variant="gradient" onClose={() => setSuccess("")}>
 							{success}
+						</Alert>
+					)}
+
+					{deleteSuccess && (
+						<Alert variant="gradient" onClose={clearSuccess}>
+							{deleteSuccess}
 						</Alert>
 					)}
 
