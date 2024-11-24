@@ -55,9 +55,16 @@
 <li><a class="reference internal" href="#app.utils.claude_request_stream.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-app.utils.convert_mp4_to_mp3">app.utils.convert_mp4_to_mp3 module</a><ul>
+<li><a class="reference internal" href="#app.utils.convert_mp4_to_mp3.convert_mp4_to_mp3"><code class="docutils literal notranslate"><span class="pre">convert_mp4_to_mp3()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-app.utils.gemini_extract_text_from_audio">app.utils.gemini_extract_text_from_audio module</a><ul>
+<li><a class="reference internal" href="#app.utils.gemini_extract_text_from_audio.extract_text_from_audio"><code class="docutils literal notranslate"><span class="pre">extract_text_from_audio()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-app.utils.gemini_request_stream">app.utils.gemini_request_stream module</a><ul>
 <li><a class="reference internal" href="#app.utils.gemini_request_stream.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.gemini_request_stream.convert_mp4_to_mp3"><code class="docutils literal notranslate"><span class="pre">convert_mp4_to_mp3()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.gemini_request_stream.generate_content_stream"><code class="docutils literal notranslate"><span class="pre">generate_content_stream()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.gemini_request_stream.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
@@ -150,7 +157,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.claude_request_stream.generate_content_stream">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">generate_content_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-3-5-sonnet&#64;20240620'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#generate_content_stream"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.generate_content_stream" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">generate_content_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-3-5-sonnet&#64;20240620'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#generate_content_stream"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.generate_content_stream" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -177,16 +184,44 @@
 </dd></dl>
 
 </section>
+<section id="module-app.utils.convert_mp4_to_mp3">
+<span id="app-utils-convert-mp4-to-mp3-module"></span><h2>app.utils.convert_mp4_to_mp3 module<a class="headerlink" href="#module-app.utils.convert_mp4_to_mp3" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.convert_mp4_to_mp3.convert_mp4_to_mp3">
+<span class="sig-prename descclassname"><span class="pre">app.utils.convert_mp4_to_mp3.</span></span><span class="sig-name descname"><span class="pre">convert_mp4_to_mp3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/convert_mp4_to_mp3.html#convert_mp4_to_mp3"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.convert_mp4_to_mp3.convert_mp4_to_mp3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-app.utils.gemini_extract_text_from_audio">
+<span id="app-utils-gemini-extract-text-from-audio-module"></span><h2>app.utils.gemini_extract_text_from_audio module<a class="headerlink" href="#module-app.utils.gemini_extract_text_from_audio" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.gemini_extract_text_from_audio.extract_text_from_audio">
+<span class="sig-prename descclassname"><span class="pre">app.utils.gemini_extract_text_from_audio.</span></span><span class="sig-name descname"><span class="pre">extract_text_from_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'gemini-1.5-pro-001'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation_config:</span> <span class="pre">~vertexai.generative_models._generative_models.GenerationConfig</span> <span class="pre">=</span> <span class="pre">temperature:</span> <span class="pre">0</span> <span class="pre">max_output_tokens:</span> <span class="pre">8192</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_extract_text_from_audio.html#extract_text_from_audio"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_extract_text_from_audio.extract_text_from_audio" title="Link to this definition"></a></dt>
+<dd><p>音声ファイルからテキストを抽出する同期関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bucket_name</strong> (<em>str</em>) -- GCSバケット名</p></li>
+<li><p><strong>file_name</strong> (<em>str</em>) -- 音声ファイル名</p></li>
+<li><p><strong>model_name</strong> (<em>str</em>) -- 使用するモデル名</p></li>
+<li><p><strong>generation_config</strong> (<em>GenerationConfig</em>) -- 生成設定</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>抽出されたテキスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-app.utils.gemini_request_stream">
 <span id="app-utils-gemini-request-stream-module"></span><h2>app.utils.gemini_request_stream module<a class="headerlink" href="#module-app.utils.gemini_request_stream" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.gemini_request_stream.check_file_exists">
 <span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">check_file_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#check_file_exists"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.check_file_exists" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.gemini_request_stream.convert_mp4_to_mp3">
-<span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">convert_mp4_to_mp3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#convert_mp4_to_mp3"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.convert_mp4_to_mp3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

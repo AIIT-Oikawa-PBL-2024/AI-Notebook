@@ -12,6 +12,22 @@ app.utils.claude\_request\_stream module
    :undoc-members:
    :show-inheritance:
 
+app.utils.convert\_mp4\_to\_mp3 module
+--------------------------------------
+
+.. automodule:: app.utils.convert_mp4_to_mp3
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+app.utils.gemini\_extract\_text\_from\_audio module
+---------------------------------------------------
+
+.. automodule:: app.utils.gemini_extract_text_from_audio
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.utils.gemini\_request\_stream module
 ----------------------------------------
 
