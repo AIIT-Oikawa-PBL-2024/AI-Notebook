@@ -206,7 +206,7 @@ describe("MultipleChoiceQuestions", () => {
 			screen.getByText(`エラーが発生しました: ${mockError}`),
 		).toBeInTheDocument();
 		expect(screen.getByText("再試行")).toBeInTheDocument();
-		expect(screen.getByText("ストレージをクリア")).toBeInTheDocument();
+		expect(screen.getByText("キャッシュをクリア")).toBeInTheDocument();
 	});
 
 	it("問題が正しく表示される", () => {

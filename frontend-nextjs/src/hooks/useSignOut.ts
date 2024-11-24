@@ -10,7 +10,7 @@ export const useSignOut = () => {
 	const router = useRouter();
 
 	const clearSessionAndCache = useCallback(async () => {
-		// ローカルストレージをクリア（Firebaseトークンを含む）
+		// ローカルストレージをクリア
 		localStorage.clear();
 		// セッションストレージをクリア
 		sessionStorage.clear();
@@ -22,7 +22,7 @@ export const useSignOut = () => {
 			document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
 		}
 
-		// アプリケーションストレージをクリア
+		// アプリケーションキャッシュをクリア
 		if ("caches" in window) {
 			try {
 				const keys = await caches.keys();
