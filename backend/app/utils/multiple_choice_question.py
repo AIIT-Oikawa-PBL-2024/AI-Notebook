@@ -3,6 +3,7 @@ import base64
 import io
 import logging
 import os
+import unicodedata
 
 import fitz
 from anthropic import AnthropicVertex
@@ -12,6 +13,9 @@ from google.api_core.exceptions import (
     InternalServerError,
 )
 from google.cloud import storage
+
+from app.utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
+from app.utils.gemini_extract_text_from_audio import extract_text_from_audio
 
 # 環境変数を読み込む
 load_dotenv()
@@ -31,8 +35,8 @@ tool_name = "print_multiple_choice_questions"
 
 description = """
 - あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
-- 複数のファイルは、ソフトウェア工学の解説スライドです。
-- 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。
+- 複数のファイルは、大学院の講義資料です。
+- 複数のテキスト, imageファイルを読み解いて、練習問題を作って下さい。
 - "4択の選択問題"と"正解"と"解説"のセットを10問作成してください。
 - 以下のexapmleは参考例です。10問の中には、この例と同じ問題を含めないでください。
 - 以下のruleに従って作成してください。
@@ -199,23 +203,30 @@ async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
 # 複数のpdf, imageファイルを入力してコンテンツを生成
 async def generate_content_json(
     files: list[str],
+    uid: str,
     model_name: str = MODEL_NAME,
     bucket_name: str = BUCKET_NAME,
 ) -> dict:
     print("generate_content_json started")  # デバッグ用
 
+    content: list = []
     image_files: list[dict] = []
 
     try:
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
         extracted_text = ""  # 初期化
         for file_name in files:
+            # ユーザーIDの検証
+            if not uid or not uid.strip():
+                raise ValueError("Invalid user ID")
+
+            # パスの正規化
+            safe_uid = uid.strip().rstrip("/")
+            file_name = unicodedata.normalize("NFC", f"{safe_uid}/{file_name}")
             print(f"Processing file: {file_name}")  # デバッグ用
             if await check_file_exists(bucket_name, file_name):
                 print(f"File {file_name} exists in bucket {bucket_name}")  # デバッグ用
-                if file_name.lower().endswith(
-                    (".png", ".jpg", ".jpeg", ".gif", "webp")
-                ):
+                if file_name.lower().endswith((".png", ".jpg", ".jpeg", ".gif", "webp")):
                     print(f"Reading image file: {file_name}")  # デバッグ用
                     image_file = await read_file(bucket_name, file_name)
                     file_extension = file_name.split(".")[-1].lower()
@@ -234,18 +245,28 @@ async def generate_content_json(
                     print(f"Extracting text from PDF: {file_name}")  # デバッグ用
                     extracted_text = await extract_text_from_pdf(bucket_name, file_name)
                     print(f"Extracted text length: {len(extracted_text)}")  # デバッグ用
+                if file_name.lower().endswith(".mp4"):
+                    # ファイルを音声ファイルに変換する
+                    logging.info(f"Converting {file_name} to mp3 format.")
+                    if convert_mp4_to_mp3(bucket_name, file_name):
+                        print(f"Successfully converted {file_name} to mp3 format.")
+                        extracted_text = extract_text_from_audio(bucket_name, file_name)
+                        content.append({"type": "text", "text": extracted_text})
+                        print("Added extracted text to content")  # デバッグ用
+                    else:
+                        logging.error(f"Failed to convert {file_name} to mp3 format.")
+                        raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
+                if file_name.lower().endswith(".mp3") or file_name.lower().endswith(".wav"):
+                    extracted_text = extract_text_from_audio(bucket_name, file_name)
+                    content.append({"type": "text", "text": extracted_text})
+                    print("Added extracted text to content")  # デバッグ用
 
         print(f"Total image files processed: {len(image_files)}")  # デバッグ用
 
-        content: list = []
         if image_files:
             for i, image in enumerate(image_files, 1):
                 content.extend([{"type": "text", "text": f"Image {i}:"}, image])
             print(f"Added {len(image_files)} images to content")  # デバッグ用
-
-        if extracted_text:
-            content.append({"type": "text", "text": extracted_text})
-            print("Added extracted text to content")  # デバッグ用
 
         content.append({"type": "text", "text": prompt})
         print("Added prompt to content")  # デバッグ用
@@ -296,7 +317,8 @@ async def main() -> None:
     """
     response: dict = await generate_content_json(
         # ["kougi_sample.png", "kougi_sample2.png"],
-        ["1_ソフトウェア工学の誕生.pdf"]
+        ["1_ソフトウェア工学の誕生.pdf"],
+        "test_uid",
     )
     print(response)
 

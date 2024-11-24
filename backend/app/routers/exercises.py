@@ -242,7 +242,7 @@ async def request_choice_question_json(
         )
 
     try:
-        response = await generate_content_json(request.files)
+        response = await generate_content_json(request.files, uid)
         logging.info(f"Generated response: {response}")
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")

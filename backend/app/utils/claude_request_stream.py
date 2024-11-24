@@ -101,10 +101,11 @@ async def generate_content_stream(
     print("generate_content_stream started")  # デバッグ用
 
     image_files: list[dict] = []
+    content: list = []
     prompt = """
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
         - #input_files: 複数のファイルは、大学院の講義資料です。
-        - #instruction: 複数のpdf, imageファイルを読み解いて、練習問題を作って下さい。
+        - #instruction: 複数のテキスト, imageファイルを読み解いて、練習問題を作って下さい。
         - #style1: "4択の選択問題"を5問 + "穴埋め問題"を5問、合計10問出題してください。
         - #style2: 200文字程度の"記述式問題"を3問出題して下さい。
         - #style3: 最後に一括して"正解"と"解説"を箇条書き形式で表示してください。
@@ -149,31 +150,30 @@ async def generate_content_stream(
                     print(f"Extracting text from PDF: {file_name}")  # デバッグ用
                     extracted_text = await extract_text_from_pdf(bucket_name, file_name)
                     print(f"Extracted text length: {len(extracted_text)}")  # デバッグ用
+                    content.append({"type": "text", "text": extracted_text})
+                    print("Added extracted text to content")  # デバッグ用
                 if file_name.lower().endswith(".mp4"):
                     # ファイルを音声ファイルに変換する
                     logging.info(f"Converting {file_name} to mp3 format.")
                     if convert_mp4_to_mp3(bucket_name, file_name):
                         print(f"Successfully converted {file_name} to mp3 format.")
                         extracted_text = extract_text_from_audio(bucket_name, file_name)
-                        print(f"テキストに変換：{extracted_text}")
+                        content.append({"type": "text", "text": extracted_text})
+                        print("Added extracted text to content")  # デバッグ用
                     else:
                         logging.error(f"Failed to convert {file_name} to mp3 format.")
                         raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
                 if file_name.lower().endswith(".mp3") or file_name.lower().endswith(".wav"):
                     extracted_text = extract_text_from_audio(bucket_name, file_name)
-                    print(f"テキストに変換：{extracted_text}")
+                    content.append({"type": "text", "text": extracted_text})
+                    print("Added extracted text to content")  # デバッグ用
 
         print(f"Total image files processed: {len(image_files)}")  # デバッグ用
 
-        content: list = []
         if image_files:
             for i, image in enumerate(image_files, 1):
                 content.extend([{"type": "text", "text": f"Image {i}:"}, image])
             print(f"Added {len(image_files)} images to content")  # デバッグ用
-
-        if extracted_text:
-            content.append({"type": "text", "text": extracted_text})
-            print("Added extracted text to content")  # デバッグ用
 
         content.append({"type": "text", "text": prompt})
         print(f"contents: {content}")
