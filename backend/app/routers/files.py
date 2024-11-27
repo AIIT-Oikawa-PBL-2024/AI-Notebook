@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.files as files_cruds
 import app.schemas.files as files_schemas
+from app.cruds.files import get_file_id_by_name_and_userid
 from app.database import get_db
 from app.utils.operate_cloud_storage import (
     delete_files_from_gcs,
@@ -67,21 +68,34 @@ async def upload_files(
         if file.filename and file.size:
             # ファイル名を正規化
             normalized_filename = unicodedata.normalize("NFC", file.filename)
-
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
 
-            file_create = files_schemas.FileCreate(
-                file_name=normalized_filename,
-                file_size=file.size,
-                user_id=uid,
-                created_at=now_japan,
-            )
-
             # ファイル情報を保存
             try:
-                regist_file = await files_cruds.create_file(db, file_create, uid)
-                logging.info(f"File {regist_file.file_name} saved to database.")
+                file_id = await get_file_id_by_name_and_userid(db, normalized_filename, uid)
+                if file_id is None:
+                    logging.info(f"File {normalized_filename} not found in database.")
+                    file_create = files_schemas.FileCreate(
+                        file_name=normalized_filename,
+                        file_size=file.size,
+                        user_id=uid,
+                        created_at=now_japan,  # 日本時間の現在日時を設定
+                        updated_at=now_japan,  # 日本時間の現在日時を設定
+                    )
+                    regist_file = await files_cruds.create_file(db, file_create, uid)
+                    logging.info(f"File {regist_file.file_name} saved to database.")
+                else:
+                    logging.info(f"File {normalized_filename} found in database. {file_id}")
+                    file_update = files_schemas.FileUpdate(
+                        file_name=normalized_filename,
+                        file_size=file.size,
+                        user_id=uid,
+                        updated_at=now_japan,  # 日本時間の現在日時を設定
+                    )
+                    print(file_id)
+                    update_file = await files_cruds.update_file(db, file_id, file_update, uid)
+                    logging.info(f"File {update_file.file_name} updated in database.")
             except Exception as e:
                 raise HTTPException(
                     status_code=500,
@@ -253,21 +267,34 @@ async def register_files(
         if file.filename and file.size:
             # ファイル名を正規化
             normalized_filename = unicodedata.normalize("NFC", file.filename)
-
             # 日本時間の現在日時を取得
             now_japan = datetime.now(JST)
 
-            file_create = files_schemas.FileCreate(
-                file_name=normalized_filename,
-                file_size=file.size,
-                user_id=uid,
-                created_at=now_japan,  # 日本時間の現在日時を設定
-            )
-
             # ファイル情報を保存
             try:
-                regist_file = await files_cruds.create_file(db, file_create, uid)
-                logging.info(f"File {regist_file.file_name} saved to database.")
+                file_id = await get_file_id_by_name_and_userid(db, normalized_filename, uid)
+                if file_id is None:
+                    logging.info(f"File {normalized_filename} not found in database.")
+                    file_create = files_schemas.FileCreate(
+                        file_name=normalized_filename,
+                        file_size=file.size,
+                        user_id=uid,
+                        created_at=now_japan,  # 日本時間の現在日時を設定
+                        updated_at=now_japan,  # 日本時間の現在日時を設定
+                    )
+                    regist_file = await files_cruds.create_file(db, file_create, uid)
+                    logging.info(f"File {regist_file.file_name} saved to database.")
+                else:
+                    logging.info(f"File {normalized_filename} found in database. {file_id}")
+                    file_update = files_schemas.FileUpdate(
+                        file_name=normalized_filename,
+                        file_size=file.size,
+                        user_id=uid,
+                        updated_at=now_japan,  # 日本時間の現在日時を設定
+                    )
+                    print(file_id)
+                    update_file = await files_cruds.update_file(db, file_id, file_update, uid)
+                    logging.info(f"File {update_file.file_name} updated in database.")
             except Exception as e:
                 raise HTTPException(
                     status_code=500,

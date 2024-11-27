@@ -45,6 +45,7 @@ async def test_create_file(session: AsyncSession, test_user_id: str) -> None:
         file_size=12345,
         user_id=test_user_id,
         created_at=datetime.now(JST),
+        updated_at=datetime.now(JST),
     )
     file = await files_cruds.create_file(session, file_create, test_user_id)
 
@@ -71,6 +72,7 @@ async def test_get_files(session: AsyncSession, test_user_id: str) -> None:
         file_size=12345,
         user_id=test_user_id,
         created_at=datetime.now(JST),
+        updated_at=datetime.now(JST),
     )
     await files_cruds.create_file(session, file_create, test_user_id)
 
@@ -98,13 +100,12 @@ async def test_get_file_by_id(session: AsyncSession, test_user_id: str) -> None:
         file_size=12345,
         user_id=test_user_id,
         created_at=datetime.now(JST),
+        updated_at=datetime.now(JST),
     )
     file = await files_cruds.create_file(session, file_create, test_user_id)
     file_id = int(file.id)
 
-    retrieved_file = await files_cruds.get_file_by_id_and_user_id(
-        session, file_id, test_user_id
-    )
+    retrieved_file = await files_cruds.get_file_by_id_and_user_id(session, file_id, test_user_id)
     assert retrieved_file is not None
     assert retrieved_file.id == file.id
     assert retrieved_file.file_name == file.file_name
@@ -122,9 +123,7 @@ async def test_get_file_by_id_not_found(session: AsyncSession) -> None:
     :type session: AsyncSession
     :return: None
     """
-    retrieved_file = await files_cruds.get_file_by_id_and_user_id(
-        session, 9999, "test_user_id"
-    )
+    retrieved_file = await files_cruds.get_file_by_id_and_user_id(session, 9999, "test_user_id")
     assert retrieved_file is None
 
 
@@ -145,15 +144,12 @@ async def test_delete_file_by_name(session: AsyncSession, test_user_id: str) -> 
         file_size=12345,
         user_id=test_user_id,
         created_at=datetime.now(JST),
+        updated_at=datetime.now(JST),
     )
     file = await files_cruds.create_file(session, file_create, test_user_id)
 
-    await files_cruds.delete_file_by_name_and_userid(
-        session, "test_file.pdf", test_user_id
-    )
+    await files_cruds.delete_file_by_name_and_userid(session, "test_file.pdf", test_user_id)
     file_id = int(file.id)
 
-    retrieved_file = await files_cruds.get_file_by_id_and_user_id(
-        session, file_id, test_user_id
-    )
+    retrieved_file = await files_cruds.get_file_by_id_and_user_id(session, file_id, test_user_id)
     assert retrieved_file is None

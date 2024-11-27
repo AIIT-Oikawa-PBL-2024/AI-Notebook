@@ -29,6 +29,18 @@ class FileCreate(FileBase):
 
     user_id: str
     created_at: datetime
+    updated_at: datetime
+
+
+class FileUpdate(FileBase):
+    """
+    FileBaseクラスを継承したファイル更新を表すクラス。
+    :param created_at: 作成日時
+    :type created_at: datetime
+    """
+
+    user_id: str
+    updated_at: datetime
 
 
 class File(FileBase):
