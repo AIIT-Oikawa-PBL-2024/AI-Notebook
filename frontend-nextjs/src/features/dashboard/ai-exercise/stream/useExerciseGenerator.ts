@@ -1,3 +1,5 @@
+"use client";
+
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useCallback, useEffect, useRef, useState } from "react";
 

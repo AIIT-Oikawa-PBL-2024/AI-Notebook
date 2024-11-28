@@ -1,3 +1,5 @@
+"use client";
+
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {

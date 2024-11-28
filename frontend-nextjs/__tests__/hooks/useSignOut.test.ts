@@ -63,7 +63,7 @@ describe("useSignOut", () => {
 		});
 	});
 
-	it("should sign out successfully and clear data", async () => {
+	it("正常にサインアウトしてデータをクリアする", async () => {
 		(signOut as Mock).mockResolvedValue(undefined);
 
 		const { result } = renderHook(() => useSignOut());
@@ -81,7 +81,7 @@ describe("useSignOut", () => {
 		expect(result.current.error).toBeNull();
 	});
 
-	it("should handle sign out error", async () => {
+	it("サインアウト時のエラーを適切に処理する", async () => {
 		const errorMessage = "サインアウト中にエラーが発生しました。";
 		(signOut as Mock).mockRejectedValue(new Error("Sign out failed"));
 
@@ -97,7 +97,7 @@ describe("useSignOut", () => {
 		expect(result.current.error).toBe(errorMessage);
 	});
 
-	it("should set loading state during sign out process", async () => {
+	it("サインアウト処理中にローディング状態を設定する", async () => {
 		let resolveSignOut: () => void;
 		const signOutPromise = new Promise<void>((resolve) => {
 			resolveSignOut = resolve;
@@ -129,7 +129,7 @@ describe("useSignOut", () => {
 		expect(result.current.isLoading).toBe(false);
 	});
 
-	it("should handle cache clearing error", async () => {
+	it("キャッシュのクリア時のエラーを適切に処理する", async () => {
 		(signOut as Mock).mockResolvedValue(undefined);
 		(window.caches.delete as Mock).mockRejectedValue(
 			new Error("Cache delete failed"),
@@ -144,7 +144,7 @@ describe("useSignOut", () => {
 		});
 
 		expect(consoleSpy).toHaveBeenCalledWith(
-			"ストレージのクリアに失敗しました:",
+			"キャッシュのクリアに失敗しました:",
 			expect.any(Error),
 		);
 		expect(mockPush).toHaveBeenCalledWith("/signin");

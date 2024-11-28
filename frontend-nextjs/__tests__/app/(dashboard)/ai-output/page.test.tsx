@@ -9,11 +9,6 @@ vi.mock("@/features/dashboard/ai-output/hooks/useOutputGenerator", () => ({
 	useOutputGenerator: vi.fn(),
 }));
 
-// withAuthのモック
-vi.mock("@/utils/withAuth", () => ({
-	withAuth: (Component: React.ComponentType) => Component,
-}));
-
 // OutputDisplayのモック
 vi.mock("@/features/dashboard/ai-output/OutputDisplay", () => ({
 	OutputDisplay: vi.fn(() => (
