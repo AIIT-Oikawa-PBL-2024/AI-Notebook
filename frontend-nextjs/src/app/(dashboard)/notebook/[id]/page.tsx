@@ -13,44 +13,52 @@ const EditNotebookPage = ({ params }: Props) => {
 	const router = useRouter();
 	const { getNotebooks, deleteNotebook } = useNotebookActions();
 	const [note, setNote] = useState<Note | undefined>(undefined);
+	const [isLoading, setIsLoading] = useState(true);
 	const noteId = Number.parseInt(params.id);
 
 	useEffect(() => {
-		let isMounted = true;
-		const fetchNote = async (noteId: number) => {
+		const fetchNote = async () => {
+			if (!noteId) return;
+
 			try {
 				const fetchedNotes = await getNotebooks();
 				const currentNote = fetchedNotes.find((note) => note.id === noteId);
+
 				if (!currentNote) {
 					router.push("/");
 					return;
 				}
-				if (isMounted) {
-					setNote(currentNote);
-				}
+				setNote(currentNote);
 			} catch (error) {
 				console.error("Note fetch error: ", error);
 				router.push("/");
+			} finally {
+				setIsLoading(false);
 			}
 		};
-		if (noteId) {
-			fetchNote(noteId);
-		}
+
+		fetchNote();
+
 		return () => {
-			isMounted = false;
+			setNote(undefined);
+			setIsLoading(true);
 		};
-	}, [noteId, getNotebooks, router]);
+	}, [noteId, router, getNotebooks]);
 
 	const handleDelete = async () => {
 		if (!noteId) return;
 
 		try {
 			await deleteNotebook(noteId);
+			router.push("/");
 		} catch (error) {
 			console.error(error);
 		}
-		router.push("/");
 	};
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
 	return (
 		<NotebookForm
