@@ -132,7 +132,7 @@ describe("AuthProvider", () => {
 
 		await waitFor(() => {
 			expect(result.current.error).toBe(
-				"認証トークンの更新に失敗しました。再度サインインしてください",
+				"認証トークンの更新に失敗しました。再度サインインしてください。",
 			);
 		});
 	});

@@ -9,11 +9,6 @@ vi.mock("@/features/dashboard/ai-exercise/stream/useExerciseGenerator", () => ({
 	useExerciseGenerator: vi.fn(),
 }));
 
-// withAuthのモック
-vi.mock("@/utils/withAuth", () => ({
-	withAuth: (Component: React.ComponentType) => Component,
-}));
-
 // ExerciseDisplayのモック
 vi.mock("@/features/dashboard/ai-exercise/stream/ExerciseDisplay", () => ({
 	ExerciseDisplay: vi.fn(() => (

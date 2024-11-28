@@ -2,7 +2,6 @@
 
 import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
 import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
-import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 
 const CreateOutputPage: NextPage = () => {
@@ -24,4 +23,4 @@ const CreateOutputPage: NextPage = () => {
 	);
 };
 
-export default withAuth(CreateOutputPage as React.ComponentType);
+export default CreateOutputPage as React.ComponentType;

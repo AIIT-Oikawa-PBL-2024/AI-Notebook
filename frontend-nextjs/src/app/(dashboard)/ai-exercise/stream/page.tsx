@@ -2,7 +2,6 @@
 
 import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/stream/ExerciseDisplay";
 import { useExerciseGenerator } from "@/features/dashboard/ai-exercise/stream/useExerciseGenerator";
-import { withAuth } from "@/utils/withAuth";
 import type { NextPage } from "next";
 
 const CreateExercisePage: NextPage = () => {
@@ -30,4 +29,4 @@ const CreateExercisePage: NextPage = () => {
 	);
 };
 
-export default withAuth(CreateExercisePage as React.ComponentType);
+export default CreateExercisePage as React.ComponentType;

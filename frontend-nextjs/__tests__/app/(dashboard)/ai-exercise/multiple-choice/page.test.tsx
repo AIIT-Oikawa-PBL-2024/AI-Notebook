@@ -13,34 +13,12 @@ vi.mock(
 	}),
 );
 
-vi.mock("@/utils/withAuth", () => ({
-	withAuth: vi.fn((Component) => {
-		const WithAuthMock = (props: React.ComponentProps<typeof Component>) => {
-			return <Component {...props} />;
-		};
-		return WithAuthMock;
-	}),
-}));
-
 describe("MultipleChoiceQuestionsPage", () => {
-	it("should render MultipleChoiceQuestions component", () => {
+	it("MultipleChoiceQuestionsコンポーネントがレンダリングされるべき", () => {
 		render(<MultipleChoiceQuestionsPage />);
 
 		expect(
 			screen.getByText("Mocked MultipleChoiceQuestions"),
 		).toBeInTheDocument();
-	});
-
-	it("should be wrapped with withAuth HOC", () => {
-		render(<MultipleChoiceQuestionsPage />);
-
-		expect(withAuth).toHaveBeenCalled();
-	});
-
-	it("should render correctly with withAuth HOC", () => {
-		render(<MultipleChoiceQuestionsPage />);
-
-		const component = screen.getByText("Mocked MultipleChoiceQuestions");
-		expect(component).toBeInTheDocument();
 	});
 });
