@@ -153,3 +153,44 @@ async def test_delete_file_by_name(session: AsyncSession, test_user_id: str) -> 
 
     retrieved_file = await files_cruds.get_file_by_id_and_user_id(session, file_id, test_user_id)
     assert retrieved_file is None
+
+
+# update_file関数のテスト
+@pytest.mark.asyncio
+async def test_update_file(session: AsyncSession, test_user_id: str) -> None:
+    """
+    update_file関数のテスト。
+
+    :param session: 非同期セッション
+    :type session: AsyncSession
+    :param test_user_id: テストユーザーのID
+    :type test_user_id: str
+    :return: None
+    """
+
+    # 固定の過去の日付を設定（例：2024年11月27日）
+    fixed_date = datetime(2024, 11, 27, 20, 31, 43)
+    file_create = files_schemas.FileCreate(
+        file_name="test_file.pdf",
+        file_size=12345,
+        user_id=test_user_id,
+        created_at=fixed_date,
+        updated_at=fixed_date,
+    )
+    file = await files_cruds.create_file(session, file_create, test_user_id)
+    file_id = int(file.id)
+
+    file_update = files_schemas.FileUpdate(
+        file_name="updated_file.pdf",
+        file_size=54321,
+        user_id=test_user_id,
+        updated_at=datetime.now(JST),
+    )
+    updated_file = await files_cruds.update_file(session, file_id, file_update, test_user_id)
+
+    assert updated_file.id == file.id
+    assert updated_file.file_name == "updated_file.pdf"
+    assert updated_file.file_size == 54321
+    assert updated_file.user_id == test_user_id
+    assert updated_file.created_at == fixed_date
+    assert updated_file.updated_at > fixed_date
