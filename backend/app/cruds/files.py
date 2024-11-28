@@ -120,7 +120,7 @@ async def get_file_id_by_name_and_userid(db: AsyncSession, file_name: str, uid: 
 # ファイルを更新する処理
 async def update_file(
     db: AsyncSession, file_id: int, file_update: files_schemas.FileUpdate, uid: str
-) -> files_models.File:
+) -> files_models.File | None:
     """
     ファイルを更新する関数
 

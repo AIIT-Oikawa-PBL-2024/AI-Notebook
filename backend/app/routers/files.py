@@ -95,7 +95,10 @@ async def upload_files(
                     )
                     print(file_id)
                     update_file = await files_cruds.update_file(db, file_id, file_update, uid)
-                    logging.info(f"File {update_file.file_name} updated in database.")
+                    if update_file:
+                        logging.info(f"File {update_file.file_name} updated in database.")
+                    else:
+                        logging.error(f"Failed to update file {normalized_filename} in database.")
             except Exception as e:
                 raise HTTPException(
                     status_code=500,
@@ -294,7 +297,10 @@ async def register_files(
                     )
                     print(file_id)
                     update_file = await files_cruds.update_file(db, file_id, file_update, uid)
-                    logging.info(f"File {update_file.file_name} updated in database.")
+                    if update_file:
+                        logging.info(f"File {update_file.file_name} updated in database.")
+                    else:
+                        logging.error(f"Failed to update file {normalized_filename} in database.")
             except Exception as e:
                 raise HTTPException(
                     status_code=500,
