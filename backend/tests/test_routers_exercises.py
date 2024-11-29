@@ -48,6 +48,7 @@ async def test_request_content_stream_success(
         file_size=1234,
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
     session_cleanup.add(file_data)
     await session_cleanup.commit()
@@ -99,6 +100,7 @@ async def test_request_content_stream_gcs_not_found(
         file_size=1234,
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
     session_cleanup.add(file_data)
     await session_cleanup.commit()
@@ -137,6 +139,7 @@ async def test_request_content_stream_invalid_filename(
         file_size=1234,
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
     session_cleanup.add(file_data)
     await session_cleanup.commit()
@@ -175,6 +178,7 @@ async def test_request_content_stream_google_api_error(
         file_size=1234,
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
     session_cleanup.add(file_data)
     await session_cleanup.commit()
@@ -238,6 +242,7 @@ async def test_multiple_choice_success(
         file_size=1234,
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
     session_cleanup.add(file_data)
     await session_cleanup.commit()

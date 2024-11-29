@@ -24,6 +24,7 @@ async def create_file(
     file_data = file_create.model_dump()
     file_data["user_id"] = uid
     file = files_models.File(**file_data)
+    print(file)
     db.add(file)
     await db.commit()
     await db.refresh(file)
@@ -113,4 +114,37 @@ async def get_file_id_by_name_and_userid(db: AsyncSession, file_name: str, uid: 
         .filter(files_models.File.user_id == uid)
     )
     file = result.scalar_one_or_none()
+    return file
+
+
+# ファイルを更新する処理
+async def update_file(
+    db: AsyncSession, file_id: int, file_update: files_schemas.FileUpdate, uid: str
+) -> files_models.File | None:
+    """
+    ファイルを更新する関数
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param file_id: 更新するファイルのID
+    :type file_id: int
+    :param file_update: 更新するファイルの情報
+    :type file_update: files_schemas.FileUpdate
+    :param uid: ファイルを所有するユーザーのID
+    :type uid: str
+    :return: 更新されたファイルのインスタンス
+    :rtype: files_models.File
+    """
+    result: Result = await db.execute(
+        select(files_models.File)
+        .filter(files_models.File.id == file_id)
+        .filter(files_models.File.user_id == uid)
+    )
+    print(result)
+    file = result.scalars().first()
+    file_data = file_update.model_dump()
+    for key, value in file_data.items():
+        setattr(file, key, value)
+    await db.commit()
+    await db.refresh(file)
     return file

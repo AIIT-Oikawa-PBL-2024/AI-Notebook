@@ -31,6 +31,7 @@ class File(Base):
     file_size = Column(Integer, nullable=False)
     user_id = Column(String(128), nullable=False, index=True)  # Firebase UIDの最大長に合わせて調整
     created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
     # リレーションシップの定義
     exercises = relationship(
