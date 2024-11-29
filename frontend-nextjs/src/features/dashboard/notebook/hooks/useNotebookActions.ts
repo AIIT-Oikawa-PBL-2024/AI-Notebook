@@ -1,6 +1,7 @@
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { parseWithZod } from "@conform-to/zod";
 import { getAuth } from "firebase/auth";
+import { useCallback, useMemo } from "react";
 import { notebookSchema } from "../schema";
 import type { Note } from "../types/data";
 
@@ -9,95 +10,104 @@ export function useNotebookActions() {
 	const currentUser = auth.currentUser;
 	const authFetch = useAuthFetch();
 
-	const getNotebooks = async (): Promise<Note[]> => {
-		const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes`;
+	// authFetchをメモ化された関数として保持
+	const memoizedAuthFetch = useCallback(authFetch, []);
 
-		try {
-			const response = await authFetch(endpoint);
-			if (!response.ok) {
-				throw new Error("リクエストに失敗しました");
-			}
-			return await response.json();
-		} catch (error) {
-			throw new Error("ノートブックの取得に失敗しました");
-		}
-	};
+	// すべてのアクションをuseMemoで安定した参照を維持
+	const notebookActions = useMemo(
+		() => ({
+			getNotebooks: async (): Promise<Note[]> => {
+				const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes/`;
 
-	const createNotebook = async (prevState: unknown, formData: FormData) => {
-		const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes`;
+				try {
+					const response = await memoizedAuthFetch(endpoint);
+					if (!response.ok) {
+						throw new Error("リクエストに失敗しました");
+					}
+					return await response.json();
+				} catch (error) {
+					throw new Error("ノートブックの取得に失敗しました");
+				}
+			},
 
-		if (currentUser) {
-			// TODO: user id 仮置き
-			formData.set("user_id", currentUser.uid);
-		} else {
-			throw new Error("ユーザー情報が取得できませんでした");
-		}
+			createNotebook: async (prevState: unknown, formData: FormData) => {
+				const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes/`;
 
-		const submission = parseWithZod(formData, {
-			schema: notebookSchema,
-		});
+				if (currentUser) {
+					formData.set("user_id", currentUser.uid);
+				} else {
+					throw new Error("ユーザー情報が取得できませんでした");
+				}
 
-		if (submission.status !== "success") {
-			return submission.reply();
-		}
+				const submission = parseWithZod(formData, {
+					schema: notebookSchema,
+				});
 
-		try {
-			const response = await authFetch(endpoint, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(submission.value),
-			});
-			return await response.json();
-		} catch (error) {
-			throw new Error("ノートブックの作成に失敗しました");
-		}
-	};
+				if (submission.status !== "success") {
+					return submission.reply();
+				}
 
-	const updateNotebook = async (
-		noteId: number,
-		prevState: unknown,
-		formData: FormData,
-	) => {
-		const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes/${noteId}`;
+				try {
+					const response = await memoizedAuthFetch(endpoint, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(submission.value),
+					});
+					return await response.json();
+				} catch (error) {
+					throw new Error("ノートブックの作成に失敗しました");
+				}
+			},
 
-		const submission = parseWithZod(formData, {
-			schema: notebookSchema,
-		});
+			updateNotebook: async (
+				noteId: number,
+				prevState: unknown,
+				formData: FormData,
+			) => {
+				const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes/${noteId}`;
 
-		if (submission.status !== "success") {
-			return submission.reply();
-		}
+				const submission = parseWithZod(formData, {
+					schema: notebookSchema,
+				});
 
-		try {
-			const response = await authFetch(endpoint, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(submission.value),
-			});
-			return await response.json();
-		} catch (error) {
-			throw new Error("ノートブックの更新に失敗しました");
-		}
-	};
+				if (submission.status !== "success") {
+					return submission.reply();
+				}
 
-	const deleteNotebook = async (noteId: number) => {
-		const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes/${noteId}`;
+				try {
+					const response = await memoizedAuthFetch(endpoint, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(submission.value),
+					});
+					return await response.json();
+				} catch (error) {
+					throw new Error("ノートブックの更新に失敗しました");
+				}
+			},
 
-		try {
-			const response = await authFetch(endpoint, {
-				method: "DELETE",
-			});
-			if (!response.ok) {
-				throw new Error("リクエストに失敗しました");
-			}
-			return await response.json();
-		} catch (error) {
-			throw new Error("ノートブックの削除に失敗しました");
-		}
-	};
-	return { getNotebooks, createNotebook, updateNotebook, deleteNotebook };
+			deleteNotebook: async (noteId: number) => {
+				const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_HOST}/notes/${noteId}`;
+
+				try {
+					const response = await memoizedAuthFetch(endpoint, {
+						method: "DELETE",
+					});
+					if (!response.ok) {
+						throw new Error("リクエストに失敗しました");
+					}
+					return await response.json();
+				} catch (error) {
+					throw new Error("ノートブックの削除に失敗しました");
+				}
+			},
+		}),
+		[memoizedAuthFetch, currentUser],
+	); // currentUserも依存配列に追加
+
+	return notebookActions;
 }
