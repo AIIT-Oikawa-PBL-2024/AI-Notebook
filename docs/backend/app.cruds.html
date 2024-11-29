@@ -61,6 +61,7 @@
 <li><a class="reference internal" href="#app.cruds.files.get_file_by_id_and_user_id"><code class="docutils literal notranslate"><span class="pre">get_file_by_id_and_user_id()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.files.get_file_id_by_name_and_userid"><code class="docutils literal notranslate"><span class="pre">get_file_id_by_name_and_userid()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.files.get_files_by_user_id"><code class="docutils literal notranslate"><span class="pre">get_files_by_user_id()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.files.update_file"><code class="docutils literal notranslate"><span class="pre">update_file()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.cruds.notes">app.cruds.notes module</a><ul>
@@ -341,6 +342,28 @@ ExerciseCreateスキーマには既にuser_idが含まれているため、追�
 </dd>
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list[files_schemas.File]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.files.update_file">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.files.</span></span><span class="sig-name descname"><span class="pre">update_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.files.FileUpdate" title="app.schemas.files.FileUpdate"><span class="pre">FileUpdate</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/files.html#update_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.files.update_file" title="Link to this definition"></a></dt>
+<dd><p>ファイルを更新する関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>file_id</strong> (<em>int</em>) -- 更新するファイルのID</p></li>
+<li><p><strong>file_update</strong> (<em>files_schemas.FileUpdate</em>) -- 更新するファイルの情報</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) -- ファイルを所有するユーザーのID</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>更新されたファイルのインスタンス</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>files_models.File</p>
 </dd>
 </dl>
 </dd></dl>
