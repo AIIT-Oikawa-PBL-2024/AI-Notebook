@@ -70,14 +70,12 @@ async def test_read_file(mock_storage_client: Mock) -> None:
     # ファイル内容のモック
     mock_file_content = b"test file content"
 
-    # 非同期コンテキストマネージャとしてモックする
-    mock_blob.open.return_value = AsyncContextManager(
-        AsyncMock(read=AsyncMock(return_value=mock_file_content))
-    )
+    # download_as_bytesのモックを設定
+    mock_blob.download_as_bytes.return_value = mock_file_content
     mock_bucket.blob.return_value = mock_blob
     mock_storage_client.return_value.bucket.return_value = mock_bucket
 
-    result = await claude_request_stream.read_file("test-bucket-name", "test-file.pdf")
+    result = await claude_request_stream.read_file("test-bucket-name", "test-file.png")
 
     # 戻り値がbase64エンコードされた内容であることを確認
     assert result == base64.b64encode(mock_file_content).decode("utf-8")

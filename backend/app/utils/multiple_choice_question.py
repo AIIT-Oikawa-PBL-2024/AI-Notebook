@@ -166,8 +166,8 @@ async def read_file(bucket_name: str, file_name: str) -> str:
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(file_name)
-    async with blob.open("rb") as f:
-        file_content = await f.read()
+    # asyncio.to_threadを使用して同期的な操作を非同期に変換
+    file_content = await asyncio.to_thread(blob.download_as_bytes)
     # base64エンコーディング
     base64_encoded = base64.b64encode(file_content).decode("utf-8")
     return base64_encoded
@@ -288,10 +288,15 @@ async def generate_content_json(
 
         # デバッグ用にコンテンツの内容を出力
         print("Content structure:")
-        for item in content:
-            print(
-                f"- Type: {item['type']}, Length: {len(item['text']) if 'text' in item else 'N/A'}"
-            )
+        for i, item in enumerate(content, 1):
+            if item["type"] == "text":
+                print(f"{i}. Type: text, Length: {len(item['text'])}")
+            elif item["type"] == "image":
+                image_info = item["source"]
+                print(
+                    f"{i}. Type: image, Format: {image_info['media_type']}, "
+                    + f"Size: {len(image_info['data'])//1024}KB"
+                )
 
         response = client.messages.create(
             max_tokens=4096,
