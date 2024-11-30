@@ -118,6 +118,7 @@ async def test_generate_content_json_internal_server_error(
             await generate_content_json(
                 files=["test.pdf"],
                 uid=MOCK_UID,
+                title="Test title",
                 model_name=MOCK_MODEL_NAME,
                 bucket_name=MOCK_BUCKET_NAME,
             )
@@ -198,6 +199,7 @@ async def test_generate_content_json_pdf(
         result = await generate_content_json(
             files=["test.pdf"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -227,6 +229,7 @@ async def test_generate_content_json_image(
         result = await generate_content_json(
             files=["test.png"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -248,6 +251,7 @@ async def test_generate_content_json_file_not_found(
         await generate_content_json(
             files=["nonexistent.pdf"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -265,6 +269,7 @@ async def test_generate_content_json_google_api_error(
         await generate_content_json(
             files=["test.pdf"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
