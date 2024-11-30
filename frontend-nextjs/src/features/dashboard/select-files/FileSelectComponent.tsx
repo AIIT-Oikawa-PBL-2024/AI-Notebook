@@ -123,7 +123,10 @@ export default function FileSelectComponent() {
 
 	const createAiContent = useCallback(
 		async (
-			type: "ai-output" | "ai-exercise/stream" | "ai-exercise/multiple-choice",
+			type:
+				| "ai-output/stream"
+				| "ai-exercise/stream"
+				| "ai-exercise/multiple-choice",
 		) => {
 			if (!user) {
 				setError("認証が必要です");
@@ -148,7 +151,7 @@ export default function FileSelectComponent() {
 					for (const key of Object.values(STORAGE_KEYS.STREAM_EXERCISE)) {
 						localStorage.removeItem(key);
 					}
-				} else if (type === "ai-output") {
+				} else if (type === "ai-output/stream") {
 					localStorage.removeItem("cached_output");
 				}
 
@@ -331,7 +334,7 @@ export default function FileSelectComponent() {
 								<div className="flex gap-4">
 									<Button
 										size="lg"
-										onClick={() => createAiContent("ai-output")}
+										onClick={() => createAiContent("ai-output/stream")}
 										className="flex-1"
 										disabled={loading}
 									>

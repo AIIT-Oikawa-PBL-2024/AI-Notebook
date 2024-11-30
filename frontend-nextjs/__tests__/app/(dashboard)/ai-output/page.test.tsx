@@ -1,4 +1,4 @@
-import CreateOutputPage from "@/app/(dashboard)/ai-output/page";
+import CreateOutputPage from "@/app/(dashboard)/ai-output/stream/page";
 import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
 import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
 import { render, screen, waitFor } from "@testing-library/react";

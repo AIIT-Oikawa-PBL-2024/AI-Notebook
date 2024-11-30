@@ -72,7 +72,7 @@ export default function NavBar() {
 						ファイル選択
 					</ListItem>
 				</Link>
-				<Link href="/ai-output">
+				<Link href="/ai-output/stream">
 					<ListItem>
 						<ListItemPrefix>
 							<ComputerDesktopIcon className="h-5 w-5" />
