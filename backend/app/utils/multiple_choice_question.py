@@ -198,6 +198,21 @@ async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
     return extracted_text
 
 
+# ファイル拡張子から適切なmedia_typeを返す
+def get_media_type(extension: str) -> str:
+    """
+    ファイル拡張子から適切なmedia_typeを返す
+    """
+    media_types = {
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "png": "image/png",
+        "gif": "image/gif",
+        "webp": "image/webp",
+    }
+    return media_types.get(extension.lower(), "image/jpeg")
+
+
 # 複数のpdf, image, 動画ファイルを入力してコンテンツを生成
 async def generate_content_json(
     files: list[str],
@@ -238,17 +253,19 @@ async def generate_content_json(
                 elif file_name.lower().endswith((".png", ".jpg", ".jpeg")):
                     print(f"Reading image file: {file_name}")
                     image_file = await read_file(bucket_name, file_name)
+
                     file_extension = file_name.split(".")[-1].lower()
                     image_files.append(
                         {
                             "type": "image",
                             "source": {
                                 "type": "base64",
-                                "media_type": f"image/{file_extension}",
+                                "media_type": get_media_type(file_extension),
                                 "data": image_file,
                             },
                         }
                     )
+
                     print(f"Added image file: {file_name} to image_files")
 
                 elif file_name.lower().endswith(".mp4"):
