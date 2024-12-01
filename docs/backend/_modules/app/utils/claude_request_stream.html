@@ -135,8 +135,8 @@
     <span class="n">storage_client</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
     <span class="n">bucket</span> <span class="o">=</span> <span class="n">storage_client</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">)</span>
     <span class="n">blob</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">blob</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">with</span> <span class="n">blob</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">file_content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="c1"># asyncio.to_threadを使用して同期的な操作を非同期に変換</span>
+    <span class="n">file_content</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">blob</span><span class="o">.</span><span class="n">download_as_bytes</span><span class="p">)</span>
     <span class="c1"># base64エンコーディング</span>
     <span class="n">base64_encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">file_content</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">base64_encoded</span></div>
@@ -168,6 +168,24 @@
         <span class="n">page_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">get_text</span><span class="p">)</span>
         <span class="n">extracted_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">ページ</span><span class="se">\n</span><span class="si">{</span><span class="n">page_text</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">extracted_text</span></div>
+
+
+
+<span class="c1"># ファイル拡張子から適切なmedia_typeを返す</span>
+<div class="viewcode-block" id="get_media_type">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.get_media_type">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">get_media_type</span><span class="p">(</span><span class="n">extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイル拡張子から適切なmedia_typeを返す</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">media_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;jpg&quot;</span><span class="p">:</span> <span class="s2">&quot;image/jpeg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jpeg&quot;</span><span class="p">:</span> <span class="s2">&quot;image/jpeg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;png&quot;</span><span class="p">:</span> <span class="s2">&quot;image/png&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gif&quot;</span><span class="p">:</span> <span class="s2">&quot;image/gif&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;webp&quot;</span><span class="p">:</span> <span class="s2">&quot;image/webp&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">media_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s2">&quot;image/jpeg&quot;</span><span class="p">)</span></div>
 
 
 
@@ -216,17 +234,19 @@
                 <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.gif&quot;</span><span class="p">,</span> <span class="s2">&quot;webp&quot;</span><span class="p">)):</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading image file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
                     <span class="n">image_file</span> <span class="o">=</span> <span class="k">await</span> <span class="n">read_file</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+
                     <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                     <span class="n">image_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="p">{</span>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">{</span>
                                 <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;base64&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;media_type&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;image/</span><span class="si">{</span><span class="n">file_extension</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;media_type&quot;</span><span class="p">:</span> <span class="n">get_media_type</span><span class="p">(</span><span class="n">file_extension</span><span class="p">),</span>
                                 <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">image_file</span><span class="p">,</span>
                             <span class="p">},</span>
                         <span class="p">}</span>
                     <span class="p">)</span>
+
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added image file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to image_files&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
                 <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracting text from PDF: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
