@@ -118,6 +118,7 @@ async def test_generate_content_json_internal_server_error(
             await generate_content_json(
                 files=["test.pdf"],
                 uid=MOCK_UID,
+                title="Test title",
                 model_name=MOCK_MODEL_NAME,
                 bucket_name=MOCK_BUCKET_NAME,
             )
@@ -158,9 +159,11 @@ async def test_read_file(
     """Test read_file function"""
     mock_client, mock_blob = mock_storage_client
     test_content = b"test content"
-    mock_blob.open.return_value.__aenter__.return_value.read = AsyncMock(return_value=test_content)
 
-    result = await read_file(MOCK_BUCKET_NAME, "test.txt")
+    # download_as_bytesの戻り値を設定
+    mock_blob.download_as_bytes.return_value = test_content
+
+    result = await read_file(MOCK_BUCKET_NAME, "test.png")
 
     expected_base64 = base64.b64encode(test_content).decode("utf-8")
     assert result == expected_base64
@@ -198,6 +201,7 @@ async def test_generate_content_json_pdf(
         result = await generate_content_json(
             files=["test.pdf"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -216,7 +220,7 @@ async def test_generate_content_json_image(
     mock_client, mock_blob = mock_storage_client
     mock_blob.exists.return_value = True
     test_content = b"test image content"
-    mock_blob.open.return_value.__aenter__.return_value.read = AsyncMock(return_value=test_content)
+    mock_blob.download_as_bytes.return_value = test_content
 
     with patch("app.utils.multiple_choice_question.AnthropicVertex") as mock_anthropic:
         mock_instance = mock_anthropic.return_value
@@ -227,6 +231,7 @@ async def test_generate_content_json_image(
         result = await generate_content_json(
             files=["test.png"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -248,6 +253,7 @@ async def test_generate_content_json_file_not_found(
         await generate_content_json(
             files=["nonexistent.pdf"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -265,6 +271,7 @@ async def test_generate_content_json_google_api_error(
         await generate_content_json(
             files=["test.pdf"],
             uid=MOCK_UID,
+            title="Test title",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
