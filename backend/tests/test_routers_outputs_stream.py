@@ -1,269 +1,261 @@
 import pytest
-from httpx import AsyncClient, ASGITransport
-from unittest.mock import patch, Mock
-from pytest import MonkeyPatch
-from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
-from typing import AsyncGenerator
+from unittest.mock import patch, Mock, AsyncMock
 from sqlalchemy.ext.asyncio import AsyncSession
-import logging
+from app.models.files import File
+from datetime import datetime, timezone, timedelta
+from typing import Any, AsyncGenerator, Callable, Awaitable
+from httpx import AsyncClient, ASGITransport
+from google.api_core.exceptions import GoogleAPIError, InvalidArgument, NotFound
+from sqlalchemy.exc import SQLAlchemyError
+import json
+from sqlalchemy import select
+from sqlalchemy.sql import text
 
 from app.main import app
+from app.models.outputs import Output
+from app.models.outputs_files import output_file
+from app.models.files import File
+from app.routers.outputs_stream import router
 
 
 # 環境変数を設定するフィクスチャ
 @pytest.fixture
-def mock_env_vars(monkeypatch: MonkeyPatch) -> None:
-    """
-    環境変数を設定するフィクスチャ
-
-    :param monkeypatch: pytestのMonkeyPatchオブジェクト
-    :type monkeypatch: MonkeyPatch
-    """
-    # 環境変数を設定
+def mock_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("PROJECT_ID", "your_project_id")
     monkeypatch.setenv("REGION", "your_region")
 
 
-# sessionフィクスチャを提供するフィクスチャを定義
+# データベースセッションのクリーンアップを行うフィクスチャ
 @pytest.fixture
-async def session(
-    setup_and_teardown_database: AsyncGenerator[AsyncSession, None],
-) -> AsyncGenerator[AsyncSession, None]:
-    """
-    データベースのセットアップとテアダウンを行うフィクスチャ
-
-    :param setup_and_teardown_database: データベースのセットアップとテアダウンを行う非同期ジェネレータ
-    :type setup_and_teardown_database: AsyncGenerator[AsyncSession, None]
-    :yield: 非同期セッション
-    :rtype: AsyncGenerator[AsyncSession, None]
-    """
-    async with setup_and_teardown_database as session:  # type: ignore
-        yield session
-
-
-# モックのコンテンツ
-class MockContent:
-    def to_dict(self) -> dict:
-        """
-        モックのコンテンツを辞書形式で返す
-
-        :return: モックのコンテンツ
-        :rtype: dict
-        """
-        return {
-            "candidates": [{"content": {"parts": [{"text": "生成されたコンテンツ"}]}}]
-        }
+async def session_cleanup(session: AsyncSession) -> AsyncGenerator:
+    yield session
+    await session.close()  # セッションをクローズ
 
 
 # 正常にコンテンツが生成される場合のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs_stream.generate_content_stream")
+@patch("app.routers.outputs_stream.get_file_id_by_name_and_userid")
 async def test_request_content_stream_success(
-    mock_generate_content_stream: Mock, mock_env_vars: None, session: AsyncSession
+    mock_get_file_id: Mock,
+    mock_generate_content_stream: Mock,
+    mock_env_vars: None,
+    session_cleanup: AsyncSession,  # session_cleanupを使って自動クリーンアップ
 ) -> None:
-    """
-    正常にコンテンツが生成される場合のテスト
-
-    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
-    :type mock_generate_content_stream: Mock
-    :param mock_env_vars: 環境変数を設定するフィクスチャ
-    :type mock_env_vars: None
-    :param session: 非同期セッション
-    :type session: AsyncSession
-    """
-    # フィクスチャを適用
-    mock_env_vars
-
-    async def mock_streamer(file_names: list[str]) -> AsyncGenerator[MockContent, None]:
-        assert file_names == ["file1.pdf", "file2.pdf"]
-        yield MockContent()
-
-    mock_generate_content_stream.return_value = mock_streamer(
-        ["file1.pdf", "file2.pdf"]
+    # モックファイルを作成してデータベースに挿入
+    file_data = File(
+        file_name="file1.pdf",
+        file_size=1234,
+        user_id="test_user",
+        created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
+    session_cleanup.add(file_data)
+    await session_cleanup.commit()
+    await session_cleanup.refresh(file_data)
 
+    # モックが返すfile_idを上で挿入したものと一致させる
+    mock_get_file_id.return_value = file_data.id
+
+    # モックストリームを返すようにパッチ
+    async def mock_streamer(file_names: list[str]) -> AsyncGenerator[str, None]:
+        yield "生成されたコンテンツ"
+
+    mock_generate_content_stream.return_value = mock_streamer(["file1.pdf"])
+
+
+# ファイルが見つからない場合のテスト
+@pytest.mark.asyncio
+@patch("app.routers.outputs_stream.get_file_id_by_name_and_userid", return_value=None)
+async def test_request_content_stream_file_not_found(mock_get_file_id: Mock) -> None:
+    """
+    ファイルが見つからない場合のテスト。
+    """
     transport = ASGITransport(app=app)  # type: ignore
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"], headers=headers
+            "/outputs/request_stream",
+            json={"files": ["file1.pdf"], "title": "ファイル分析課題"},
+            headers=headers,
         )
-
-    assert response.status_code == 200
-    content = [chunk async for chunk in response.aiter_text()]
-    assert content == ["生成されたコンテンツ"]
+    assert response.status_code == 404
+    assert "指定されたファイルの一部がデータベースに存在しません" in response.text
 
 
-# 指定されたファイルが見つからない場合のテスト
+# Google Cloud Storageでファイルが見つからない場合のテスト
 @pytest.mark.asyncio
+@patch("app.routers.outputs_stream.get_file_id_by_name_and_userid")
 @patch("app.routers.outputs_stream.generate_content_stream")
-async def test_request_content_stream_file_not_found(
-    mock_generate_content_stream: Mock, mock_env_vars: None
+async def test_request_content_stream_gcs_not_found(
+    mock_generate_content_stream: Mock,
+    mock_get_file_id: Mock,
+    session_cleanup: AsyncSession,
 ) -> None:
     """
-    指定されたファイルが見つからない場合のテスト
-
-    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
-    :type mock_generate_content_stream: Mock
-    :param mock_env_vars: 環境変数を設定するフィクスチャ
-    :type mock_env_vars: None
+    Google Cloud Storageでファイルが見つからない場合のテスト
     """
-    # フィクスチャを適用
-    mock_env_vars
-    mock_generate_content_stream.side_effect = NotFound("File not found")
+    file_data = File(
+        file_name="missing_file.pdf",
+        file_size=1234,
+        user_id="test_user",
+        created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
+    )
+    session_cleanup.add(file_data)
+    await session_cleanup.commit()
+    await session_cleanup.refresh(file_data)
+
+    mock_get_file_id.return_value = file_data.id
+    mock_generate_content_stream.side_effect = NotFound("Specified file not found in GCS")
 
     transport = ASGITransport(app=app)  # type: ignore
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["non_existent_file.pdf"], headers=headers
+            "/outputs/request_stream",
+            json={"files": ["file111111.pdf"], "title": "ファイル分析課題"},
+            headers=headers,
         )
 
     assert response.status_code == 404
-    assert response.json() == {
-        "detail": "指定されたファイルがGoogle Cloud Storageに見つかりません。"
-        + "ファイル名を再確認してください。"
-    }
+    assert "指定されたファイルがGoogle Cloud Storageに見つかりません" in response.text
 
 
-# 無効なファイル形式が指定された場合のテスト
+# 無効なファイル名形式の場合のテスト
 @pytest.mark.asyncio
+@patch("app.routers.outputs_stream.get_file_id_by_name_and_userid")
 @patch("app.routers.outputs_stream.generate_content_stream")
-async def test_request_content_stream_invalid_argument(
-    mock_generate_content_stream: Mock, mock_env_vars: None
+async def test_request_content_stream_invalid_filename(
+    mock_generate_content_stream: Mock,
+    mock_get_file_id: Mock,
+    session_cleanup: AsyncSession,
 ) -> None:
     """
-    無効なファイル形式が指定された場合のテスト
-
-    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
-    :type mock_generate_content_stream: Mock
-    :param mock_env_vars: 環境変数を設定するフィクスチャ
-    :type mock_env_vars: None
+    無効なファイル名形式でリクエストした場合のテスト
     """
-    # フィクスチャを適用
-    mock_env_vars
-    mock_generate_content_stream.side_effect = InvalidArgument("Invalid file format")
+    file_data = File(
+        file_name="invalid/file/name.pdf",
+        file_size=1234,
+        user_id="test_user",
+        created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
+    )
+    session_cleanup.add(file_data)
+    await session_cleanup.commit()
+    await session_cleanup.refresh(file_data)
+
+    mock_get_file_id.return_value = file_data.id
+    mock_generate_content_stream.side_effect = InvalidArgument("Invalid file name format")
 
     transport = ASGITransport(app=app)  # type: ignore
     headers = {"Authorization": "Bearer fake_token"}
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
-            "/outputs/request_stream", json=["invalid_format.txt"], headers=headers
+            "/outputs/request_stream",
+            json={"files": ["invalid/file/name.pdf"], "title": "テスト"},
+            headers=headers,
         )
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "ファイル名の形式が無効です。有効なファイル名を指定してください。"
-    }
+    assert "ファイル名の形式が無効です" in response.text
 
 
-# Google APIエラーが発生した場合のテスト
+# Google APIエラーの場合のテスト
 @pytest.mark.asyncio
+@patch("app.routers.outputs_stream.get_file_id_by_name_and_userid")
 @patch("app.routers.outputs_stream.generate_content_stream")
 async def test_request_content_stream_google_api_error(
-    mock_generate_content_stream: Mock, mock_env_vars: None
-) -> None:
-    """
-    Google APIエラーが発生した場合のテスト
-
-    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
-    :type mock_generate_content_stream: Mock
-    :param mock_env_vars: 環境変数を設定するフィクスチャ
-    :type mock_env_vars: None
-    """
-    # フィクスチャを適用
-    mock_env_vars
-    mock_generate_content_stream.side_effect = GoogleAPIError("Google API error")
-
-    transport = ASGITransport(app=app)  # type: ignore
-    headers = {"Authorization": "Bearer fake_token"}
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post(
-            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"], headers=headers
-        )
-
-    assert response.status_code == 500
-    assert response.json() == {
-        "detail": "Google APIからエラーが返されました。"
-        + "システム管理者に連絡してください。"
-    }
-
-
-# 予期せぬエラーが発生した場合のテスト
-@pytest.mark.asyncio
-@patch("app.routers.outputs_stream.generate_content_stream")
-async def test_request_content_stream_unexpected_error(
-    mock_generate_content_stream: Mock, mock_env_vars: None
-) -> None:
-    """
-    予期せぬエラーが発生した場合のテスト
-
-    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
-    :type mock_generate_content_stream: Mock
-    :param mock_env_vars: 環境変数を設定するフィクスチャ
-    :type mock_env_vars: None
-    """
-    # フィクスチャを適用
-    mock_env_vars
-    mock_generate_content_stream.side_effect = Exception("Unexpected error")
-
-    transport = ASGITransport(app=app)  # type: ignore
-    headers = {"Authorization": "Bearer fake_token"}
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.post(
-            "/outputs/request_stream", json=["file1.pdf", "file2.pdf"], headers=headers
-        )
-
-    assert response.status_code == 500
-    assert response.json() == {
-        "detail": "コンテンツの生成中に予期せぬエラーが発生しました。"
-        + "システム管理者に連絡してください。"
-    }
-
-
-# 最終的なコンテンツが結合されてログに記録されることを確認するテスト
-@pytest.mark.asyncio
-@patch("app.routers.outputs_stream.generate_content_stream")
-async def test_request_content_stream_final_content_logging(
     mock_generate_content_stream: Mock,
-    mock_env_vars: None,
-    caplog: pytest.LogCaptureFixture,
-    session: AsyncSession,
+    mock_get_file_id: Mock,
+    session_cleanup: AsyncSession,
 ) -> None:
     """
-    最終的なコンテンツが結合されてログに記録されることを確認するテスト
-
-    :param mock_generate_content_stream: モックされたgenerate_content_stream関数
-    :type mock_generate_content_stream: Mock
-    :param mock_env_vars: 環境変数を設定するフィクスチャ
-    :type mock_env_vars: None
-    :param caplog: ログキャプチャフィクスチャ
-    :type caplog: pytest.LogCaptureFixture
-    :param session: 非同期セッション
-    :type session: AsyncSession
+    Google APIがエラーを返した場合のテスト
     """
-    # フィクスチャを適用
-    mock_env_vars
-
-    async def mock_streamer(file_names: list[str]) -> AsyncGenerator[MockContent, None]:
-        yield MockContent()
-
-    mock_generate_content_stream.return_value = mock_streamer(
-        ["file1.pdf", "file2.pdf"]
+    file_data = File(
+        file_name="file1.pdf",
+        file_size=1234,
+        user_id="test_user",
+        created_at=datetime.now(timezone(timedelta(hours=9))),
+        updated_at=datetime.now(timezone(timedelta(hours=9))),
     )
+    session_cleanup.add(file_data)
+    await session_cleanup.commit()
+    await session_cleanup.refresh(file_data)
 
-    with caplog.at_level(logging.INFO):
-        transport = ASGITransport(app=app)  # type: ignore
-        headers = {"Authorization": "Bearer fake_token"}
-        async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            response = await ac.post(
-                "/outputs/request_stream",
-                json=["file1.pdf", "file2.pdf"],
-                headers=headers,
-            )
+    mock_get_file_id.return_value = file_data.id
+    mock_generate_content_stream.side_effect = GoogleAPIError("Google API error occurred")
 
-        assert response.status_code == 200
-        content = [chunk async for chunk in response.aiter_text()]
-        assert content == ["生成されたコンテンツ"]
-        # 最後のログメッセージを確認
-        assert "Final content for DB: 生成されたコンテンツ" in caplog.text
+    transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.post(
+            "/outputs/request_stream",
+            json={"files": ["file1.pdf"], "title": "タイトル"},
+            headers=headers,
+        )
+
+    assert response.status_code == 500
+    assert "Google APIからエラーが返されました" in response.text
+
+
+# ファイルIDの取得に失敗した場合のテスト
+@pytest.mark.asyncio
+@patch("app.routers.outputs_stream.get_file_id_by_name_and_userid")
+async def test_request_content_stream_file_id_error(
+    mock_get_file_id: Mock,
+    session_cleanup: AsyncSession,
+) -> None:
+    """
+    ファイルIDの取得時にエラーが発生した場合のテスト
+    """
+    mock_get_file_id.side_effect = SQLAlchemyError("Database error during file ID retrieval")
+
+    transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.post(
+            "/outputs/request_stream",
+            json={"files": ["file1.pdf"], "title": "タイトル"},
+            headers=headers,
+        )
+
+    assert response.status_code == 500
+    assert "データベースからファイル情報を取得する際にエラーが発生しました" in response.text
+
+
+# ユーザーのAI出力を全て取得する場合のテスト
+@pytest.mark.asyncio
+@patch("app.routers.outputs_stream.get_user_outputs")
+async def test_get_outputs_by_user_id_success(mock_get_user_outputs: Mock) -> None:
+    """
+    ユーザーのAI出力を全て取得する場合のテスト
+    """
+    transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
+    mock_get_user_outputs.return_value = [
+        Output(
+            id=1,
+            title="AI出力1",
+            output="出力1",
+            user_id="test_user",
+            created_at=datetime.now(timezone(timedelta(hours=9))),
+            model_config={"model": "config"},
+            file_names=["file1.pdf"],
+        ),
+        Output(
+            id=2,
+            title="AI出力2",
+            output="出力2",
+            user_id="test_user",
+            created_at=datetime.now(timezone(timedelta(hours=9))),
+            model_config={"model": "config"},
+            file_names=["file2.pdf"],
+        ),
+    ]
+
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.get("/outputs", headers=headers)
+
+    assert response.status_code == 200

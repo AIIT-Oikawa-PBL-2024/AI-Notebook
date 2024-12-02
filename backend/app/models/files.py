@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 from app.database import Base
 from app.models.exercises_files import exercise_file
+from app.models.outputs_files import output_file
 
 
 class File(Base):
@@ -37,5 +38,12 @@ class File(Base):
     exercises = relationship(
         "Exercise",
         secondary=exercise_file,  # 中間テーブルのオブジェクトを指定
+        back_populates="files",
+    )
+
+    # リレーションシップの定義
+    outputs = relationship(
+        "Output",
+        secondary=output_file,  # 中間テーブルのオブジェクトを指定
         back_populates="files",
     )

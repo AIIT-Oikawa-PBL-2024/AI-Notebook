@@ -1,6 +1,6 @@
 import CreateOutputPage from "@/app/(dashboard)/ai-output/stream/page";
-import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
-import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
+import { OutputDisplay } from "@/features/dashboard/ai-output/stream/OutputDisplay";
+import { useOutputGenerator } from "@/features/dashboard/ai-output/stream/hooks/useOutputGenerator";
 import { render, screen, waitFor } from "@testing-library/react";
 import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 

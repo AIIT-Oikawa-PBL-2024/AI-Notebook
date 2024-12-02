@@ -72,6 +72,14 @@ export default function NavBar() {
 						ファイル選択
 					</ListItem>
 				</Link>
+				<Link href="/ai-output/select-ai-output">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI出力リスト
+					</ListItem>
+				</Link>
 				<Link href="/ai-output/stream">
 					<ListItem>
 						<ListItemPrefix>

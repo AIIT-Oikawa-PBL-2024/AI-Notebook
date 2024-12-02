@@ -170,9 +170,11 @@ async def request_content(
                 await db.flush()  # exercise.idを取得するため一旦flushします
 
                 # 中間テーブルへの関連付けを手動で追加
-                await db.execute(
-                    insert(exercise_file).values(exercise_id=exercise.id, file_id=file_id)
-                )
+                # 複数のファイルIDを関連付ける
+                for file_id in file_ids:
+                    await db.execute(
+                        insert(exercise_file).values(exercise_id=exercise.id, file_id=file_id)
+                    )
 
                 await db.commit()
                 await db.refresh(exercise)
