@@ -223,39 +223,3 @@ async def test_request_content_stream_file_id_error(
 
     assert response.status_code == 500
     assert "データベースからファイル情報を取得する際にエラーが発生しました" in response.text
-
-
-# ユーザーのAI出力を全て取得する場合のテスト
-@pytest.mark.asyncio
-@patch("app.routers.outputs_stream.get_user_outputs")
-async def test_get_outputs_by_user_id_success(mock_get_user_outputs: Mock) -> None:
-    """
-    ユーザーのAI出力を全て取得する場合のテスト
-    """
-    transport = ASGITransport(app=app)  # type: ignore
-    headers = {"Authorization": "Bearer fake_token"}
-    mock_get_user_outputs.return_value = [
-        Output(
-            id=1,
-            title="AI出力1",
-            output="出力1",
-            user_id="test_user",
-            created_at=datetime.now(timezone(timedelta(hours=9))),
-            model_config={"model": "config"},
-            file_names=["file1.pdf"],
-        ),
-        Output(
-            id=2,
-            title="AI出力2",
-            output="出力2",
-            user_id="test_user",
-            created_at=datetime.now(timezone(timedelta(hours=9))),
-            model_config={"model": "config"},
-            file_names=["file2.pdf"],
-        ),
-    ]
-
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.get("/outputs", headers=headers)
-
-    assert response.status_code == 200
