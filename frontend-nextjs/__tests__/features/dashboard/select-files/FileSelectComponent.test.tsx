@@ -112,7 +112,7 @@ describe("FileSelectComponent", () => {
 
 		// ルーティングの確認
 		await waitFor(() => {
-			expect(mockRouter.push).toHaveBeenCalledWith("/ai-output");
+			expect(mockRouter.push).toHaveBeenCalledWith("/ai-output/stream");
 		});
 	});
 

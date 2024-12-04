@@ -84,7 +84,10 @@ describe("useOutputGenerator", () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(["file1.pdf", "file2.pdf"]),
+				body: JSON.stringify({
+					files: ["file1.pdf", "file2.pdf"],
+					title: "テストタイトル",
+				}),
 			},
 		);
 	});
