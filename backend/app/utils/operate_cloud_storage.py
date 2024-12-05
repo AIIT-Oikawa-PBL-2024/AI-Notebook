@@ -41,9 +41,7 @@ async def post_files(files: list[UploadFile], uid: str) -> dict:
     upload_result = await upload_files(ext_correct_files, uid)
 
     if "success" not in upload_result or not upload_result["success"]:
-        raise HTTPException(
-            status_code=500, detail="ファイルのアップロードに失敗しました"
-        )
+        raise HTTPException(status_code=500, detail="ファイルのアップロードに失敗しました")
 
     if ext_error_files:
         raise HTTPException(
@@ -78,9 +76,7 @@ async def upload_files(ext_correct_files: list[UploadFile], uid: str) -> dict:
 
             # パスの正規化
             safe_uid = uid.strip().rstrip("/")
-            normalized_blobname = unicodedata.normalize(
-                "NFC", f"{safe_uid}/{file.filename}"
-            )
+            normalized_blobname = unicodedata.normalize("NFC", f"{safe_uid}/{file.filename}")
 
         client = storage.Client.from_service_account_json(credentials)
         bucket = storage.Bucket(client, bucket_name)
@@ -95,21 +91,15 @@ async def upload_files(ext_correct_files: list[UploadFile], uid: str) -> dict:
 
             # アップロードの結果をチェック
             if blob.exists():
-                success_message = (
-                    f"ファイル {file.filename} のアップロードが成功しました"
-                )
-                success_files.append(
-                    {"message": success_message, "filename": file.filename}
-                )
+                success_message = f"ファイル {file.filename} のアップロードが成功しました"
+                success_files.append({"message": success_message, "filename": file.filename})
             else:
                 error_message = f"ファイル {file.filename} のアップロードに失敗しました"
                 failed_files.append(error_message)
 
         # Google Cloud に関連するエラーの処理
         except GoogleAPIError as e:
-            error_msg_part = (
-                f"ファイル {file.filename} のアップロード中にエラーが発生しました: "
-            )
+            error_msg_part = f"ファイル {file.filename} のアップロード中にエラーが発生しました: "
             error_message = error_msg_part + str(e)
             failed_files.append(error_message)
 
@@ -165,15 +155,11 @@ async def delete_files_from_gcs(files: list[str], uid: str) -> dict:
 
             # メタデータを取得して詳細なログを残す
             blob_metadata = blob.metadata if blob.metadata else {}
-            logging.info(
-                f"削除開始: {normalized_blobname}, メタデータ: {blob_metadata}"
-            )
+            logging.info(f"削除開始: {normalized_blobname}, メタデータ: {blob_metadata}")
 
             blob.delete()
             success_message = f"ファイル {normalized_blobname} が削除されました"
-            success_files.append(
-                {"message": success_message, "filename": normalized_blobname}
-            )
+            success_files.append({"message": success_message, "filename": normalized_blobname})
             logging.info(success_message)
 
         except GoogleAPIError as e:
@@ -248,3 +234,79 @@ async def generate_upload_signed_url_v4(files: list[str], uid: str) -> dict:
         """
         upload_signed_urls[normalized_blobname] = url
     return upload_signed_urls
+
+
+async def generate_download_signed_url_v4(files: list[str], uid: str) -> dict:
+    download_signed_urls = {}
+
+    # 環境変数から認証情報を取得
+    credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    bucket_name = os.getenv("BUCKET_NAME")
+
+    if not credentials or not bucket_name:
+        raise ValueError("必要な環境変数が設定されていません")
+
+    # ユーザーIDの検証
+    if not uid or not uid.strip():
+        raise ValueError("Invalid user ID")
+
+    client = storage.Client.from_service_account_json(credentials)
+    bucket = storage.Bucket(client, bucket_name)
+
+    for filename in files:
+        try:
+            # パスの正規化
+            safe_uid = uid.strip().rstrip("/")
+            normalized_blobname = unicodedata.normalize("NFC", f"{safe_uid}/{filename}")
+            blob = bucket.blob(normalized_blobname)
+
+            # ファイルの存在確認
+            if not blob.exists():
+                logging.warning(f"ファイル {normalized_blobname} が存在しません")
+                continue
+
+            # ファイルの拡張子に基づいてContent-Typeを設定
+            if filename.lower().endswith(".pdf"):
+                response_type = "application/pdf"
+            elif filename.lower().endswith((".png", ".jpg", ".jpeg", ".gif")):
+                response_type = "image/*"
+            elif filename.lower().endswith((".mp4", ".mov", ".avi")):
+                response_type = "video/*"
+            elif filename.lower().endswith((".mp3", ".wav")):
+                response_type = "audio/*"
+            else:
+                response_type = "application/octet-stream"
+
+            url = blob.generate_signed_url(
+                version="v4",
+                # URLの有効期限を15分に設定
+                expiration=datetime.timedelta(minutes=15),
+                # GETリクエストを許可
+                method="GET",
+                # Content-Dispositionをinlineに設定
+                response_disposition="inline",
+                # Content-Typeを設定
+                response_type=response_type,
+            )
+
+            download_signed_urls[normalized_blobname] = url
+
+        except GoogleAPIError as e:
+            error_message = (
+                f"GCS API エラー - ファイル: {filename}, "
+                f"エラーコード: {getattr(e, 'code', 'unknown')}, "
+                f"詳細: {str(e)}"
+            )
+            logging.error(error_message)
+            continue
+
+        except Exception as e:
+            error_message = (
+                f"予期しないエラー - ファイル: {filename}, "
+                f"エラータイプ: {type(e).__name__}, "
+                f"詳細: {str(e)}"
+            )
+            logging.error(error_message, exc_info=True)
+            continue
+
+    return download_signed_urls

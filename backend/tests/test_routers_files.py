@@ -4,7 +4,8 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.main import app
 import unicodedata
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+import os
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
@@ -162,7 +163,7 @@ async def test_upload_file_with_dakuten(session: AsyncSession, mock_auth: Mock) 
         assert unicodedata.is_normalized("NFC", uploaded_filename)
 
 
-# 署名付きURL取得のテスト
+# 署名付きURL取得のテスト(アップロード用)
 @pytest.mark.asyncio
 async def test_generate_upload_signed_url(session: AsyncSession) -> None:
     headers = {"Authorization": "Bearer fake_token"}
@@ -208,3 +209,72 @@ async def test_register_files(session: AsyncSession) -> None:
         assert response.status_code == 200
         data = response.json()
         assert data is True
+
+
+@pytest.mark.asyncio
+async def test_generate_download_signed_url(session: AsyncSession) -> None:
+    """ダウンロード用署名付きURL生成エンドポイントのテスト"""
+    # 環境変数の設定
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "dummy_credentials.json"
+    os.environ["BUCKET_NAME"] = "test-bucket"
+
+    # GCSのモックを設定
+    with (
+        patch("google.cloud.storage.Client") as mock_client,
+        patch("google.cloud.storage.Bucket") as mock_bucket,
+    ):
+        # blobのモックを設定
+        mock_blob = Mock()
+        mock_blob.exists.return_value = True
+        mock_blob.generate_signed_url.return_value = "https://example.com/signed-url"
+        mock_bucket.return_value.blob.return_value = mock_blob
+        mock_client.from_service_account_json.return_value = mock_bucket.return_value
+
+        headers = {"Authorization": "Bearer fake_token"}
+        async with AsyncClient(
+            transport=ASGITransport(app),  # type: ignore
+            base_url="http://test",
+        ) as client:
+            testfiles = ["test_file1.pdf", "test_file2.pdf"]
+            response = await client.post(
+                "/files/generate_download_signed_url",
+                headers=headers,
+                json=testfiles,
+            )
+            assert response.status_code == 200
+            data = response.json()
+            assert data["test_user/test_file1.pdf"] is not None
+            assert data["test_user/test_file2.pdf"] is not None
+
+
+@pytest.mark.asyncio
+async def test_generate_download_signed_url_server_error(session: AsyncSession) -> None:
+    """サーバーエラー（500）のテスト"""
+    # 環境変数の設定
+    with patch.dict(
+        os.environ,
+        {"GOOGLE_APPLICATION_CREDENTIALS": "dummy_credentials.json", "BUCKET_NAME": "test-bucket"},
+    ):
+        # generate_download_signed_urlのモックのみ設定
+        with patch("app.routers.files.generate_download_signed_url") as mock_generate:
+            # 予期しないエラーを発生させる
+            mock_generate.side_effect = Exception("Unexpected server error")
+
+            headers = {"Authorization": "Bearer fake_token"}
+            async with AsyncClient(
+                transport=ASGITransport(app),  # type: ignore
+                base_url="http://test",
+            ) as client:
+                response = await client.post(
+                    "/files/generate_download_signed_url",
+                    headers=headers,
+                    # より現実的なリクエストデータを使用
+                    json=["file1.pdf", "file2.pdf"],
+                )
+
+                assert response.status_code == 500
+                data = response.json()
+                assert (
+                    "指定されたファイルの署名付きURLを生成できませんでした。システム管理者に連絡してください。"
+                    in data["detail"]
+                )

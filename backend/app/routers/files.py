@@ -12,6 +12,7 @@ from app.cruds.files import get_file_id_by_name_and_userid
 from app.database import get_db
 from app.utils.operate_cloud_storage import (
     delete_files_from_gcs,
+    generate_download_signed_url_v4,
     generate_upload_signed_url_v4,
     post_files,
 )
@@ -227,7 +228,7 @@ async def delete_files(
         ) from e
 
 
-# 署名付きURLの生成
+# 署名付きURLの生成（アップロード用）
 @router.post("/generate_upload_signed_url", response_model=dict)
 async def generate_upload_signed_url(files: list[str], uid: str = Depends(get_uid)) -> dict:
     """
@@ -308,3 +309,45 @@ async def register_files(
                 ) from e
                 return False
     return True
+
+
+# 署名付きURLの生成（ダウンロード用）
+@router.post("/generate_download_signed_url", response_model=dict)
+async def generate_download_signed_url(files: list[str], uid: str = Depends(get_uid)) -> dict:
+    """
+    指定されたファイルリストに対して表示/ダウンロード用の署名付きURLを生成します。
+
+    :param files: 署名付きURLを生成するファイルのリスト
+    :type files: list[str]
+    :param uid: ユーザーID（認証システムから取得）
+    :type uid: str
+    :raises HTTPException: URL生成中にエラーが発生した場合、
+    ステータスコード500とエラーメッセージを含むHTTPExceptionを送出します。
+    :return: ファイル名をキーとし、署名付きURLを値とする辞書
+    :rtype: dict
+    """
+    try:
+        download_signed_urls: dict[str, str] = {}
+        download_signed_urls = await generate_download_signed_url_v4(files, uid)
+
+        # 署名付きURLが生成されなかった場合（対象ファイルが存在しない場合など）
+        if not download_signed_urls:
+            raise HTTPException(
+                status_code=404, detail="指定されたファイルの署名付きURLを生成できませんでした"
+            )
+
+        return download_signed_urls
+
+    except ValueError as e:
+        # バリデーションエラー（無効なユーザーIDなど）の場合
+        raise HTTPException(
+            status_code=400,
+            detail="指定されたファイルの署名付きURLを生成できませんでした。システム管理者に連絡してください。",
+        ) from e
+
+    except Exception as e:
+        # その他の予期しないエラーの場合
+        raise HTTPException(
+            status_code=500,
+            detail="指定されたファイルの署名付きURLを生成できませんでした。システム管理者に連絡してください。",
+        ) from e
