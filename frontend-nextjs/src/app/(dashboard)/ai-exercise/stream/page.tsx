@@ -4,17 +4,15 @@ import { ExerciseDisplay } from "@/features/dashboard/ai-exercise/stream/Exercis
 import { useExerciseGenerator } from "@/features/dashboard/ai-exercise/stream/useExerciseGenerator";
 import type { NextPage } from "next";
 
-const ThrowError = () => {
-	throw new Error("Error in CreateExercisePage");
-};
-
 const CreateExercisePage: NextPage = () => {
 	const { loading, error, exercise, title, resetExercise } =
 		useExerciseGenerator();
 
 	return (
-		<div className="container mx-auto p-4">
-			<ThrowError />
+		<div
+			className="container mx-auto p-4"
+			data-testid="exercise-page-container"
+		>
 			<ExerciseDisplay
 				loading={loading}
 				error={error}

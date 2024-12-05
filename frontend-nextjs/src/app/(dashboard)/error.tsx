@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Button } from "@material-tailwind/react";
+import { Alert } from "@material-tailwind/react";
 
 function Icon() {
 	return (
