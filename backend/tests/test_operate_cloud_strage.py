@@ -9,12 +9,13 @@ from app.utils.operate_cloud_storage import (
     upload_files,
     delete_files_from_gcs,
     generate_upload_signed_url_v4,
+    generate_download_signed_url_v4,
 )
 from app.main import app
-from unittest.mock import patch, MagicMock
-from google.api_core.exceptions import GoogleAPIError
+from unittest.mock import patch, MagicMock, Mock, call
+from google.api_core.exceptions import GoogleAPIError, NotFound
 import unicodedata
-
+from google.cloud import storage
 
 load_dotenv()  # 環境変数の読み込み
 
@@ -288,3 +289,92 @@ async def test_generate_upload_signed_url_v4() -> None:
     assert result["test_user/5_アジャイルⅡ.pdf"] is not None
     assert result["test_user/AI-powered Code Review with LLM.pdf"] is not None
     assert len(result) == 2
+
+
+@pytest.mark.asyncio
+async def test_generate_download_signed_url_v4() -> None:
+    """generate_download_signed_url_v4 の基本機能テスト"""
+    # テスト用のファイルリスト
+    test_files = [
+        "5_アジャイルⅡ.pdf",
+        "AI-powered Code Review with LLM.pdf",
+    ]
+    uid = "test_user"
+
+    # 環境変数の設定
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "dummy_credentials.json"
+    os.environ["BUCKET_NAME"] = "test-bucket"
+
+    # GCSのモックを設定
+    with (
+        patch("google.cloud.storage.Client") as mock_client,
+        patch("google.cloud.storage.Bucket") as mock_bucket,
+    ):
+        # blobのモックを設定
+        mock_blob = Mock()
+        mock_blob.exists.return_value = True
+        mock_blob.generate_signed_url.return_value = "https://example.com/signed-url"
+        mock_bucket.return_value.blob.return_value = mock_blob
+
+        # テスト実行
+        result: dict[str, str] = await generate_download_signed_url_v4(test_files, uid)
+
+        # 結果の検証
+        assert len(result) == 2
+        assert f"{uid}/5_アジャイルⅡ.pdf" in result
+        assert f"{uid}/AI-powered Code Review with LLM.pdf" in result
+        assert all(isinstance(url, str) for url in result.values())
+        assert all(url.startswith("https://") for url in result.values())
+
+
+@pytest.mark.asyncio
+async def test_generate_download_signed_url_v4_with_invalid_inputs() -> None:
+    """無効な入力パラメータのテスト"""
+    # 環境変数の設定
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "dummy_credentials.json"
+    os.environ["BUCKET_NAME"] = "test-bucket"
+
+    # 空のユーザーIDでテスト
+    with pytest.raises(ValueError, match="Invalid user ID"):
+        await generate_download_signed_url_v4(["test.pdf"], "")
+
+    with pytest.raises(ValueError, match="Invalid user ID"):
+        await generate_download_signed_url_v4(["test.pdf"], "   ")
+
+
+@pytest.mark.asyncio
+async def test_generate_download_signed_url_v4_with_missing_env_vars() -> None:
+    """環境変数が設定されていない場合のテスト"""
+    # 環境変数をクリア
+    os.environ.pop("GOOGLE_APPLICATION_CREDENTIALS", None)
+    os.environ.pop("BUCKET_NAME", None)
+
+    with pytest.raises(ValueError, match="必要な環境変数が設定されていません"):
+        await generate_download_signed_url_v4(["test.pdf"], "test_user")
+
+
+@pytest.mark.asyncio
+async def test_generate_download_signed_url_v4_with_gcs_error() -> None:
+    """GCS APIエラーが発生した場合のテスト"""
+    test_files = ["error.pdf"]
+    uid = "test_user"
+
+    # 環境変数の設定
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "dummy_credentials.json"
+    os.environ["BUCKET_NAME"] = "test-bucket"
+
+    with (
+        patch("google.cloud.storage.Client") as mock_client,
+        patch("google.cloud.storage.Bucket") as mock_bucket,
+    ):
+        # GCS APIエラーをシミュレート
+        mock_blob = Mock()
+        mock_blob.exists.return_value = True
+        mock_blob.generate_signed_url.side_effect = NotFound("File not found")
+        mock_bucket.return_value.blob.return_value = mock_blob
+
+        # テスト実行
+        result = await generate_download_signed_url_v4(test_files, uid)
+
+        # エラーが処理され、空の結果が返されることを確認
+        assert len(result) == 0

@@ -1,4 +1,12 @@
-import { Card, Checkbox, Input, Typography } from "@material-tailwind/react";
+import FilePreviewComponent from "@/features/dashboard/select-files/FilePreviewComponent";
+import { useFilePreview } from "@/features/dashboard/select-files/useFilePreview";
+import { EyeIcon } from "@heroicons/react/24/outline";
+import {
+	Card,
+	Checkbox,
+	IconButton,
+	Typography,
+} from "@material-tailwind/react";
 import type React from "react";
 import { useState } from "react";
 
@@ -34,6 +42,19 @@ const FileTable: React.FC<FileTableProps> = ({
 	const [sortKey, setSortKey] = useState<SortKey>("file_name");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedFile, setSelectedFile] = useState<string | null>(null);
+	const { previewUrls, generatePreviewUrl } = useFilePreview();
+
+	const handlePreview = async (fileName: string) => {
+		if (!previewUrls[fileName]) {
+			await generatePreviewUrl([fileName]);
+		}
+		setSelectedFile(fileName);
+	};
+
+	const handleClosePreview = () => {
+		setSelectedFile(null);
+	};
 
 	const formatFileSize = (bytes: number): string => {
 		if (bytes >= 1024 * 1024) {
@@ -158,6 +179,11 @@ const FileTable: React.FC<FileTableProps> = ({
 								作成日時 {getSortIcon("created_at")}
 							</Typography>
 						</th>
+						<th className="border-b p-4">
+							<Typography variant="small" className="font-normal leading-none">
+								プレビュー
+							</Typography>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -185,10 +211,29 @@ const FileTable: React.FC<FileTableProps> = ({
 									{formatDate(file.created_at)}
 								</Typography>
 							</td>
+							<td className="p-4">
+								<IconButton
+									variant="text"
+									color="blue-gray"
+									onClick={() => handlePreview(file.file_name)}
+								>
+									<EyeIcon className="h-4 w-4" />
+								</IconButton>
+							</td>
 						</tr>
 					))}
 				</tbody>
 			</table>
+
+			{selectedFile && previewUrls[selectedFile] && (
+				<FilePreviewComponent
+					fileName={selectedFile}
+					url={previewUrls[selectedFile].url}
+					contentType={previewUrls[selectedFile].contentType}
+					onClose={handleClosePreview}
+					open={!!selectedFile}
+				/>
+			)}
 		</Card>
 	);
 };

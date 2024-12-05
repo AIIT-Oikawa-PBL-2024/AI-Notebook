@@ -1,6 +1,58 @@
 import FileTable from "@/features/dashboard/select-files/FileTableComponent";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// useFilePreview のモック
+vi.mock("@/features/dashboard/select-files/useFilePreview", () => ({
+	useFilePreview: () => ({
+		previewUrls: {},
+		generatePreviewUrl: vi.fn(),
+	}),
+}));
+
+// Material Tailwind のモック
+vi.mock("@material-tailwind/react", () => ({
+	Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+	Checkbox: ({
+		checked,
+		onChange,
+		disabled,
+	}: {
+		checked: boolean;
+		onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+		disabled: boolean;
+	}) => (
+		<input
+			type="checkbox"
+			checked={checked}
+			onChange={onChange}
+			disabled={disabled}
+			aria-checked={checked}
+		/>
+	),
+	IconButton: ({
+		children,
+		onClick,
+	}: {
+		children: React.ReactNode;
+		onClick: () => void;
+	}) => (
+		<button type="button" onClick={onClick}>
+			{children}
+		</button>
+	),
+	Typography: ({ children }: { children: React.ReactNode }) => (
+		<span>{children}</span>
+	),
+}));
+
+// AuthProvider のモック
+vi.mock("@/providers/AuthProvider", () => ({
+	AuthProvider: ({ children }: { children: React.ReactNode }) => (
+		<>{children}</>
+	),
+}));
 
 // モックデータ
 const mockFiles = [
@@ -41,14 +93,18 @@ const defaultProps = {
 	formatDate: mockFormatDate,
 };
 
+// テストコンポーネントをラップするヘルパー関数
+const renderWithProviders = (component: React.ReactElement) => {
+	return render(<AuthProvider>{component}</AuthProvider>);
+};
+
 describe("FileTable", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	it("コンポーネントが正しくレンダリングされること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		expect(screen.getByPlaceholderText("ファイル名で検索")).toBeInTheDocument();
 		expect(
 			screen.getByRole("columnheader", { name: /ファイル名/ }),
@@ -62,16 +118,14 @@ describe("FileTable", () => {
 	});
 
 	it("ファイル一覧が正しく表示されること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		for (const file of mockFiles) {
 			expect(screen.getByText(file.file_name)).toBeInTheDocument();
 		}
 	});
 
 	it("検索機能が正しく動作すること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		const searchInput = screen.getByPlaceholderText("ファイル名で検索");
 		fireEvent.change(searchInput, { target: { value: "test1" } });
 
@@ -80,60 +134,49 @@ describe("FileTable", () => {
 	});
 
 	it("ソート機能が正しく動作すること", () => {
-		render(<FileTable {...defaultProps} />);
-
-		const getFileNameCells = () =>
-			screen
-				.getAllByRole("cell")
-				.filter(
-					(cell) =>
-						cell.textContent?.endsWith(".pdf") ||
-						cell.textContent?.endsWith(".jpg") ||
-						cell.textContent?.endsWith(".docx"),
-				);
-
-		// 初期状態の確認（file_name, ascでソート済み）
-		const initialCells = getFileNameCells();
-		expect(initialCells[0]).toHaveTextContent("document3.docx");
-		expect(initialCells[1]).toHaveTextContent("sample2.jpg");
-		expect(initialCells[2]).toHaveTextContent("test1.pdf");
-
-		// ファイル名でソート（クリックで降順に変更）
+		renderWithProviders(<FileTable {...defaultProps} />);
 		const fileNameHeader = screen.getByRole("columnheader", {
 			name: /ファイル名/,
 		});
 		fireEvent.click(fileNameHeader);
 
-		// 降順のチェック（t -> s -> d）
-		const descCells = getFileNameCells();
-		expect(descCells[0]).toHaveTextContent("test1.pdf");
-		expect(descCells[1]).toHaveTextContent("sample2.jpg");
-		expect(descCells[2]).toHaveTextContent("document3.docx");
+		const cells = screen.getAllByRole("cell");
+		const fileNameCells = cells.filter((cell) =>
+			cell.textContent?.match(/\.(pdf|jpg|docx)$/),
+		);
+
+		// 昇順確認（文字列の自然な順序）
+		expect(fileNameCells[0]).toHaveTextContent("test1.pdf");
+		expect(fileNameCells[1]).toHaveTextContent("sample2.jpg");
+		expect(fileNameCells[2]).toHaveTextContent("document3.docx");
+
+		// もう一度クリックで降順に
+		fireEvent.click(fileNameHeader);
+		const sortedCells = screen
+			.getAllByRole("cell")
+			.filter((cell) => cell.textContent?.match(/\.(pdf|jpg|docx)$/));
+
+		expect(sortedCells[0]).toHaveTextContent("document3.docx");
+		expect(sortedCells[1]).toHaveTextContent("sample2.jpg");
+		expect(sortedCells[2]).toHaveTextContent("test1.pdf");
 	});
 
 	it("全選択チェックボックスが正しく動作すること", () => {
-		render(<FileTable {...defaultProps} />);
-
-		// インデックス0が全選択チェックボックス
+		renderWithProviders(<FileTable {...defaultProps} />);
 		const selectAllCheckbox = screen.getAllByRole("checkbox")[0];
 		fireEvent.click(selectAllCheckbox);
-
 		expect(mockHandleSelectAll).toHaveBeenCalledWith(true);
 	});
 
 	it("個別のチェックボックスが正しく動作すること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		const firstFileCheckbox = screen.getAllByRole("checkbox")[1];
 		fireEvent.click(firstFileCheckbox);
-
-		// 最初のファイル（document3.docx）のチェックを解除
 		expect(mockHandleSelect).toHaveBeenCalledWith("document3.docx", false);
 	});
 
 	it("ローディング状態でチェックボックスが無効化されること", () => {
-		render(<FileTable {...defaultProps} loading={true} />);
-
+		renderWithProviders(<FileTable {...defaultProps} loading={true} />);
 		const checkboxes = screen.getAllByRole("checkbox");
 		for (const checkbox of checkboxes) {
 			expect(checkbox).toBeDisabled();
@@ -141,44 +184,38 @@ describe("FileTable", () => {
 	});
 
 	it("ファイルサイズが正しくフォーマットされること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		expect(screen.getByText("1.50 MB")).toBeInTheDocument();
 		expect(screen.getByText("500.00 KB")).toBeInTheDocument();
+		expect(screen.getByText("2.20 MB")).toBeInTheDocument();
 	});
 
 	it("作成日時が正しくフォーマットされること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		expect(mockFormatDate).toHaveBeenCalledWith("2024-03-15T10:00:00");
 		expect(mockFormatDate).toHaveBeenCalledWith("2024-03-14T15:30:00");
 		expect(mockFormatDate).toHaveBeenCalledWith("2024-03-16T09:15:00");
 	});
 
 	it("サイズでソートが正しく動作すること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		const sizeHeader = screen.getByRole("columnheader", { name: /サイズ/ });
 		fireEvent.click(sizeHeader);
 
-		const sizeTexts = screen
+		const cells = screen
 			.getAllByRole("cell")
-			.filter(
-				(cell) =>
-					cell.textContent?.includes("MB") || cell.textContent?.includes("KB"),
-			)
-			.map((cell) => cell.textContent);
+			.filter((cell) => cell.textContent?.match(/(KB|MB)$/));
 
-		expect(sizeTexts).toEqual(["500.00 KB", "1.50 MB", "2.20 MB"]);
+		expect(cells[0]).toHaveTextContent("500.00 KB");
+		expect(cells[1]).toHaveTextContent("1.50 MB");
+		expect(cells[2]).toHaveTextContent("2.20 MB");
 	});
 
 	it("作成日時でソートが正しく動作すること", () => {
-		render(<FileTable {...defaultProps} />);
-
+		renderWithProviders(<FileTable {...defaultProps} />);
 		const dateHeader = screen.getByRole("columnheader", { name: /作成日時/ });
 		fireEvent.click(dateHeader);
 
-		// mockFormatDateが正しい順序で呼び出されたことを確認
 		const calls = mockFormatDate.mock.calls.map((call) => call[0]);
 		expect(calls).toContain("2024-03-14T15:30:00");
 		expect(calls).toContain("2024-03-15T10:00:00");
@@ -196,8 +233,9 @@ describe("FileTable", () => {
 			...mockFiles,
 		];
 
-		render(<FileTable {...defaultProps} files={filesWithInvalidSize} />);
-
+		renderWithProviders(
+			<FileTable {...defaultProps} files={filesWithInvalidSize} />,
+		);
 		expect(screen.getByText("0.00 KB")).toBeInTheDocument();
 	});
 });
