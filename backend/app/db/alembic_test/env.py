@@ -12,6 +12,7 @@ from app.models.exercises_files import exercise_file  # noqa: F401
 from app.models.files import File  # noqa: F401
 from app.models.notes import Note  # noqa: F401
 from app.models.outputs import Output  # noqa: F401
+from app.models.outputs_files import output_file  # noqa: F401
 
 # .envファイルを読み込む
 load_dotenv()

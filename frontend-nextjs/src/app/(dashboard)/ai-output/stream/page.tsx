@@ -1,7 +1,7 @@
 "use client";
 
-import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
-import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
+import { OutputDisplay } from "@/features/dashboard/ai-output/stream/OutputDisplay";
+import { useOutputGenerator } from "@/features/dashboard/ai-output/stream/hooks/useOutputGenerator";
 import type { NextPage } from "next";
 
 const CreateOutputPage: NextPage = () => {

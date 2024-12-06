@@ -1,5 +1,5 @@
 // FILE: OutputDisplay.test.tsx
-import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
+import { OutputDisplay } from "@/features/dashboard/ai-output/stream/OutputDisplay";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";

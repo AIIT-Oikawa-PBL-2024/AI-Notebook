@@ -1,16 +1,19 @@
-import CreateOutputPage from "@/app/(dashboard)/ai-output/page";
-import { OutputDisplay } from "@/features/dashboard/ai-output/OutputDisplay";
-import { useOutputGenerator } from "@/features/dashboard/ai-output/hooks/useOutputGenerator";
+import CreateOutputPage from "@/app/(dashboard)/ai-output/stream/page";
+import { OutputDisplay } from "@/features/dashboard/ai-output/stream/OutputDisplay";
+import { useOutputGenerator } from "@/features/dashboard/ai-output/stream/hooks/useOutputGenerator";
 import { render, screen, waitFor } from "@testing-library/react";
 import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 
 // useOutputGeneratorのモック
-vi.mock("@/features/dashboard/ai-output/hooks/useOutputGenerator", () => ({
-	useOutputGenerator: vi.fn(),
-}));
+vi.mock(
+	"@/features/dashboard/ai-output/stream/hooks/useOutputGenerator",
+	() => ({
+		useOutputGenerator: vi.fn(),
+	}),
+);
 
 // OutputDisplayのモック
-vi.mock("@/features/dashboard/ai-output/OutputDisplay", () => ({
+vi.mock("@/features/dashboard/ai-output/stream/OutputDisplay", () => ({
 	OutputDisplay: vi.fn(() => (
 		<div data-testid="output-display">Output Display</div>
 	)),
