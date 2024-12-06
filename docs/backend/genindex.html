@@ -188,6 +188,13 @@
         <li><a href="app.models.html#module-app.models.outputs">module</a>
 </li>
       </ul></li>
+      <li>
+    app.models.outputs_files
+
+      <ul>
+        <li><a href="app.models.html#module-app.models.outputs_files">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
@@ -347,6 +354,8 @@
 </li>
         <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate.created_at">(app.schemas.outputs.OutputCreate の属性)</a>
 </li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.created_at">(app.schemas.outputs.OutputRead の属性)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -425,7 +434,11 @@
 </li>
       </ul></li>
       <li><a href="app.schemas.html#app.schemas.exercises.ExerciseCreate.file_names">file_names (app.schemas.exercises.ExerciseCreate の属性)</a>
+
+      <ul>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate.file_names">(app.schemas.outputs.OutputCreate の属性)</a>
 </li>
+      </ul></li>
       <li><a href="app.models.html#app.models.files.File.file_size">file_size (app.models.files.File の属性)</a>
 
       <ul>
@@ -441,9 +454,15 @@
       <li><a href="app.models.html#app.models.exercises.Exercise.files">files (app.models.exercises.Exercise の属性)</a>
 
       <ul>
+        <li><a href="app.models.html#app.models.outputs.Output.files">(app.models.outputs.Output の属性)</a>
+</li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRead.files">(app.schemas.exercises.ExerciseRead の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRequest.files">(app.schemas.exercises.ExerciseRequest の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.files">(app.schemas.outputs.OutputRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRequest.files">(app.schemas.outputs.OutputRequest の属性)</a>
 </li>
       </ul></li>
       <li><a href="app.schemas.html#app.schemas.files.FileUpdate">FileUpdate (app.schemas.files のクラス)</a>
@@ -480,10 +499,10 @@
 </li>
       <li><a href="app.cruds.html#app.cruds.files.get_file_by_id_and_user_id">get_file_by_id_and_user_id() (app.cruds.files モジュール)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="app.cruds.html#app.cruds.files.get_file_id_by_name_and_userid">get_file_id_by_name_and_userid() (app.cruds.files モジュール)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="app.cruds.html#app.cruds.files.get_files_by_user_id">get_files_by_user_id() (app.cruds.files モジュール)</a>
 </li>
       <li><a href="app.utils.html#app.utils.claude_request_stream.get_media_type">get_media_type() (app.utils.claude_request_stream モジュール)</a>
@@ -506,9 +525,13 @@
 </li>
       <li><a href="app.cruds.html#app.cruds.notes.get_notes_by_user_id">get_notes_by_user_id() (app.cruds.notes モジュール)</a>
 </li>
-      <li><a href="app.cruds.html#app.cruds.outputs.get_output_by_id">get_output_by_id() (app.cruds.outputs モジュール)</a>
+      <li><a href="app.cruds.html#app.cruds.outputs.get_output_by_id_and_user">get_output_by_id_and_user() (app.cruds.outputs モジュール)</a>
+</li>
+      <li><a href="app.cruds.html#app.cruds.outputs.get_output_files_by_user">get_output_files_by_user() (app.cruds.outputs モジュール)</a>
 </li>
       <li><a href="app.cruds.html#app.cruds.outputs.get_outputs">get_outputs() (app.cruds.outputs モジュール)</a>
+</li>
+      <li><a href="app.cruds.html#app.cruds.outputs.get_outputs_by_user">get_outputs_by_user() (app.cruds.outputs モジュール)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -538,6 +561,8 @@
         <li><a href="app.schemas.html#app.schemas.notes.NoteUpdateResponse.id">(app.schemas.notes.NoteUpdateResponse の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.outputs.Output.id">(app.schemas.outputs.Output の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.id">(app.schemas.outputs.OutputRead の属性)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -595,6 +620,10 @@
 </li>
         <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate.model_computed_fields">(app.schemas.outputs.OutputCreate の属性)</a>
 </li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.model_computed_fields">(app.schemas.outputs.OutputRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRequest.model_computed_fields">(app.schemas.outputs.OutputRequest の属性)</a>
+</li>
       </ul></li>
       <li><a href="app.schemas.html#app.schemas.exercises.ExerciseBase.model_config">model_config (app.schemas.exercises.ExerciseBase の属性)</a>
 
@@ -632,6 +661,10 @@
         <li><a href="app.schemas.html#app.schemas.outputs.OutputBase.model_config">(app.schemas.outputs.OutputBase の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate.model_config">(app.schemas.outputs.OutputCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.model_config">(app.schemas.outputs.OutputRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRequest.model_config">(app.schemas.outputs.OutputRequest の属性)</a>
 </li>
       </ul></li>
       <li><a href="app.schemas.html#app.schemas.exercises.ExerciseBase.model_fields">model_fields (app.schemas.exercises.ExerciseBase の属性)</a>
@@ -671,6 +704,10 @@
 </li>
         <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate.model_fields">(app.schemas.outputs.OutputCreate の属性)</a>
 </li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.model_fields">(app.schemas.outputs.OutputRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRequest.model_fields">(app.schemas.outputs.OutputRequest の属性)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -705,6 +742,8 @@
         <li><a href="app.models.html#module-app.models.notes">app.models.notes</a>
 </li>
         <li><a href="app.models.html#module-app.models.outputs">app.models.outputs</a>
+</li>
+        <li><a href="app.models.html#module-app.models.outputs_files">app.models.outputs_files</a>
 </li>
         <li><a href="app.routers.html#module-app.routers">app.routers</a>
 </li>
@@ -771,13 +810,19 @@
 </li>
       <li><a href="app.schemas.html#app.schemas.outputs.Output">Output (app.schemas.outputs のクラス)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="app.schemas.html#app.schemas.outputs.OutputBase.output">output (app.schemas.outputs.OutputBase の属性)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="app.schemas.html#app.schemas.outputs.OutputBase">OutputBase (app.schemas.outputs のクラス)</a>
 </li>
       <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate">OutputCreate (app.schemas.outputs のクラス)</a>
+</li>
+      <li><a href="app.schemas.html#app.schemas.outputs.OutputRead">OutputRead (app.schemas.outputs のクラス)</a>
+</li>
+      <li><a href="app.schemas.html#app.schemas.outputs.OutputRequest">OutputRequest (app.schemas.outputs のクラス)</a>
+</li>
+      <li><a href="app.models.html#app.models.files.File.outputs">outputs (app.models.files.File の属性)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -818,11 +863,17 @@
       <ul>
         <li><a href="app.models.html#app.models.notes.Note.title">(app.models.notes.Note の属性)</a>
 </li>
+        <li><a href="app.models.html#app.models.outputs.Output.title">(app.models.outputs.Output の属性)</a>
+</li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseBase.title">(app.schemas.exercises.ExerciseBase の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRequest.title">(app.schemas.exercises.ExerciseRequest の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.notes.NoteBase.title">(app.schemas.notes.NoteBase の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputBase.title">(app.schemas.outputs.OutputBase の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRequest.title">(app.schemas.outputs.OutputRequest の属性)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -879,6 +930,8 @@
         <li><a href="app.schemas.html#app.schemas.notes.NoteUpdateResponse.user_id">(app.schemas.notes.NoteUpdateResponse の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.outputs.OutputCreate.user_id">(app.schemas.outputs.OutputCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.outputs.OutputRead.user_id">(app.schemas.outputs.OutputRead の属性)</a>
 </li>
       </ul></li>
   </ul></td>

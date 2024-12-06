@@ -44,6 +44,14 @@ app.models.outputs module
    :undoc-members:
    :show-inheritance:
 
+app.models.outputs\_files module
+--------------------------------
+
+.. automodule:: app.models.outputs_files
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

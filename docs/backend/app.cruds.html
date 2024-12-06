@@ -76,8 +76,10 @@
 <li><a class="reference internal" href="#module-app.cruds.outputs">app.cruds.outputs module</a><ul>
 <li><a class="reference internal" href="#app.cruds.outputs.create_output"><code class="docutils literal notranslate"><span class="pre">create_output()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.outputs.delete_output"><code class="docutils literal notranslate"><span class="pre">delete_output()</span></code></a></li>
-<li><a class="reference internal" href="#app.cruds.outputs.get_output_by_id"><code class="docutils literal notranslate"><span class="pre">get_output_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.outputs.get_output_by_id_and_user"><code class="docutils literal notranslate"><span class="pre">get_output_by_id_and_user()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.outputs.get_output_files_by_user"><code class="docutils literal notranslate"><span class="pre">get_output_files_by_user()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.outputs.get_outputs"><code class="docutils literal notranslate"><span class="pre">get_outputs()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.outputs.get_outputs_by_user"><code class="docutils literal notranslate"><span class="pre">get_outputs_by_user()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.cruds">Module contents</a></li>
@@ -445,14 +447,15 @@ ExerciseCreateスキーマには既にuser_idが含まれているため、追�
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="app.cruds.outputs.get_output_by_id">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.outputs.</span></span><span class="sig-name descname"><span class="pre">get_output_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.outputs.Output" title="app.models.outputs.Output"><span class="pre">Output</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/outputs.html#get_output_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.outputs.get_output_by_id" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="app.cruds.outputs.get_output_by_id_and_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.outputs.</span></span><span class="sig-name descname"><span class="pre">get_output_by_id_and_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.outputs.Output" title="app.models.outputs.Output"><span class="pre">Output</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/outputs.html#get_output_by_id_and_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.outputs.get_output_by_id_and_user" title="Link to this definition"></a></dt>
 <dd><p>学習帳IDから特定の学習帳を取得する関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
 <li><p><strong>output_id</strong> (<em>int</em>) -- 取得する学習帳のID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
@@ -460,6 +463,33 @@ ExerciseCreateスキーマには既にuser_idが含まれているため、追�
 </dd>
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>outputs_models.Output | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.outputs.get_output_files_by_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.outputs.</span></span><span class="sig-name descname"><span class="pre">get_output_files_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.models.html#app.models.files.File" title="app.models.files.File"><span class="pre">File</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/outputs.html#get_output_files_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.outputs.get_output_files_by_user" title="Link to this definition"></a></dt>
+<dd><p>ユーザーIDとAI出力IDから関連付けられたファイルを取得する関数</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>output_id</strong> (<em>int</em>) -- AIID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>関連付けられたファイルのリスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[files_models.File]</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> -- AI出力が見つからない場合、またはユーザーが権限を持っていない場合</p></li>
+<li><p><strong>SQLAlchemyError</strong> -- データベース操作中にエラーが発生した場合</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -477,6 +507,30 @@ ExerciseCreateスキーマには既にuser_idが含まれているため、追�
 </dd>
 <dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list[outputs_schemas.Output]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.outputs.get_outputs_by_user">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.outputs.</span></span><span class="sig-name descname"><span class="pre">get_outputs_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead" title="app.schemas.outputs.OutputRead"><span class="pre">OutputRead</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/outputs.html#get_outputs_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.outputs.get_outputs_by_user" title="Link to this definition"></a></dt>
+<dd><p>ユーザーIDに基づいてAI出力を取得する関数。
+関連するファイル情報も含めて取得し、作成日時の降順でソートします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>AsyncSession</em>) -- データベースセッション</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーID（Firebase UID）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>ユーザーに関連付けられたAI出力のリスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[outputs_schemas.OutputRead]</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SQLAlchemyError</strong> -- データベース操作中にエラーが発生した場合</p>
 </dd>
 </dl>
 </dd></dl>

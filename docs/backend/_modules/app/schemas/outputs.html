@@ -70,8 +70,11 @@
              
   <h1>app.schemas.outputs のソースコード</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="kn">from</span> <span class="nn">app.schemas.files</span> <span class="kn">import</span> <span class="n">File</span>
 
 
 <div class="viewcode-block" id="OutputBase">
@@ -80,10 +83,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    出力のベースモデル。</span>
 
+<span class="sd">    :param title: 出力のタイトル</span>
+<span class="sd">    :type title: str</span>
 <span class="sd">    :param output: 出力の文字列</span>
 <span class="sd">    :type output: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">output</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
@@ -101,7 +107,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span></div>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">file_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;関連するファイル名のリスト&quot;</span><span class="p">)</span></div>
 
 
 
@@ -120,6 +127,39 @@
     <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">from_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OutputRead">
+<a class="viewcode-back" href="../../../app.schemas.html#app.schemas.outputs.OutputRead">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">OutputRead</span><span class="p">(</span><span class="n">OutputBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    OutputBaseクラスを継承した出力データの取得を表すクラス。</span>
+
+<span class="sd">    :param id: 出力のID</span>
+<span class="sd">    :type id: int</span>
+<span class="sd">    :param user_id: ユーザーID（Firebase UID）</span>
+<span class="sd">    :type user_id: str</span>
+<span class="sd">    :param created_at: 作成日時</span>
+<span class="sd">    :type created_at: datetime</span>
+<span class="sd">    :param files: 関連するファイル情報のリスト</span>
+<span class="sd">    :type files: List[FileBase]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;出力データのID&quot;</span><span class="p">)</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ユーザーのFirebase UID&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;作成日時&quot;</span><span class="p">)</span>
+    <span class="n">files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">File</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;関連するファイル情報のリスト&quot;</span><span class="p">)</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">from_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OutputRequest">
+<a class="viewcode-back" href="../../../app.schemas.html#app.schemas.outputs.OutputRequest">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">OutputRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span></div>
 
 </pre></div>
 

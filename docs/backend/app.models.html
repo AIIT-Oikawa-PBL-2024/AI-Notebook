@@ -68,6 +68,7 @@
 <li><a class="reference internal" href="#app.models.files.File.file_name"><code class="docutils literal notranslate"><span class="pre">File.file_name</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.file_size"><code class="docutils literal notranslate"><span class="pre">File.file_size</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
+<li><a class="reference internal" href="#app.models.files.File.outputs"><code class="docutils literal notranslate"><span class="pre">File.outputs</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.updated_at"><code class="docutils literal notranslate"><span class="pre">File.updated_at</span></code></a></li>
 <li><a class="reference internal" href="#app.models.files.File.user_id"><code class="docutils literal notranslate"><span class="pre">File.user_id</span></code></a></li>
 </ul>
@@ -89,13 +90,16 @@
 <li><a class="reference internal" href="#module-app.models.outputs">app.models.outputs module</a><ul>
 <li><a class="reference internal" href="#app.models.outputs.Output"><code class="docutils literal notranslate"><span class="pre">Output</span></code></a><ul>
 <li><a class="reference internal" href="#app.models.outputs.Output.created_at"><code class="docutils literal notranslate"><span class="pre">Output.created_at</span></code></a></li>
+<li><a class="reference internal" href="#app.models.outputs.Output.files"><code class="docutils literal notranslate"><span class="pre">Output.files</span></code></a></li>
 <li><a class="reference internal" href="#app.models.outputs.Output.id"><code class="docutils literal notranslate"><span class="pre">Output.id</span></code></a></li>
 <li><a class="reference internal" href="#app.models.outputs.Output.output"><code class="docutils literal notranslate"><span class="pre">Output.output</span></code></a></li>
+<li><a class="reference internal" href="#app.models.outputs.Output.title"><code class="docutils literal notranslate"><span class="pre">Output.title</span></code></a></li>
 <li><a class="reference internal" href="#app.models.outputs.Output.user_id"><code class="docutils literal notranslate"><span class="pre">Output.user_id</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-app.models.outputs_files">app.models.outputs_files module</a></li>
 <li><a class="reference internal" href="#module-app.models">Module contents</a></li>
 </ul>
 </li>
@@ -235,6 +239,11 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.files.File.outputs">
+<span class="sig-name descname"><span class="pre">outputs</span></span><a class="headerlink" href="#app.models.files.File.outputs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="app.models.files.File.updated_at">
 <span class="sig-name descname"><span class="pre">updated_at</span></span><a class="headerlink" href="#app.models.files.File.updated_at" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -310,7 +319,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>int</em>) -- 出力のID</p></li>
+<li><p><strong>id</strong> (<em>str</em>) -- 出力のID</p></li>
+<li><p><strong>title</strong> -- 出力のタイトル</p></li>
 <li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーのID（Firebase UID）</p></li>
 <li><p><strong>output</strong> (<em>str</em>) -- 出力データ</p></li>
 <li><p><strong>created_at</strong> (<em>datetime</em>) -- 作成日時</p></li>
@@ -320,6 +330,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.models.outputs.Output.created_at">
 <span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#app.models.outputs.Output.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.outputs.Output.files">
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#app.models.outputs.Output.files" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -333,12 +348,20 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.outputs.Output.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#app.models.outputs.Output.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="app.models.outputs.Output.user_id">
 <span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#app.models.outputs.Output.user_id" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
+</section>
+<section id="module-app.models.outputs_files">
+<span id="app-models-outputs-files-module"></span><h2>app.models.outputs_files module<a class="headerlink" href="#module-app.models.outputs_files" title="Link to this heading"></a></h2>
 </section>
 <section id="module-app.models">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.models" title="Link to this heading"></a></h2>

@@ -130,8 +130,10 @@
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds.outputs">app.cruds.outputs module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.create_output"><code class="docutils literal notranslate"><span class="pre">create_output()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.delete_output"><code class="docutils literal notranslate"><span class="pre">delete_output()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.get_output_by_id"><code class="docutils literal notranslate"><span class="pre">get_output_by_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.get_output_by_id_and_user"><code class="docutils literal notranslate"><span class="pre">get_output_by_id_and_user()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.get_output_files_by_user"><code class="docutils literal notranslate"><span class="pre">get_output_files_by_user()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.get_outputs"><code class="docutils literal notranslate"><span class="pre">get_outputs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.outputs.get_outputs_by_user"><code class="docutils literal notranslate"><span class="pre">get_outputs_by_user()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds">Module contents</a></li>
@@ -160,6 +162,7 @@
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.file_name"><code class="docutils literal notranslate"><span class="pre">File.file_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.file_size"><code class="docutils literal notranslate"><span class="pre">File.file_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.outputs"><code class="docutils literal notranslate"><span class="pre">File.outputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.updated_at"><code class="docutils literal notranslate"><span class="pre">File.updated_at</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.user_id"><code class="docutils literal notranslate"><span class="pre">File.user_id</span></code></a></li>
 </ul>
@@ -181,13 +184,16 @@
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.outputs">app.models.outputs module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.outputs.Output"><code class="docutils literal notranslate"><span class="pre">Output</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.created_at"><code class="docutils literal notranslate"><span class="pre">Output.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.files"><code class="docutils literal notranslate"><span class="pre">Output.files</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.id"><code class="docutils literal notranslate"><span class="pre">Output.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.output"><code class="docutils literal notranslate"><span class="pre">Output.output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.title"><code class="docutils literal notranslate"><span class="pre">Output.title</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.outputs.Output.user_id"><code class="docutils literal notranslate"><span class="pre">Output.user_id</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.outputs_files">app.models.outputs_files module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models">Module contents</a></li>
 </ul>
 </li>
@@ -352,14 +358,34 @@
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.model_config"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputBase.model_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.output"><code class="docutils literal notranslate"><span class="pre">OutputBase.output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputBase.title"><code class="docutils literal notranslate"><span class="pre">OutputBase.title</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate"><code class="docutils literal notranslate"><span class="pre">OutputCreate</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.created_at"><code class="docutils literal notranslate"><span class="pre">OutputCreate.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.file_names"><code class="docutils literal notranslate"><span class="pre">OutputCreate.file_names</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.model_config"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputCreate.model_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputCreate.user_id"><code class="docutils literal notranslate"><span class="pre">OutputCreate.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead"><code class="docutils literal notranslate"><span class="pre">OutputRead</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.created_at"><code class="docutils literal notranslate"><span class="pre">OutputRead.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.files"><code class="docutils literal notranslate"><span class="pre">OutputRead.files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.id"><code class="docutils literal notranslate"><span class="pre">OutputRead.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">OutputRead.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.model_config"><code class="docutils literal notranslate"><span class="pre">OutputRead.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputRead.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRead.user_id"><code class="docutils literal notranslate"><span class="pre">OutputRead.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRequest"><code class="docutils literal notranslate"><span class="pre">OutputRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRequest.files"><code class="docutils literal notranslate"><span class="pre">OutputRequest.files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRequest.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">OutputRequest.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRequest.model_config"><code class="docutils literal notranslate"><span class="pre">OutputRequest.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRequest.model_fields"><code class="docutils literal notranslate"><span class="pre">OutputRequest.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.outputs.OutputRequest.title"><code class="docutils literal notranslate"><span class="pre">OutputRequest.title</span></code></a></li>
 </ul>
 </li>
 </ul>
