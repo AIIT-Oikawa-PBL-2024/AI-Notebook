@@ -164,3 +164,5 @@ cython_debug/
 
 # zed (for dev)
 .zed/
+
+.DS_Store
