@@ -138,11 +138,25 @@
     <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">mp3_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">wav_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Part</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">file_names</span> <span class="o">=</span> <span class="n">files</span>
+    <span class="c1"># ファイル名をプロンプト内に挿入する</span>
+    <span class="c1"># mp4だけ拡張子をmp3に変更する</span>
+    <span class="c1"># 拡張子が.mp4のファイルを.mp3に変更する</span>
+    <span class="n">file_list_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.mp3`&quot;</span>
+            <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">`&quot;</span>
+            <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">file_names</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
     <span class="c1"># プロンプト（指示文）</span>
-    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
-<span class="s2">        - #input_files: 複数のファイルは、大学院の講義資料です。</span>
-<span class="s2">        - #instruction: 複数のpdf, image、audioファイルを読み解いて、</span>
+<span class="s2">        - #input_files: </span><span class="si">{</span><span class="n">file_list_str</span><span class="si">}</span><span class="s2"> は、大学院の講義資料です。</span>
+<span class="s2">        - #instruction: </span><span class="si">{</span><span class="n">file_list_str</span><span class="si">}</span><span class="s2"> のファイルを読み解いて、</span>
 <span class="s2">            親しみやすい解説がついて、誰もが読みたくなるような、</span>
 <span class="s2">            わかりやすい整理ノートを日本語で作成して下さい。</span>
 <span class="s2">            imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。</span>
@@ -157,6 +171,7 @@
 <span class="s2">        - #format: タイトルを付けて、8000文字程度のMarkdownで出力してください。</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt: </span><span class="si">{</span><span class="n">prompt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
             <span class="c1"># ブロブ名を正規化</span>
