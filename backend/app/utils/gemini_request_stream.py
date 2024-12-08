@@ -62,11 +62,25 @@ async def generate_content_stream(
     image_files: list[Part] = []
     mp3_files: list[Part] = []
     wav_files: list[Part] = []
+
+    file_names = files
+    # ファイル名をプロンプト内に挿入する
+    # mp4だけ拡張子をmp3に変更する
+    # 拡張子が.mp4のファイルを.mp3に変更する
+    file_list_str = ", ".join(
+        [
+            f"`{os.path.splitext(file_name)[0]}.mp3`"
+            if file_name.endswith(".mp4")
+            else f"`{file_name}`"
+            for file_name in file_names
+        ]
+    )
+
     # プロンプト（指示文）
-    prompt = """
+    prompt = f"""
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
-        - #input_files: 複数のファイルは、大学院の講義資料です。
-        - #instruction: 複数のpdf, image、audioファイルを読み解いて、
+        - #input_files: {file_list_str} は、大学院の講義資料です。
+        - #instruction: {file_list_str} のファイルを読み解いて、
             親しみやすい解説がついて、誰もが読みたくなるような、
             わかりやすい整理ノートを日本語で作成して下さい。
             imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。
@@ -81,6 +95,7 @@ async def generate_content_stream(
         - #format: タイトルを付けて、8000文字程度のMarkdownで出力してください。
     """
 
+    logging.info(f"Prompt: {prompt}")
     try:
         for file_name in files:
             # ブロブ名を正規化
