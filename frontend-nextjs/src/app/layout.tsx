@@ -3,6 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/providers/AuthProvider";
 import ClientThemeProvider from "@/providers/ClientThemeProvider";
 import type { Metadata } from "next";
+import { ErrorBoundary } from "react-error-boundary";
+import DashboardError from "./(dashboard)/error";
 
 const notoSansJP = Noto_Sans_JP({
 	subsets: ["latin"],
@@ -33,7 +35,9 @@ export default function RootLayout({
 				}}
 			>
 				<ClientThemeProvider>
-					<AuthProvider>{children}</AuthProvider>
+					<ErrorBoundary fallback={<DashboardError />}>
+						<AuthProvider>{children}</AuthProvider>
+					</ErrorBoundary>
 				</ClientThemeProvider>
 			</body>
 		</html>

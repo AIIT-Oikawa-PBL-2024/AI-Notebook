@@ -7,6 +7,11 @@ vi.mock("@/components/layouts/NavBar", () => ({
 	default: () => <nav>Mock NavBar</nav>,
 }));
 
+// DashboardError Mock
+vi.mock("./error", () => ({
+	default: () => <div data-testid="dashboard-error">Error Dashboard</div>,
+}));
+
 describe("Layout", () => {
 	it("renders the NavBar component", () => {
 		render(<Layout>Test Content</Layout>);
@@ -23,3 +28,20 @@ describe("Layout", () => {
 		expect(screen.getByText(testContent)).toBeInTheDocument();
 	});
 });
+
+//   it("handles errors with ErrorBoundary", () => {
+//     const ThrowError = () => {
+//       throw new Error("Test Error");
+//     };
+
+//     render(
+//       <Layout>
+//         <ThrowError />
+//       </Layout>,
+//     );
+
+//     expect(
+//       screen.getByText("エラーが発生しました。もう一度お試しください。"),
+//     ).toBeInTheDocument();
+//   });
+// });
