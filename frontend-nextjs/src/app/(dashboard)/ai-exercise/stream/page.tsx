@@ -9,7 +9,10 @@ const CreateExercisePage: NextPage = () => {
 		useExerciseGenerator();
 
 	return (
-		<div className="container mx-auto p-4">
+		<div
+			className="container mx-auto p-4"
+			data-testid="exercise-page-container"
+		>
 			<ExerciseDisplay
 				loading={loading}
 				error={error}
