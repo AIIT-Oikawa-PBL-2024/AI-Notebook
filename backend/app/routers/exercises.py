@@ -19,6 +19,7 @@ from app.cruds.files import get_file_id_by_name_and_userid
 from app.database import get_db
 from app.models.exercises_files import exercise_file
 from app.utils.claude_request_stream import generate_content_stream
+from app.utils.essay_question import generate_essay_json
 from app.utils.multiple_choice_question import generate_content_json
 from app.utils.user_auth import get_uid
 
@@ -286,6 +287,127 @@ async def request_choice_question_json(
                 user_id=uid,
                 created_at=datetime.now(JST),
                 exercise_type="multiple_choice",
+            )
+
+            db.add(exercise)
+            await db.flush()  # exercise.idを取得するため一旦flushします
+
+            # 中間テーブルへの関連付けを手動で追加
+            for file_id in file_ids:
+                await db.execute(
+                    insert(exercise_file).values(exercise_id=exercise.id, file_id=file_id)
+                )
+
+            await db.commit()
+            await db.refresh(exercise)
+            logging.info(f"Exercise saved to database with ID: {exercise.id}")
+
+        except Exception as e:
+            logging.error(f"Error saving exercise to database: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="コンテンツをデータベースに保存中にエラーが発生しました。システム管理者に連絡してください。",
+            ) from e
+
+    return response
+
+
+@router.post("/essay_question")
+async def request_essay_question_json(
+    request: exercises_schemas.ExerciseRequest,
+    uid: str = Depends(get_uid),
+    db: AsyncSession = db_dependency,
+) -> dict:
+    """
+    複数のファイル名のリストを入力して、記述問題を生成するエンドポイント
+
+    :param files: 記述問題生成のためのファイル名リスト
+    :type files: list[str]
+    :param title: 記述問題のタイトル
+    :type title: str
+    :param uid: 現在のユーザーのID（Firebase UID）
+    :type uid: str
+    :param db: 非同期データベースセッション
+    :type db: AsyncSession
+    :return: 生成された記述問題のJSONデータ
+    :rtype: dict
+    :raises HTTPException: 生成中にエラーが発生した場合
+    """
+    logging.info(f"Requesting content generation for files: {request.files}")
+
+    # ユーザーIDとファイル名から関連するファイルIDを取得
+    file_ids = []
+    missing_files = []
+
+    for file_name in request.files:
+        try:
+            logging.info(f"Attempting to retrieve file ID for file_name: {file_name}")
+            file_id = await get_file_id_by_name_and_userid(db, file_name, uid)
+            if file_id is None:
+                logging.warning(
+                    f"File not found in database for file_name: {file_name} and user_id: {uid}"
+                )
+                missing_files.append(file_name)
+            else:
+                logging.info(f"Found file ID: {file_id} for file_name: {file_name}")
+                file_ids.append(file_id)
+        except Exception as e:
+            logging.error(f"Error retrieving file ID for file_name: {file_name}: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="データベースからファイル情報を取得する際にエラーが発生しました。",
+            ) from e
+
+    if missing_files:
+        raise HTTPException(
+            status_code=404,
+            detail="指定されたファイルの一部がデータベースに存在しません:"
+            + f" {', '.join(missing_files)}",
+        )
+
+    try:
+        response = await generate_essay_json(
+            files=request.files,
+            uid=uid,
+            title=request.title,  # タイトルを追加
+        )
+        logging.info(f"Generated response: {response}")
+    except NotFound as e:
+        logging.error(f"File not found in Google Cloud Storage: {e}")
+        raise HTTPException(
+            status_code=404,
+            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。"
+            + "ファイル名を再確認してください。",
+        ) from e
+    except InvalidArgument as e:
+        logging.error(f"Invalid argument: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="ファイル名の形式が無効です。有効なファイル名を指定してください。",
+        ) from e
+    except GoogleAPIError as e:
+        logging.error(f"Google API error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Google APIからエラーが返されました。システム管理者に連絡してください。",
+        ) from e
+    except Exception as e:
+        logging.error(f"Error generating content: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="コンテンツの生成中に予期せぬエラーが発生しました。システム管理者に連絡してください。",
+        ) from e
+
+    if response:
+        try:
+            logging.info("Saving final content to database.")
+            # Exerciseインスタンスを作成し、exerciseファイルの関連付けは直接行う
+            exercise = exercises_models.Exercise(
+                title=request.title,
+                response=json.dumps(response),
+                user_id=uid,
+                created_at=datetime.now(JST),
+                exercise_type="essay_question",
             )
 
             db.add(exercise)
