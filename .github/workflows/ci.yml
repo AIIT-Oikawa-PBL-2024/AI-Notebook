@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]    
   pull_request:
-    branches: [ "main" ] 
+    branches: [ "main", "feature/sprint11" ]
   workflow_dispatch:  # 手動実行を可能にする   
 
 permissions:
