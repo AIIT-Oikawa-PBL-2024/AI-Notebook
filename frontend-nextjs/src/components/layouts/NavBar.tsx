@@ -112,6 +112,14 @@ export default function NavBar() {
 						選択問題テスト
 					</ListItem>
 				</Link>
+				<Link href="/ai-exercise/essay-question">
+					<ListItem>
+						<ListItemPrefix>
+							<DocumentCheckIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						記述問題テスト
+					</ListItem>
+				</Link>
 				<Link href="/notebook">
 					<ListItem>
 						<ListItemPrefix>

@@ -208,6 +208,8 @@ export default function ExerciseSelectComponent() {
 				return "選択問題";
 			case "stream":
 				return "総合問題";
+			case "essay_question":
+				return "記述問題";
 			default:
 				return type;
 		}
