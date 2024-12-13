@@ -1,5 +1,6 @@
 import { ButtonWithIcon } from "@/features/dashboard/fileupload/Button";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
+import { Spinner } from "@material-tailwind/react";
 import type React from "react";
 import { type ChangeEvent, type DragEvent, useRef, useState } from "react";
 
@@ -259,7 +260,7 @@ const FileUploadComponent: React.FC = () => {
 							onClick={handleUpload}
 							disabled={isUploading || files.length === 0}
 						>
-							{isUploading ? "アップロード中..." : "アップロード"}
+							{isUploading ? <Spinner /> : "アップロード"}
 						</ButtonWithIcon>
 					</div>
 				</div>
