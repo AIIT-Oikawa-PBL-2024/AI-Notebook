@@ -44,7 +44,18 @@ export const NotebookForm = ({
 	const memorizedFields = useMemo(() => fields, [fields]);
 
 	return (
-		<form id={form.id} onSubmit={form.onSubmit} action={action} noValidate>
+		// <form id={form.id} onSubmit={form.onSubmit} action={action} noValidate>
+		<form
+			id={form.id}
+			onSubmit={async (e) => {
+				e.preventDefault();
+				form.onSubmit(e);
+				// フォームデータを取得して action を実行
+				const formData = new FormData(e.currentTarget);
+				action(formData);
+			}}
+			noValidate
+		>
 			<div className="flex flex-col items-center justify-start gap-4 m-4 h-screen">
 				<NotebookFormHeader
 					fields={fields}

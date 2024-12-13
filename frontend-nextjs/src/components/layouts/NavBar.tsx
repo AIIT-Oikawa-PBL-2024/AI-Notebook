@@ -112,6 +112,14 @@ export default function NavBar() {
 						選択問題テスト
 					</ListItem>
 				</Link>
+				<Link href="/select-notes">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ノート一覧
+					</ListItem>
+				</Link>
 				<Link href="/notebook">
 					<ListItem>
 						<ListItemPrefix>
