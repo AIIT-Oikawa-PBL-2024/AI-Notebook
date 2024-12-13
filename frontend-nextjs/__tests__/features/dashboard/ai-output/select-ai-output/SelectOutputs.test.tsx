@@ -1,7 +1,7 @@
 import OutputSelectComponent from "@/features/dashboard/ai-output/select-ai-output/SelectAIOutput";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -63,20 +63,25 @@ describe("OutputSelectComponent", () => {
 	});
 
 	it("正しくコンポーネントがレンダリングされること", async () => {
-		render(<OutputSelectComponent />);
+		await act(async () => {
+			render(<OutputSelectComponent />);
+		});
 
-		// ヘッダーが表示されることを確認
-		expect(screen.getByText("AIノートリスト")).toBeInTheDocument();
-
-		// 検索フィールドが表示されることを確認
-		expect(screen.getByRole("searchbox")).toBeInTheDocument();
+		await waitFor(() => {
+			// ヘッダーが表示されることを確認
+			expect(screen.getByText("AIノートリスト")).toBeInTheDocument();
+			// 検索フィールドが表示されることを確認
+			expect(screen.getByRole("searchbox")).toBeInTheDocument();
+		});
 	});
 
 	it("認証エラーが正しく表示されること", async () => {
 		// 未認証状態をモック
 		(useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: null });
 
-		render(<OutputSelectComponent />);
+		await act(async () => {
+			render(<OutputSelectComponent />);
+		});
 
 		await waitFor(() => {
 			expect(screen.getByText("認証が必要です")).toBeInTheDocument();
@@ -87,7 +92,9 @@ describe("OutputSelectComponent", () => {
 		// APIエラーをモック
 		mockAuthFetch.mockRejectedValue(new Error("AI出力の取得に失敗しました"));
 
-		render(<OutputSelectComponent />);
+		await act(async () => {
+			render(<OutputSelectComponent />);
+		});
 
 		await waitFor(() => {
 			expect(
