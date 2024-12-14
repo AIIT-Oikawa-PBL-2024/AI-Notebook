@@ -77,7 +77,7 @@ export default function NavBar() {
 						<ListItemPrefix>
 							<ListBulletIcon className="h-5 w-5" />
 						</ListItemPrefix>
-						AI出力リスト
+						AI要約リスト
 					</ListItem>
 				</Link>
 				<Link href="/ai-output/stream">
@@ -85,7 +85,7 @@ export default function NavBar() {
 						<ListItemPrefix>
 							<ComputerDesktopIcon className="h-5 w-5" />
 						</ListItemPrefix>
-						AI出力
+						AI要約
 					</ListItem>
 				</Link>
 				<Link href="/ai-exercise/select-exercises">

@@ -78,7 +78,7 @@ export default function OutputSelectComponent() {
 			const response = await authFetch(BACKEND_API_URL_GET_OUTPUTS);
 
 			if (!response.ok) {
-				throw new Error("AI出力の取得に失敗しました");
+				throw new Error("AI要約の取得に失敗しました");
 			}
 
 			const data = await response.json();
@@ -230,7 +230,7 @@ export default function OutputSelectComponent() {
 			return;
 		}
 
-		if (window.confirm("選択したAI出力を削除してもよろしいですか？")) {
+		if (window.confirm("選択したAI要約を削除してもよろしいですか？")) {
 			await deleteOutput(selectedOutputId);
 		}
 	};
@@ -262,7 +262,7 @@ export default function OutputSelectComponent() {
 			<Card>
 				<CardHeader className="mb-4 grid h-28 place-items-center border-b border-gray-200">
 					<Typography variant="h3" className="text-gray-900">
-						AIノートリスト
+						AI要約リスト
 					</Typography>
 				</CardHeader>
 
@@ -293,7 +293,7 @@ export default function OutputSelectComponent() {
 							onClick={handleNavigate}
 							disabled={!selectedOutputId}
 						>
-							選択したAI出力ページを開く
+							選択したAI要約ページを開く
 						</button>
 						<button
 							type="button"
@@ -305,7 +305,7 @@ export default function OutputSelectComponent() {
 							onClick={handleDelete}
 							disabled={!selectedOutputId || isDeleting}
 						>
-							{isDeleting ? "削除中..." : "選択したAI出力を削除"}
+							{isDeleting ? "削除中..." : "選択したAI要約を削除"}
 						</button>
 						<button
 							type="button"
@@ -326,7 +326,7 @@ export default function OutputSelectComponent() {
 							<Spinner className="h-8 w-8" />
 						</div>
 					) : !outputs.length ? (
-						<Alert variant="gradient">AI出力が見つかりません</Alert>
+						<Alert variant="gradient">AI要約が見つかりません</Alert>
 					) : (
 						<table className="w-full min-w-max table-auto text-left">
 							<thead>
@@ -451,7 +451,7 @@ export default function OutputSelectComponent() {
 			</Card>
 
 			<Dialog open={openModal} handler={() => setOpenModal(false)} size="lg">
-				<DialogHeader>AI出力の内容</DialogHeader>
+				<DialogHeader>AI要約の内容</DialogHeader>
 				<DialogBody divider className="h-96 overflow-auto">
 					<Typography className="whitespace-pre-wrap">
 						{selectedContent}

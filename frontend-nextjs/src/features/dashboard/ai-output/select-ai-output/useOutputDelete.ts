@@ -28,7 +28,7 @@ export const useOutputDelete = ({
 	const deleteOutput = useCallback(
 		async (outputId: number) => {
 			if (!outputId) {
-				const errorMessage = "削除するAI出力が選択されていません。";
+				const errorMessage = "削除するAI要約が選択されていません。";
 				setError(errorMessage);
 				onError?.(errorMessage);
 				return;
@@ -49,7 +49,7 @@ export const useOutputDelete = ({
 				);
 
 				if (!response.ok) {
-					throw new Error("AI出力の削除に失敗しました。");
+					throw new Error("AI要約の削除に失敗しました。");
 				}
 
 				// 削除成功時の処理
