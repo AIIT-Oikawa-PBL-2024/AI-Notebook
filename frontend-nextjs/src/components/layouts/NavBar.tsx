@@ -118,6 +118,8 @@ export default function NavBar() {
 							<DocumentCheckIcon className="h-5 w-5" />
 						</ListItemPrefix>
 						記述問題テスト
+					</ListItem>
+				</Link>
 				<Link href="/select-notes">
 					<ListItem>
 						<ListItemPrefix>
