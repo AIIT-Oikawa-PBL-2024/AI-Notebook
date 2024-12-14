@@ -80,10 +80,10 @@ describe("useOutputDelete", () => {
 		});
 
 		await vi.waitFor(() => {
-			expect(result.current.error).toBe("AI出力の削除に失敗しました。");
+			expect(result.current.error).toBe("AI要約の削除に失敗しました。");
 		});
 
-		expect(mockOnError).toHaveBeenCalledWith("AI出力の削除に失敗しました。");
+		expect(mockOnError).toHaveBeenCalledWith("AI要約の削除に失敗しました。");
 		expect(result.current.isDeleting).toBe(false);
 	});
 
@@ -98,9 +98,9 @@ describe("useOutputDelete", () => {
 
 		// 不正なoutputIdのエラーハンドリングの確認
 		expect(mockOnError).toHaveBeenCalledWith(
-			"削除するAI出力が選択されていません。",
+			"削除するAI要約が選択されていません。",
 		);
-		expect(result.current.error).toBe("削除するAI出力が選択されていません。");
+		expect(result.current.error).toBe("削除するAI要約が選択されていません。");
 		expect(result.current.isDeleting).toBe(false);
 		expect(mockAuthFetch).not.toHaveBeenCalled();
 	});

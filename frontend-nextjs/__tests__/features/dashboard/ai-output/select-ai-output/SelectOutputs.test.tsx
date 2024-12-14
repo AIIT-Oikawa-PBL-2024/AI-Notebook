@@ -69,7 +69,7 @@ describe("OutputSelectComponent", () => {
 
 		await waitFor(() => {
 			// ヘッダーが表示されることを確認
-			expect(screen.getByText("AIノートリスト")).toBeInTheDocument();
+			expect(screen.getByText("AI要約リスト")).toBeInTheDocument();
 			// 検索フィールドが表示されることを確認
 			expect(screen.getByRole("searchbox")).toBeInTheDocument();
 		});
@@ -90,7 +90,7 @@ describe("OutputSelectComponent", () => {
 
 	it("APIエラーが正しく表示されること", async () => {
 		// APIエラーをモック
-		mockAuthFetch.mockRejectedValue(new Error("AI出力の取得に失敗しました"));
+		mockAuthFetch.mockRejectedValue(new Error("AI要約の取得に失敗しました"));
 
 		await act(async () => {
 			render(<OutputSelectComponent />);
@@ -98,7 +98,7 @@ describe("OutputSelectComponent", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByText("AI出力の取得に失敗しました"),
+				screen.getByText("AI要約の取得に失敗しました"),
 			).toBeInTheDocument();
 		});
 	});

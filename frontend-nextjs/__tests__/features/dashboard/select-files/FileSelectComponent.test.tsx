@@ -84,7 +84,7 @@ describe("FileSelectComponent", () => {
 		});
 	});
 
-	it("ファイルを選択してAIノートを作成できること", async () => {
+	it("ファイルを選択してAI要約を作成できること", async () => {
 		render(<FileSelectComponent />);
 
 		// ファイル一覧の表示を待機
@@ -98,12 +98,12 @@ describe("FileSelectComponent", () => {
 
 		// タイトルを入力
 		const titleInput = screen.getByPlaceholderText(
-			"AIノート/演習のタイトルを入力してください（最大100文字）",
+			"AI要約/演習のタイトルを入力してください（最大100文字）",
 		);
 		fireEvent.change(titleInput, { target: { value: "テストノート" } });
 
-		// AIノート作成ボタンをクリック
-		const createButton = screen.getByText("AIノート作成");
+		// AI要約作成ボタンをクリック
+		const createButton = screen.getByText("AI要約作成");
 		fireEvent.click(createButton);
 
 		// ローカルストレージの確認
@@ -127,7 +127,7 @@ describe("FileSelectComponent", () => {
 		fireEvent.click(checkboxes[1]);
 
 		const titleInput = screen.getByPlaceholderText(
-			"AIノート/演習のタイトルを入力してください（最大100文字）",
+			"AI要約/演習のタイトルを入力してください（最大100文字）",
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト演習" } });
 
@@ -153,7 +153,7 @@ describe("FileSelectComponent", () => {
 		fireEvent.click(checkboxes[1]);
 
 		const titleInput = screen.getByPlaceholderText(
-			"AIノート/演習のタイトルを入力してください（最大100文字）",
+			"AI要約/演習のタイトルを入力してください（最大100文字）",
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト選択問題" } });
 

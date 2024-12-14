@@ -114,7 +114,7 @@ describe("useOutputGenerator", () => {
 			expect(result.current.loading).toBe(false);
 		});
 
-		expect(result.current.error).toBe("AIノートの生成に失敗しました");
+		expect(result.current.error).toBe("AI要約の生成に失敗しました");
 	});
 
 	it("エラー系: ストリーミングの初期化に失敗する場合", async () => {

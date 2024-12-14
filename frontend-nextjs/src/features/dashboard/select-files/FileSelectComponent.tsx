@@ -331,7 +331,7 @@ export default function FileSelectComponent() {
 								<Input
 									value={title}
 									onChange={(e) => setTitle(e.target.value)}
-									placeholder="AIノート/演習のタイトルを入力してください（最大100文字）"
+									placeholder="AI要約/演習のタイトルを入力してください（最大100文字）"
 									maxLength={100}
 									className="mt-1 focus:outline-none !border !border-gray-300 focus:!border-gray-900 rounded-lg"
 									labelProps={{
@@ -349,7 +349,7 @@ export default function FileSelectComponent() {
 										className="flex-1"
 										disabled={loading}
 									>
-										AIノート作成
+										AI要約作成
 									</Button>
 									<Button
 										size="lg"

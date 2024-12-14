@@ -58,7 +58,7 @@ export function useOutputGenerator() {
 			);
 
 			if (!response.ok) {
-				throw new Error("AIノートの生成に失敗しました");
+				throw new Error("AI要約の生成に失敗しました");
 			}
 
 			const reader = response.body?.getReader();
