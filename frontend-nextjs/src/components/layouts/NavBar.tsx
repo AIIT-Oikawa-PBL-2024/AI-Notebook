@@ -117,7 +117,7 @@ export default function NavBar() {
 						<ListItemPrefix>
 							<ListBulletIcon className="h-5 w-5" />
 						</ListItemPrefix>
-						ノート一覧
+						ノートリスト
 					</ListItem>
 				</Link>
 				<Link href="/notebook">

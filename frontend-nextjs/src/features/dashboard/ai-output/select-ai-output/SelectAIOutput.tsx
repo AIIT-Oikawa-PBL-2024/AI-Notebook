@@ -1,4 +1,5 @@
 "use client";
+import { useNoteInitialData } from "@/features/dashboard/ai-output/select-ai-output/useNoteInitialData";
 import { useOutputDelete } from "@/features/dashboard/ai-output/select-ai-output/useOutputDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
@@ -61,6 +62,7 @@ export default function OutputSelectComponent() {
 
 	const { user } = useAuth();
 	const authFetch = useAuthFetch();
+	const { setInitialData } = useNoteInitialData();
 
 	const fetchOutputs = useCallback(async () => {
 		if (!user) {
@@ -233,6 +235,28 @@ export default function OutputSelectComponent() {
 		}
 	};
 
+	const handleCreateNote = useCallback(() => {
+		if (!selectedOutputId) {
+			alert("アイテムを選択してください。");
+			return;
+		}
+
+		const selectedOutput = outputs.find(
+			(output) => output.id === selectedOutputId,
+		);
+
+		if (!selectedOutput) {
+			return;
+		}
+
+		setInitialData({
+			title: selectedOutput.title,
+			content: selectedOutput.output,
+		});
+
+		router.push("/notebook");
+	}, [selectedOutputId, outputs, router, setInitialData]);
+
 	return (
 		<div className="container mx-auto p-4">
 			<Card>
@@ -282,6 +306,18 @@ export default function OutputSelectComponent() {
 							disabled={!selectedOutputId || isDeleting}
 						>
 							{isDeleting ? "削除中..." : "選択したAI出力を削除"}
+						</button>
+						<button
+							type="button"
+							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
+								selectedOutputId
+									? "bg-gray-800 hover:bg-gray-600"
+									: "bg-gray-400 cursor-not-allowed"
+							}`}
+							onClick={handleCreateNote}
+							disabled={!selectedOutputId}
+						>
+							ノートを作成
 						</button>
 					</div>
 
