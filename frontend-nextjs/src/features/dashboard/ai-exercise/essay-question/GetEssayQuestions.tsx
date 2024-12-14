@@ -7,8 +7,8 @@ import {
 	Card,
 	CardBody,
 	Spinner,
-	Typography,
 	Textarea,
+	Typography,
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 
