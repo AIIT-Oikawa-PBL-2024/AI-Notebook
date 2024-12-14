@@ -12,21 +12,21 @@ type Props = {
 export const NotebookEditor = forwardRef<{ clear: () => void }, Props>(
 	({ fields, defaultValue }, ref) => {
 		const [inputValue, setInputValue] = useState(defaultValue || "");
-		// エディタの設定(ショートカットキーを無効化)
+
 		const editor = useEditor({
 			extensions: [
 				StarterKit.configure({
-					heading: false, // 見出し
-					bulletList: false, // 箇条書き
-					orderedList: false, // 番号付きリスト
-					listItem: false, // リストアイテム
-					bold: false, // 太字
-					italic: false, // 斜体
-					strike: false, // 取り消し線
-					blockquote: false, // 引用
-					code: false, // インラインコード
-					codeBlock: false, // コードブロック
-					horizontalRule: false, // 水平線
+					heading: false,
+					bulletList: false,
+					orderedList: false,
+					listItem: false,
+					bold: false,
+					italic: false,
+					strike: false,
+					blockquote: false,
+					code: false,
+					codeBlock: false,
+					horizontalRule: false,
 				}),
 			],
 			autofocus: false,
@@ -40,16 +40,29 @@ export const NotebookEditor = forwardRef<{ clear: () => void }, Props>(
 				},
 			},
 			onUpdate: ({ editor }) => {
-				const editorText = editor.getText();
-				console.log("Editor onUpdate - テキスト更新:", editorText);
-				setInputValue(editorText);
+				// HTMLコンテンツを取得し、改行を保持する形に変換
+				const content = editor.getHTML();
+				// <p>タグをnewlineに変換
+				const processedContent = content
+					.replace(/<p>/g, "")
+					.replace(/<\/p>/g, "\n")
+					.replace(/<br\/?>/g, "\n")
+					.trim();
+
+				console.log("Editor onUpdate - テキスト更新:", processedContent);
+				setInputValue(processedContent);
 			},
 		});
 
 		useEffect(() => {
 			if (editor && defaultValue !== undefined) {
 				console.log("初期値設定:", defaultValue);
-				editor.commands.setContent(defaultValue);
+				// 初期値の改行を<p>タグに変換してセット
+				const formattedContent = defaultValue
+					.split("\n")
+					.map((line) => `<p>${line}</p>`)
+					.join("");
+				editor.commands.setContent(formattedContent);
 				setInputValue(defaultValue);
 			}
 		}, [editor, defaultValue]);
