@@ -214,4 +214,3 @@ jobs:
       uses: davelosert/vitest-coverage-report-action@v2
       with:
         working-directory: frontend-nextjs
-
