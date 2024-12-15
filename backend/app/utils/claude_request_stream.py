@@ -24,7 +24,7 @@ load_dotenv()
 # プロジェクトIDとリージョンを環境変数から取得
 PROJECT_ID = str(os.getenv("PROJECT_ID"))
 REGION = "us-east5"  # リージョンは固定
-MODEL_NAME = "claude-3-5-sonnet@20240620"  # Claudeモデル名は固定
+MODEL_NAME = "claude-3-5-sonnet-v2@20241022"  # Claudeモデル名は固定
 BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
 
 
