@@ -1,5 +1,6 @@
 import { Inter, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/providers/AuthProvider";
 import ClientThemeProvider from "@/providers/ClientThemeProvider";
 import type { Metadata } from "next";
@@ -37,6 +38,7 @@ export default function RootLayout({
 				<ClientThemeProvider>
 					<ErrorBoundary fallback={<DashboardError />}>
 						<AuthProvider>{children}</AuthProvider>
+						<Toaster />
 					</ErrorBoundary>
 				</ClientThemeProvider>
 			</body>
