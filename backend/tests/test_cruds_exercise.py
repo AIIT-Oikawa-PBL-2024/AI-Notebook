@@ -3,16 +3,20 @@ from datetime import datetime
 from unittest.mock import Mock, AsyncMock
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.future import select
 
 import app.models.exercises as exercises_models
 import app.models.files as files_models
 import app.schemas.exercises as exercises_schemas
+import app.schemas.exercises_user_answer as exercises_user_answer_schemas
+import app.models.exercises_user_answer as exercises_user_answer_models
 from app.cruds.exercises import (
     create_exercise,
     get_exercises_by_user,
     get_exercise_by_id_and_user,
     delete_exercise_by_user,
     get_exercise_files_by_user,
+    create_user_answer,
 )
 
 
@@ -218,3 +222,35 @@ async def test_get_exercise_files_by_user_not_found(mock_db: AsyncMock) -> None:
     # テスト実行とアサーション
     with pytest.raises(ValueError, match="Exercise with ID 1 not found for user test-user-123"):
         await get_exercise_files_by_user(mock_db, 1, "test-user-123")
+
+
+@pytest.mark.asyncio
+async def test_create_user_answer(async_session: AsyncSession) -> None:
+    # Arrange
+    user_answer_data = {
+        "exercise_id": 1,
+        "user_id": "test_user",
+        "answer": "This is a test answer",
+        "is_correct": True,
+    }
+    user_answer_create = exercises_user_answer_schemas.ExerciseUserAnswerCreate(**user_answer_data)
+
+    # Act
+    created_user_answer = await create_user_answer(async_session, user_answer_create)
+
+    # Assert
+    assert created_user_answer.exercise_id == user_answer_data["exercise_id"]
+    assert created_user_answer.user_id == user_answer_data["user_id"]
+    assert created_user_answer.answer == user_answer_data["answer"]
+    assert created_user_answer.is_correct == user_answer_data["is_correct"]
+
+    # Verify the user answer is actually in the database
+    result = await async_session.execute(
+        select(exercises_user_answer_models.ExerciseUserAnswer).filter_by(id=created_user_answer.id)
+    )
+    user_answer_in_db = result.scalar_one()
+    assert user_answer_in_db is not None
+    assert user_answer_in_db.exercise_id == user_answer_data["exercise_id"]
+    assert user_answer_in_db.user_id == user_answer_data["user_id"]
+    assert user_answer_in_db.answer == user_answer_data["answer"]
+    assert user_answer_in_db.is_correct == user_answer_data["is_correct"]

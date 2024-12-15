@@ -7,8 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 import app.models.exercises as exercises_models
+import app.models.exercises_user_answer as exercises_user_answer_models
 import app.models.files as files_models
 import app.schemas.exercises as exercises_schemas
+import app.schemas.exercises_user_answer as exercises_user_answer_schemas
 
 
 async def create_exercise(
@@ -175,3 +177,24 @@ async def get_exercise_files_by_user(
     except SQLAlchemyError as e:
         logging.error(f"Error retrieving files for exercise {exercise_id} and user {user_id}: {e}")
         raise
+
+
+async def create_user_answer(
+    db: AsyncSession, user_answer_create: exercises_user_answer_schemas.ExerciseUserAnswerCreate
+) -> exercises_user_answer_models.ExerciseUserAnswer:
+    """
+    新しいユーザー回答を作成する関数。
+    ExerciseUserAnswerCreateスキーマには既にuser_idが含まれているため、追加のユーザーIDは不要です。
+
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :param user_answer_create: 作成するユーザー回答の情報（user_idを含む）
+    :type user_answer_create: exercises_user_answer_schemas.ExerciseUserAnswerCreate
+    :return: 作成されたユーザー回答の情報
+    :rtype: exercises_user_answer_models.ExerciseUserAnswer
+    """
+    user_answer = exercises_user_answer_models.ExerciseUserAnswer(**user_answer_create.model_dump())
+    db.add(user_answer)
+    await db.commit()
+    await db.refresh(user_answer)
+    return user_answer
