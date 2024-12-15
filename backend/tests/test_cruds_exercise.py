@@ -84,6 +84,35 @@ def sample_files(sample_datetime: datetime) -> list[files_models.File]:
     ]
 
 
+@pytest.fixture
+def sample_user_answer(
+    sample_datetime: datetime,
+) -> exercises_user_answer_models.ExerciseUserAnswer:
+    """ExerciseUserAnswerモデルのサンプルデータを作成するフィクスチャ"""
+    return exercises_user_answer_models.ExerciseUserAnswer(
+        id=1,
+        exercise_id=1,
+        user_id="test-user-123",
+        answer="This is a test answer",
+        scoring_results="This is a test scoring result",
+        created_at=sample_datetime,
+    )
+
+
+@pytest.fixture
+def sample_user_answer_create(
+    sample_datetime: datetime,
+) -> exercises_user_answer_schemas.ExerciseUserAnswerCreate:
+    """ExerciseUserAnswerCreateスキーマのサンプルデータを作成するフィクスチャ"""
+    return exercises_user_answer_schemas.ExerciseUserAnswerCreate(
+        exercise_id=1,
+        user_id="test-user-123",
+        answer="This is a test answer",
+        scoring_results="This is a test scoring result",
+        created_at=sample_datetime,
+    )
+
+
 @pytest.mark.asyncio
 async def test_create_exercise_success(
     mock_db: AsyncMock,
@@ -225,32 +254,20 @@ async def test_get_exercise_files_by_user_not_found(mock_db: AsyncMock) -> None:
 
 
 @pytest.mark.asyncio
-async def test_create_user_answer(async_session: AsyncSession) -> None:
-    # Arrange
-    user_answer_data = {
-        "exercise_id": 1,
-        "user_id": "test_user",
-        "answer": "This is a test answer",
-        "is_correct": True,
-    }
-    user_answer_create = exercises_user_answer_schemas.ExerciseUserAnswerCreate(**user_answer_data)
+async def test_create_user_answer_success(
+    mock_db: AsyncMock,
+    sample_user_answer_create: exercises_user_answer_schemas.ExerciseUserAnswerCreate,
+) -> None:
+    # テスト実行
+    result = await create_user_answer(mock_db, sample_user_answer_create)
 
-    # Act
-    created_user_answer = await create_user_answer(async_session, user_answer_create)
-
-    # Assert
-    assert created_user_answer.exercise_id == user_answer_data["exercise_id"]
-    assert created_user_answer.user_id == user_answer_data["user_id"]
-    assert created_user_answer.answer == user_answer_data["answer"]
-    assert created_user_answer.is_correct == user_answer_data["is_correct"]
-
-    # Verify the user answer is actually in the database
-    result = await async_session.execute(
-        select(exercises_user_answer_models.ExerciseUserAnswer).filter_by(id=created_user_answer.id)
-    )
-    user_answer_in_db = result.scalar_one()
-    assert user_answer_in_db is not None
-    assert user_answer_in_db.exercise_id == user_answer_data["exercise_id"]
-    assert user_answer_in_db.user_id == user_answer_data["user_id"]
-    assert user_answer_in_db.answer == user_answer_data["answer"]
-    assert user_answer_in_db.is_correct == user_answer_data["is_correct"]
+    # アサーション
+    assert result is not None
+    assert mock_db.add.called
+    assert mock_db.commit.called
+    assert mock_db.refresh.called
+    assert result.exercise_id == sample_user_answer_create.exercise_id
+    assert result.user_id == sample_user_answer_create.user_id
+    assert result.answer == sample_user_answer_create.answer
+    assert result.scoring_results == sample_user_answer_create.scoring_results
+    assert result.created_at == sample_user_answer_create.created_at

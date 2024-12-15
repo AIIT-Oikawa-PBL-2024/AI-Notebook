@@ -9,6 +9,7 @@ from sqlalchemy.engine import Connection
 from app.database import Base
 from app.models.exercises import Exercise  # noqa: F401
 from app.models.exercises_files import exercise_file  # noqa: F401
+from app.models.exercises_user_answer import ExerciseUserAnswer  # noqa: F401
 from app.models.files import File  # noqa: F401
 from app.models.notes import Note  # noqa: F401
 from app.models.outputs import Output  # noqa: F401

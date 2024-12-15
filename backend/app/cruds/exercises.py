@@ -182,17 +182,6 @@ async def get_exercise_files_by_user(
 async def create_user_answer(
     db: AsyncSession, user_answer_create: exercises_user_answer_schemas.ExerciseUserAnswerCreate
 ) -> exercises_user_answer_models.ExerciseUserAnswer:
-    """
-    新しいユーザー回答を作成する関数。
-    ExerciseUserAnswerCreateスキーマには既にuser_idが含まれているため、追加のユーザーIDは不要です。
-
-    :param db: データベースセッション
-    :type db: AsyncSession
-    :param user_answer_create: 作成するユーザー回答の情報（user_idを含む）
-    :type user_answer_create: exercises_user_answer_schemas.ExerciseUserAnswerCreate
-    :return: 作成されたユーザー回答の情報
-    :rtype: exercises_user_answer_models.ExerciseUserAnswer
-    """
     user_answer = exercises_user_answer_models.ExerciseUserAnswer(**user_answer_create.model_dump())
     db.add(user_answer)
     await db.commit()
