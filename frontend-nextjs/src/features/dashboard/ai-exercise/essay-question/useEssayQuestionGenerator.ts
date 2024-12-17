@@ -8,6 +8,7 @@ interface Question {
 	question_text: string;
 	answer: string;
 	explanation: string;
+	exercise_id: number;
 }
 
 interface ExerciseResponse {
@@ -22,6 +23,7 @@ interface ExerciseResponse {
 			type: string;
 		},
 	];
+	exercise_id: number;
 }
 
 const STORAGE_KEY = "cached_essay_question";

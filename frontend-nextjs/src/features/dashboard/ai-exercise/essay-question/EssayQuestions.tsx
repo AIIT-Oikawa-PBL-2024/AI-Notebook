@@ -1,6 +1,7 @@
 "use client";
 
 import { useEssayQuestionGenerator } from "@/features/dashboard/ai-exercise/essay-question/useEssayQuestionGenerator";
+import { useSubmitAnswers } from "@/features/dashboard/ai-exercise/essay-question/useSubmitAnswers";
 import {
 	Alert,
 	Button,
@@ -21,9 +22,51 @@ type ResultState = {
 	skippedQuestions: string[];
 };
 
+const formatAnswersForRequest = (
+	answers: Record<string, string>,
+	questions: {
+		question_id: string;
+		question_text: string;
+		answer?: string;
+		explanation?: string;
+	}[],
+	exercise_id: number,
+) => {
+	// 質問データを整形
+	const formattedQuestions = questions.map((question) => ({
+		question_id: question.question_id,
+		question_text: question.question_text,
+		user_answer: answers[question.question_id] || "",
+		answer: question.answer || "",
+		explanation: question.explanation || "",
+	}));
+
+	// JSON文字列として answer に含める
+	const answer = JSON.stringify({
+		questions: formattedQuestions,
+	});
+
+	// 現在のタイムスタンプを取得
+	const createdAt = new Date().toISOString();
+
+	// リクエストフォーマットを返却
+	return {
+		answer, // JSON文字列
+		scoring_results: "", // 空文字列を仮設定
+		exercise_id, // 数値で送信
+		created_at: createdAt, // ISO 8601形式のタイムスタンプ
+	};
+};
+
 export const EssayQuestions = () => {
 	const { loading, error, exercise, resetExercise, clearCache } =
 		useEssayQuestionGenerator();
+
+	const {
+		isSubmitting,
+		error: submitError,
+		submitAnswers,
+	} = useSubmitAnswers();
 
 	const [answers, setAnswers] = useState<Record<string, string>>(() => {
 		if (typeof window !== "undefined") {
@@ -63,26 +106,44 @@ export const EssayQuestions = () => {
 		}
 	}, [resultState]);
 
-	const submitAnswersToBackend = async () => {
-		/*
+	const handleAnswerChange = (questionId: string, value: string) => {
+		setAnswers((prev) => ({
+			...prev,
+			[questionId]: value,
+		}));
+	};
+
+	const handleSubmit = async () => {
 		try {
-			const response = await fetch("/api/submit-answers", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ answers }),
-			});
-			const result = await response.json();
+			if (!exercise) {
+				console.error("Exercise data is not available.");
+				return;
+			}
+			const formattedRequest = formatAnswersForRequest(
+				answers,
+				exercise.content[0].input.questions,
+				exercise.exercise_id, // exercise_id を追加
+			);
+			const result = await submitAnswers(formattedRequest);
 			setResultState((prev) => ({
 				...prev,
 				showResults: true,
 			}));
 			console.log("Backend response:", result);
-		} catch (error) {
-			console.error("Error submitting answers:", error);
+		} catch (err) {
+			console.error("Error submitting answers:", err);
 		}
-		// */
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
+
+	const handleReset = () => {
+		setAnswers({});
+		setResultState({
+			showResults: false,
+			retryMode: false,
+			skippedQuestions: [],
+		});
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
 	if (loading) {
@@ -132,28 +193,6 @@ export const EssayQuestions = () => {
 
 	const questions = exercise.content[0].input.questions;
 
-	const handleAnswerChange = (questionId: string, value: string) => {
-		setAnswers((prev) => ({
-			...prev,
-			[questionId]: value,
-		}));
-	};
-
-	const handleSubmit = () => {
-		submitAnswersToBackend();
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	};
-
-	const handleReset = () => {
-		setAnswers({});
-		setResultState({
-			showResults: false,
-			retryMode: false,
-			skippedQuestions: [],
-		});
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	};
-
 	return (
 		<div className="container mx-auto p-4 max-w-4xl">
 			<Typography variant="h2" className="text-center mb-6">
@@ -202,6 +241,11 @@ export const EssayQuestions = () => {
 					</Button>
 				)}
 			</div>
+			{submitError && (
+				<Alert color="red" className="mt-4">
+					エラーが発生しました: {submitError}
+				</Alert>
+			)}
 		</div>
 	);
 };
