@@ -1,5 +1,6 @@
 import { useNotebookActions } from "@/features/dashboard/notebook/hooks/useNotebookActions";
 import { Button } from "@material-tailwind/react";
+import { useRouter } from "next/navigation";
 
 type DeleteButtonProps = {
 	noteId: number;
@@ -8,11 +9,12 @@ type DeleteButtonProps = {
 
 export const DeleteButton = ({ noteId, onDelete }: DeleteButtonProps) => {
 	const { deleteNotebook } = useNotebookActions();
+	const router = useRouter();
 
 	const handleDelete = async () => {
 		try {
 			await deleteNotebook(noteId);
-			onDelete();
+			router.push("/");
 		} catch (error) {
 			console.error("削除エラー:", error);
 		}
