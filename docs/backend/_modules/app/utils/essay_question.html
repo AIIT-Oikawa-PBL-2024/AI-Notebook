@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>app.utils.claude_request_stream &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
+  <title>app.utils.essay_question &mdash; AI-Notebook-backend 1.0.0 ドキュメント</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -59,7 +59,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
-      <li class="breadcrumb-item active">app.utils.claude_request_stream</li>
+      <li class="breadcrumb-item active">app.utils.essay_question</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -68,14 +68,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>app.utils.claude_request_stream のソースコード</h1><div class="highlight"><pre>
+  <h1>app.utils.essay_question のソースコード</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">unicodedata</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span>
 
 <span class="kn">import</span> <span class="nn">fitz</span>
 <span class="kn">from</span> <span class="nn">anthropic</span> <span class="kn">import</span> <span class="n">AnthropicVertex</span>
@@ -102,10 +101,82 @@
 <span class="c1"># ロギングの設定</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
+<span class="c1"># ツールの設定</span>
+<span class="n">tool_name</span> <span class="o">=</span> <span class="s2">&quot;print_essay_questions&quot;</span>
+
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">- あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
+<span class="s2">- 入力された大学院の講義テキストの内容に基づいて、</span>
+<span class="s2">  理解度を深めるための記述式の練習問題を作成してください。</span>
+<span class="s2">- &quot;記述問題&quot;と&quot;正解&quot;と&quot;解説&quot;のセットを5問作成してください。</span>
+<span class="s2">- 重要な概念や用語を確認できる問題を作成してください。</span>
+<span class="s2">- 以下のruleに従って作成してください。</span>
+
+<span class="s2">&lt;rule&gt;</span>
+<span class="s2">- 入力テキストの内容に基づいて、記述問題を5問作成してください。</span>
+<span class="s2">- 各問題には、問題文、正解、詳しい解説を含めてください。</span>
+<span class="s2">- 問題は簡易な説明問題から、応用的・発展的な論述を要求する問題へと段階的に難易度を上げてください。</span>
+<span class="s2">- 全体として、テキストの主要テーマ・概念・定義・理論構造の</span>
+<span class="s2">  理解や応用力を評価できる内容にしてください。</span>
+<span class="s2">- 問題のフォーマットは以下の形式に従ってください：</span>
+<span class="s2">  question_[番号]: 問題文</span>
+<span class="s2">  answer_[番号]: 回答例</span>
+<span class="s2">  explanation_[番号]: 解説</span>
+<span class="s2">&lt;/rule&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">tool_definition</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;print_essay_questions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+    <span class="s2">&quot;input_schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;question_id&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;問題番号 (例: question_1)&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;question_text&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;問題文&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;回答例&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;解説文&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;question_id&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;question_text&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;answer&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;explanation&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;minItems&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="s2">&quot;maxItems&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+
+<span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2"> ツールのみを利用すること。</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
 
 <span class="c1"># Google Cloud Storageでファイルが存在するかチェック</span>
 <div class="viewcode-block" id="check_file_exists">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.check_file_exists">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.essay_question.check_file_exists">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">check_file_exists</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Google Cloud Storageで指定されたバケット内のファイルが存在するかどうかを確認</span>
@@ -123,7 +194,7 @@
 
 <span class="c1"># GCSのファイル読み込み</span>
 <div class="viewcode-block" id="read_file">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.read_file">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.essay_question.read_file">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Google Cloud Storageからファイルを読み込み、base64エンコードされた文字列として返す</span>
@@ -145,7 +216,7 @@
 
 <span class="c1"># pdfからテキスト抽出</span>
 <div class="viewcode-block" id="extract_text_from_pdf">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.extract_text_from_pdf">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.essay_question.extract_text_from_pdf">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">extract_text_from_pdf</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    指定されたPDFファイルからテキストを抽出して返す</span>
@@ -173,7 +244,7 @@
 
 <span class="c1"># ファイル拡張子から適切なmedia_typeを返す</span>
 <div class="viewcode-block" id="get_media_type">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.get_media_type">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.essay_question.get_media_type">[ドキュメント]</a>
 <span class="k">def</span> <span class="nf">get_media_type</span><span class="p">(</span><span class="n">extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ファイル拡張子から適切なmedia_typeを返す</span>
@@ -189,50 +260,49 @@
 
 
 
-<span class="c1"># 複数のpdf, imageファイルを入力してコンテンツを生成</span>
-<div class="viewcode-block" id="generate_content_stream">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.generate_content_stream">[ドキュメント]</a>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_content_stream</span><span class="p">(</span>
+<span class="c1"># 複数のpdf, image, 動画ファイルを入力してコンテンツを生成</span>
+<div class="viewcode-block" id="generate_essay_json">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.essay_question.generate_essay_json">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">generate_essay_json</span><span class="p">(</span>
     <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL_NAME</span><span class="p">,</span>
     <span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BUCKET_NAME</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_stream started&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_essay_json started&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tool_name: </span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tool_definition: </span><span class="si">{</span><span class="n">tool_definition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
 
-    <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">content</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。</span>
-<span class="s2">        - #input_files: 複数のファイルは、大学院の講義資料です。</span>
-<span class="s2">        - #instruction: 複数のテキスト, imageファイルを読み解いて、練習問題を作って下さい。</span>
-<span class="s2">        - #style1: &quot;4択の選択問題&quot;を5問 + &quot;穴埋め問題&quot;を5問、合計10問出題してください。</span>
-<span class="s2">        - #style2: 200文字程度の&quot;記述式問題&quot;を3問出題して下さい。</span>
-<span class="s2">        - #style3: 最後に一括して&quot;正解&quot;と&quot;解説&quot;を箇条書き形式で表示してください。</span>
-<span class="s2">        - #style4: 記述式問題の正解は省略せず、&quot;解答例&quot;を表示してください。</span>
-<span class="s2">        - #condition1: 重要なキーワードを覚えられるような問題にしてください。</span>
-<span class="s2">        - #condition2: &quot;表形式&quot;は禁止します。&quot;箇条書き&quot;を使用してください。</span>
-<span class="s2">        - #format: タイトルを付けて、4000文字程度のMarkdownで出力してください。</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">AnthropicVertex</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">REGION</span><span class="p">,</span> <span class="n">project_id</span><span class="o">=</span><span class="n">PROJECT_ID</span><span class="p">)</span>
-        <span class="n">extracted_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># 初期化</span>
-        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="c1"># ブロブ名を正規化</span>
-            <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
-                <span class="c1"># ユーザーIDの検証</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">uid</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">uid</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid user ID&quot;</span><span class="p">)</span>
 
-                <span class="c1"># パスの正規化</span>
-                <span class="n">safe_uid</span> <span class="o">=</span> <span class="n">uid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
-                <span class="n">file_name</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">safe_uid</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+        <span class="c1"># 全ファイルからのテキストを結合するための変数</span>
+        <span class="n">all_extracted_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">uid</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">uid</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid user ID&quot;</span><span class="p">)</span>
+
+            <span class="n">safe_uid</span> <span class="o">=</span> <span class="n">uid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">safe_uid</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="k">await</span> <span class="n">check_file_exists</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> exists in bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.gif&quot;</span><span class="p">,</span> <span class="s2">&quot;webp&quot;</span><span class="p">)):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading image file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> exists in bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracting text from PDF: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">extracted_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">extract_text_from_pdf</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted text length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">extracted_text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># テキストを結合</span>
+                    <span class="n">all_extracted_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> ===</span><span class="se">\n</span><span class="si">{</span><span class="n">extracted_text</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">)):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading image file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">image_file</span> <span class="o">=</span> <span class="k">await</span> <span class="n">read_file</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
                     <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -247,41 +317,56 @@
                         <span class="p">}</span>
                     <span class="p">)</span>
 
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added image file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to image_files&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracting text from PDF: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-                    <span class="n">extracted_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">extract_text_from_pdf</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted text length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">extracted_text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-                    <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">extracted_text</span><span class="p">})</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added extracted text to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">):</span>
-                    <span class="c1"># ファイルを音声ファイルに変換する</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added image file: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to image_files&quot;</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">):</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converting </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
                         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully converted </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
-                        <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-                        <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">extracted_text</span><span class="p">})</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added extracted text to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+                        <span class="n">audio_text</span> <span class="o">=</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                        <span class="n">all_extracted_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> ===</span><span class="se">\n</span><span class="si">{</span><span class="n">audio_text</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
                         <span class="k">raise</span> <span class="n">InternalServerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp3&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.wav&quot;</span><span class="p">):</span>
-                    <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-                    <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">extracted_text</span><span class="p">})</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added extracted text to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total image files processed: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+                <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;.mp3&quot;</span><span class="p">,</span> <span class="s2">&quot;.wav&quot;</span><span class="p">)):</span>
+                    <span class="n">audio_text</span> <span class="o">=</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">all_extracted_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> ===</span><span class="se">\n</span><span class="si">{</span><span class="n">audio_text</span><span class="si">}</span><span class="s2">&quot;</span>
 
+        <span class="c1"># まず抽出したテキストをコンテンツに追加</span>
+        <span class="k">if</span> <span class="n">all_extracted_text</span><span class="p">:</span>
+            <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;講義テキスト:</span><span class="se">\n</span><span class="si">{</span><span class="n">all_extracted_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added extracted text to content (length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_extracted_text</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 画像ファイルを追加</span>
         <span class="k">if</span> <span class="n">image_files</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">image_files</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="n">content</span><span class="o">.</span><span class="n">extend</span><span class="p">([{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Image </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">},</span> <span class="n">image</span><span class="p">])</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> images to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> images to content&quot;</span><span class="p">)</span>
 
-        <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">})</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;contents: </span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># 最後にプロンプトを追加</span>
+        <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;上記の講義テキスト</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">の内容に基づいて、&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">ツールを使用して問題を作成して下さい。&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added prompt to content&quot;</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting stream with model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-        <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+        <span class="c1"># デバッグ用にコンテンツの内容を出力</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Content structure:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. Type: text, Length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span>
+                <span class="n">image_info</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. Type: image, Format: </span><span class="si">{</span><span class="n">image_info</span><span class="p">[</span><span class="s1">&#39;media_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">image_info</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span><span class="o">//</span><span class="mi">1024</span><span class="si">}</span><span class="s2">KB&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">max_tokens</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
             <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
@@ -291,11 +376,20 @@
                 <span class="p">}</span>
             <span class="p">],</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
-        <span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">stream</span><span class="o">.</span><span class="n">text_stream</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">text</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">tool_definition</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
+            <span class="n">tool_choice</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">tool_name</span><span class="p">},</span>
+        <span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_stream finished&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
+        <span class="c1"># レスポンスの検証</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;tool_use&quot;</span><span class="p">:</span>
+                <span class="n">questions</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;questions&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;&lt;UNKNOWN&gt;&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">):</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid response received with &lt;UNKNOWN&gt; values&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to generate valid questions&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_json finished&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 
     <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model attribute error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -322,19 +416,18 @@
 
 <span class="c1"># テスト用のコード</span>
 <div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.main">[ドキュメント]</a>
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.essay_question.main">[ドキュメント]</a>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    メイン関数。generate_content_stream関数をテストするためのコード</span>
+<span class="sd">    メイン関数。generate_essay_json関数をテストするためのコード</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">AsyncGenerator</span> <span class="o">=</span> <span class="n">generate_content_stream</span><span class="p">(</span>
+    <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="k">await</span> <span class="n">generate_essay_json</span><span class="p">(</span>
         <span class="c1"># [&quot;kougi_sample.png&quot;, &quot;kougi_sample2.png&quot;],</span>
         <span class="p">[</span><span class="s2">&quot;1_ソフトウェア工学の誕生.pdf&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;test_uid&quot;</span><span class="p">,</span>
+        <span class="n">uid</span><span class="o">=</span><span class="s2">&quot;test_uid&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;test_title&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
 
 
 

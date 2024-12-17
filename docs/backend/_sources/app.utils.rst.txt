@@ -20,6 +20,14 @@ app.utils.convert\_mp4\_to\_mp3 module
    :undoc-members:
    :show-inheritance:
 
+app.utils.essay\_question module
+--------------------------------
+
+.. automodule:: app.utils.essay_question
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.utils.gemini\_extract\_text\_from\_audio module
 ---------------------------------------------------
 

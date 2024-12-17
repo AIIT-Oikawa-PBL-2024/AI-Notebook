@@ -69,7 +69,9 @@
            <div itemprop="articleBody">
              
   <h1>app.schemas.notes のソースコード</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span>
 
 
 <div class="viewcode-block" id="NoteBase">
@@ -122,12 +124,18 @@
 <span class="sd">    :vartype id: int</span>
 <span class="sd">    :ivar user_id: ユーザーID</span>
 <span class="sd">    :vartype user_id: str</span>
+<span class="sd">    :ivar created_at: ノートの作成日時</span>
+<span class="sd">    :vartype created_at: datetime</span>
+<span class="sd">    :ivar updated_at: ノートの更新日時</span>
+<span class="sd">    :vartype updated_at: datetime</span>
 <span class="sd">    :ivar model_config: モデルの設定</span>
 <span class="sd">    :vartype model_config: ConfigDict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">updated_at</span><span class="p">:</span> <span class="n">datetime</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">from_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
