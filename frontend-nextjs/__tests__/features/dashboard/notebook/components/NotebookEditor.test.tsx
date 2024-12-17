@@ -48,7 +48,7 @@ describe("NotebookEditor", () => {
 	it("defaultValueが設定されている場合、エディターの内容が設定される", () => {
 		const defaultValue = "Test Content";
 		render(<NotebookEditor fields={mockFields} defaultValue={defaultValue} />);
-		expect(mockSetContent).toHaveBeenCalledWith(defaultValue);
+		expect(mockSetContent).toHaveBeenCalledWith(`<p>${defaultValue}</p>`);
 	});
 
 	it("clear関数が正しく動作する", () => {

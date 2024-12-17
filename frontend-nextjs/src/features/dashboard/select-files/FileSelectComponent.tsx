@@ -37,6 +37,12 @@ const STORAGE_KEYS = {
 		ANSWERS: "cached_answers",
 		RESULTS: "cached_results_state",
 	},
+	ESSAY_QUESTION: {
+		QUESTION: "cached_essay_question",
+		GENERATION_STATUS: "essay_question_generation_status",
+		ANSWERS: "cached_essay_answers",
+		RESULTS: "cached_essay_results_state",
+	},
 	STREAM_EXERCISE: {
 		EXERCISE: "cached_exercise",
 		GENERATION_STATUS: "exercise_generation_status",
@@ -126,7 +132,8 @@ export default function FileSelectComponent() {
 			type:
 				| "ai-output/stream"
 				| "ai-exercise/stream"
-				| "ai-exercise/multiple-choice",
+				| "ai-exercise/multiple-choice"
+				| "ai-exercise/essay-question",
 		) => {
 			if (!user) {
 				setError("認証が必要です");
@@ -149,6 +156,10 @@ export default function FileSelectComponent() {
 					}
 				} else if (type === "ai-exercise/stream") {
 					for (const key of Object.values(STORAGE_KEYS.STREAM_EXERCISE)) {
+						localStorage.removeItem(key);
+					}
+				} else if (type === "ai-exercise/essay-question") {
+					for (const key of Object.values(STORAGE_KEYS.ESSAY_QUESTION)) {
 						localStorage.removeItem(key);
 					}
 				} else if (type === "ai-output/stream") {
@@ -320,7 +331,7 @@ export default function FileSelectComponent() {
 								<Input
 									value={title}
 									onChange={(e) => setTitle(e.target.value)}
-									placeholder="AIノート/演習のタイトルを入力してください（最大100文字）"
+									placeholder="AI要約/演習のタイトルを入力してください（最大100文字）"
 									maxLength={100}
 									className="mt-1 focus:outline-none !border !border-gray-300 focus:!border-gray-900 rounded-lg"
 									labelProps={{
@@ -338,7 +349,7 @@ export default function FileSelectComponent() {
 										className="flex-1"
 										disabled={loading}
 									>
-										AIノート作成
+										AI要約作成
 									</Button>
 									<Button
 										size="lg"
@@ -357,6 +368,16 @@ export default function FileSelectComponent() {
 										disabled={loading}
 									>
 										選択問題テスト
+									</Button>
+									<Button
+										size="lg"
+										onClick={() =>
+											createAiContent("ai-exercise/essay-question")
+										}
+										className="flex-1"
+										disabled={loading}
+									>
+										記述問題テスト
 									</Button>
 								</div>
 							)}

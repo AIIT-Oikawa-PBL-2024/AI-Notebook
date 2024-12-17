@@ -137,9 +137,9 @@ describe("NavBar", () => {
 		expect(screen.getByText("ファイル選択")).toBeInTheDocument();
 	});
 
-	it("AI出力メニュー項目が表示されること", () => {
+	it("AI要約メニュー項目が表示されること", () => {
 		render(<NavBar />);
-		expect(screen.getByText("AI出力")).toBeInTheDocument();
+		expect(screen.getByText("AI要約")).toBeInTheDocument();
 	});
 
 	it("AI練習問題メニュー項目が表示されること", () => {
