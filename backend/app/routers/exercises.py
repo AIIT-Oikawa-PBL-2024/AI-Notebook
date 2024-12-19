@@ -22,6 +22,7 @@ from app.models.exercises_files import exercise_file
 from app.utils.claude_request_stream import generate_content_stream
 from app.utils.essay_question import generate_essay_json
 from app.utils.multiple_choice_question import generate_content_json
+from app.utils.user_answer import generate_scoring_result_json
 from app.utils.user_auth import get_uid
 
 # ロギング設定
@@ -570,7 +571,7 @@ async def request_essay_question_json(
 
 @router.post("/user_answer")
 async def create_user_answer(
-    user_answer: exercises_user_answer_schemas.ExerciseUserAnswerCreate,
+    user_answer: exercises_user_answer_schemas.ExerciseUserAnswerRequest,
     uid: str = Depends(get_uid),
     db: AsyncSession = db_dependency,
 ) -> exercises_user_answer_schemas.ExerciseUserAnswerRead:
@@ -588,9 +589,35 @@ async def create_user_answer(
     :raises HTTPException: ユーザーの回答作成中にエラーが発生した場合
     """
     try:
-        user_answer = await exercises_cruds.create_user_answer(db, user_answer)
-        logging.info(f"Created user answer {user_answer.id} for user {uid}")
-        return user_answer
+        # exercise_idとuser_idからExerciseを取得
+        exercise = await exercises_cruds.get_exercise_by_id_and_user(
+            db, user_answer.exercise_id, uid
+        )
+        if exercise is None:
+            raise HTTPException(status_code=404, detail="指定された練習問題が見つかりません。")
+
+        # logging.info(f"Retrieved exercise {exercise.response} for user {uid}")
+
+        response = await generate_scoring_result_json(
+            exercise=exercise.response,
+            user_answers=user_answer.user_answer,
+            uid=uid,
+        )
+        logging.info(f"Generated response: {response}")
+
+        # user_answer.user_answerをstringに変換
+        user_answer_str = json.dumps(user_answer.user_answer)
+
+        # ユーザーの回答と採点結果をデータベースに保存
+        user_answer_db = exercises_user_answer_schemas.ExerciseUserAnswerCreate(
+            exercise_id=user_answer.exercise_id,
+            user_id=uid,
+            answer=user_answer_str,
+            scoring_results=json.dumps(response),
+            created_at=datetime.now(JST),
+        )
+        user_answer_result = await exercises_cruds.create_user_answer(db, user_answer_db)
+        return user_answer_result
 
     except ValidationError as ve:
         logging.error(f"Validation error while creating user answer: {ve}")
