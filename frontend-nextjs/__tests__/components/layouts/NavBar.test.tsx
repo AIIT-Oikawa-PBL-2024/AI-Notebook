@@ -127,9 +127,9 @@ describe("NavBar", () => {
 	});
 
 	// 既存のメニュー項目のテスト
-	it("ホームメニュー項目が表示されること", () => {
+	it("アップロードメニュー項目が表示されること", () => {
 		render(<NavBar />);
-		expect(screen.getByText("ホーム")).toBeInTheDocument();
+		expect(screen.getByText("アップロード")).toBeInTheDocument();
 	});
 
 	it("ファイル選択メニュー項目が表示されること", () => {
@@ -137,18 +137,25 @@ describe("NavBar", () => {
 		expect(screen.getByText("ファイル選択")).toBeInTheDocument();
 	});
 
-	it("AI要約メニュー項目が表示されること", () => {
+	it("AI要約グループが展開されること", () => {
 		render(<NavBar />);
-		expect(screen.getByText("AI要約")).toBeInTheDocument();
+		const groupHeader = screen.getByTestId("accordion-header-AI要約");
+		fireEvent.click(groupHeader);
+		expect(screen.getByText("AI要約リスト")).toBeInTheDocument();
 	});
 
-	it("AI練習問題メニュー項目が表示されること", () => {
+	it("AI練習問題グループが展開されること", () => {
 		render(<NavBar />);
-		expect(screen.getByText("AI練習問題")).toBeInTheDocument();
+		const groupHeader = screen.getByTestId("accordion-header-AI練習問題");
+		fireEvent.click(groupHeader);
+		expect(screen.getByText("AI練習問題リスト")).toBeInTheDocument();
 	});
 
-	it("ノートメニュー項目が表示されること", () => {
+	it("ノートグループが展開されること", () => {
 		render(<NavBar />);
-		expect(screen.getByText("ノート")).toBeInTheDocument();
+		const groupHeader = screen.getByText("ノート");
+		fireEvent.click(groupHeader);
+		expect(screen.getByText("ノートリスト")).toBeInTheDocument();
+		expect(screen.getByText("ノート作成")).toBeInTheDocument();
 	});
 });
