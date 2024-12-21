@@ -256,9 +256,6 @@ describe("SelectNotesComponent", () => {
 	});
 
 	it("削除機能が正しく動作すること", async () => {
-		const confirmSpy = vi.spyOn(window, "confirm");
-		confirmSpy.mockImplementation(() => true);
-
 		await act(async () => {
 			render(<SelectNotesComponent />);
 		});
@@ -288,10 +285,20 @@ describe("SelectNotesComponent", () => {
 			fireEvent.click(deleteButton);
 		});
 
-		expect(confirmSpy).toHaveBeenCalledWith(
-			"選択したノートを削除してもよろしいですか？",
-		);
+		await waitFor(() => {
+			expect(
+				screen.getByText("選択したノートを削除しますか？"),
+			).toBeInTheDocument();
+		});
 
-		confirmSpy.mockRestore();
+		// "実行" ボタンを探して クリック
+		const executeButton = screen.getByRole("button", { name: "実行" });
+		await act(async () => {
+			fireEvent.click(executeButton);
+		});
+
+		await waitFor(() => {
+			expect(mockAuthFetch).toHaveBeenCalled();
+		});
 	});
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { PopupDialog } from "@/components/elements/PopupDialog";
 import FileTable from "@/features/dashboard/select-files/FileTableComponent";
 import { useFileDelete } from "@/features/dashboard/select-files/useFileDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
@@ -110,13 +111,7 @@ export default function FileSelectComponent() {
 	} = useFileDelete(fetchFiles);
 
 	const handleDeleteSelectedFiles = useCallback(async () => {
-		const isConfirmed = window.confirm(
-			"選択したファイルを削除してもよろしいですか？",
-		);
-
-		if (isConfirmed) {
-			await deleteSelectedFiles(files);
-		}
+		await deleteSelectedFiles(files);
 	}, [deleteSelectedFiles, files]);
 
 	const handleSelect = useCallback((fileName: string, checked: boolean) => {
@@ -263,12 +258,14 @@ export default function FileSelectComponent() {
 						>
 							リセット
 						</Button>
-						<Button
-							onClick={handleDeleteSelectedFiles}
-							disabled={!isAnyFileSelected || loading || deleteLoading}
-						>
-							選択項目を削除
-						</Button>
+						<PopupDialog
+							buttonTitle="選択項目を削除"
+							title="選択項目を削除しますか？"
+							actionProps={{ onClick: handleDeleteSelectedFiles }}
+							triggerButtonProps={{
+								disabled: !isAnyFileSelected || loading || deleteLoading,
+							}}
+						/>
 					</div>
 
 					{(error || deleteError) && (
