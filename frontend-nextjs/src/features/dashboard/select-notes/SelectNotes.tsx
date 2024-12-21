@@ -215,11 +215,14 @@ export default function SelectNotesComponent() {
 								className="w-full"
 							/>
 						</div>
-						<Button onClick={fetchNotes} disabled={loading}>
+						<Button
+							onClick={handleNavigate}
+							disabled={!selectedNoteId || loading}
+						>
 							選択したノートを開く
 						</Button>
 						<PopupDialog
-							buttonTitle="選択項目を削除"
+							buttonTitle="選択したノートを削除"
 							title="選択したノートを削除しますか？"
 							actionProps={{ onClick: handleDelete }}
 							triggerButtonProps={{ disabled: !selectedNoteId || isDeleting }}
