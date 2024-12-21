@@ -559,6 +559,9 @@ async def request_essay_question_json(
             await db.refresh(exercise)
             logging.info(f"Exercise saved to database with ID: {exercise.id}")
 
+            # exercise_idをresponseに追加
+            response["exercise_id"] = exercise.id
+
         except Exception as e:
             logging.error(f"Error saving exercise to database: {e}")
             raise HTTPException(

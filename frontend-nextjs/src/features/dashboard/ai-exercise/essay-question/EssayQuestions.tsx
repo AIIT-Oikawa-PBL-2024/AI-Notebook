@@ -20,48 +20,34 @@ type ResultState = {
 	showResults: boolean;
 	retryMode: boolean;
 	skippedQuestions: string[];
+	scoringDetails: {
+		question_id: string;
+		scoring_result: string;
+		explanation: string;
+		answer: string; // 回答例を追加
+	}[];
+};
+
+type ScoringResult = {
+	question_id: string;
+	scoring_result: string;
+	explanation: string;
 };
 
 const formatAnswersForRequest = (
 	answers: Record<string, string>,
-	questions: {
-		question_id: string;
-		question_text: string;
-		answer?: string;
-		explanation?: string;
-	}[],
 	exercise_id: number,
 ) => {
-	// 質問データを整形
-	const formattedQuestions = questions.map((question) => ({
-		question_id: question.question_id,
-		question_text: question.question_text,
-		user_answer: answers[question.question_id] || "",
-		answer: question.answer || "",
-		explanation: question.explanation || "",
-	}));
-
-	// JSON文字列として answer に含める
-	const answer = JSON.stringify({
-		questions: formattedQuestions,
-	});
-
-	// 現在のタイムスタンプを取得
-	const createdAt = new Date().toISOString();
-
-	// リクエストフォーマットを返却
+	const user_answer = Object.values(answers);
 	return {
-		answer, // JSON文字列
-		scoring_results: "", // 空文字列を仮設定
-		exercise_id, // 数値で送信
-		created_at: createdAt, // ISO 8601形式のタイムスタンプ
+		exercise_id,
+		user_answer,
 	};
 };
 
 export const EssayQuestions = () => {
 	const { loading, error, exercise, resetExercise, clearCache } =
 		useEssayQuestionGenerator();
-
 	const {
 		isSubmitting,
 		error: submitError,
@@ -85,14 +71,18 @@ export const EssayQuestions = () => {
 						showResults: false,
 						retryMode: false,
 						skippedQuestions: [] as string[],
+						scoringDetails: [], // 初期値を空配列に設定
 					};
 		}
 		return {
 			showResults: false,
 			retryMode: false,
 			skippedQuestions: [] as string[],
+			scoringDetails: [],
 		};
 	});
+
+	const [scoringResults, setScoringResults] = useState<ScoringResult[]>([]);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -121,15 +111,34 @@ export const EssayQuestions = () => {
 			}
 			const formattedRequest = formatAnswersForRequest(
 				answers,
-				exercise.content[0].input.questions,
-				exercise.exercise_id, // exercise_id を追加
+				exercise.exercise_id,
 			);
 			const result = await submitAnswers(formattedRequest);
-			setResultState((prev) => ({
-				...prev,
+
+			const parsedResults = JSON.parse(result.scoring_results);
+			const scoringDetails = parsedResults.content[0]?.input?.questions?.map(
+				(q: {
+					question_id: string;
+					scoring_result: string;
+					explanation: string;
+				}) => ({
+					question_id: q.question_id,
+					scoring_result: q.scoring_result,
+					explanation: q.explanation,
+					answer:
+						questions.find((item) => item.question_id === q.question_id)
+							?.answer || "", // 回答例をマッピング
+				}),
+			);
+
+			const newResultState = {
+				...resultState,
 				showResults: true,
-			}));
-			console.log("Backend response:", result);
+				scoringDetails,
+			};
+
+			setResultState(newResultState);
+			localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(newResultState));
 		} catch (err) {
 			console.error("Error submitting answers:", err);
 		}
@@ -142,6 +151,7 @@ export const EssayQuestions = () => {
 			showResults: false,
 			retryMode: false,
 			skippedQuestions: [],
+			scoringDetails: [],
 		});
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
@@ -198,31 +208,43 @@ export const EssayQuestions = () => {
 			<Typography variant="h2" className="text-center mb-6">
 				記述問題
 			</Typography>
-			{questions.map((question, index) => (
-				<Card key={question.question_id} className="mb-6 shadow-sm">
-					<CardBody>
-						<Typography variant="h6" className="mb-4">
-							問題 {index + 1}. {question.question_text}
-						</Typography>
-						<Textarea
-							placeholder="ここに回答を入力してください"
-							value={answers[question.question_id] || ""}
-							onChange={(e) =>
-								handleAnswerChange(question.question_id, e.target.value)
-							}
-							disabled={resultState.showResults}
-						/>
-						{resultState.showResults && (
-							<div className="mt-4">
-								<Typography className="text-gray-900">あなたの回答:</Typography>
-								<Typography className="text-blue-900">
-									{answers[question.question_id] || "未回答"}
-								</Typography>
-							</div>
-						)}
-					</CardBody>
-				</Card>
-			))}
+			{questions.map((question, index) => {
+				const result = resultState.scoringDetails.find(
+					(r) => r.question_id === question.question_id,
+				);
+
+				return (
+					<Card key={question.question_id} className="mb-6 shadow-sm">
+						<CardBody>
+							<Typography variant="h6" className="mb-4">
+								問題 {index + 1}. {question.question_text}
+							</Typography>
+							<Textarea
+								placeholder="ここに回答を入力してください"
+								value={answers[question.question_id] || ""}
+								onChange={(e) =>
+									handleAnswerChange(question.question_id, e.target.value)
+								}
+								disabled={resultState.showResults}
+							/>
+							{resultState.showResults && result && (
+								<div className="mt-4">
+									<Typography className="text-blue-900">
+										採点結果: {result.scoring_result}
+									</Typography>
+									<Typography className="text-blue-700">
+										理由: {result.explanation}
+									</Typography>
+									<Typography className="text-green-700 mt-2">
+										回答例: {result.answer || "回答例はありません"}
+									</Typography>
+								</div>
+							)}
+						</CardBody>
+					</Card>
+				);
+			})}
+
 			<div className="flex justify-between items-center mt-6">
 				{resultState.showResults ? (
 					<div className="w-full flex justify-between items-center">
@@ -237,7 +259,7 @@ export const EssayQuestions = () => {
 						disabled={Object.keys(answers).length !== questions.length}
 						color="blue"
 					>
-						回答を送信する
+						{isSubmitting ? "送信中..." : "回答を送信する"}
 					</Button>
 				)}
 			</div>
