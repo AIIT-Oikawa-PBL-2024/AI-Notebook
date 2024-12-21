@@ -1,5 +1,6 @@
 "use client";
 
+import { PopupDialog } from "@/components/elements/PopupDialog";
 import { useNoteDelete } from "@/features/dashboard/select-notes/useNoteDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
@@ -183,14 +184,8 @@ export default function SelectNotesComponent() {
 	});
 
 	const handleDelete = async () => {
-		if (!selectedNoteId) {
-			alert("ノートを選択してください。");
-			return;
-		}
-
-		if (window.confirm("選択したノートを削除してもよろしいですか？")) {
-			await deleteNote(selectedNoteId);
-		}
+		if (!selectedNoteId) return;
+		await deleteNote(selectedNoteId);
 	};
 
 	return (
@@ -231,18 +226,8 @@ export default function SelectNotesComponent() {
 						>
 							選択したノートを開く
 						</button>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedNoteId && !isDeleting
-									? "bg-blue-gray-800 hover:bg-blue-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleDelete}
-							disabled={!selectedNoteId || isDeleting}
-						>
-							{isDeleting ? "削除中..." : "選択したノートを削除"}
 						</button>
+						<PopupDialog buttonTitle="選択項目を削除" title="選択したノートを削除しますか？" actionProps={{ onClick: handleDelete }} triggerButtonProps={{ disabled: !selectedNoteId || isDeleting }} />
 					</div>
 
 					{loading ? (
