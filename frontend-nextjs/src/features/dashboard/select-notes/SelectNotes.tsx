@@ -6,6 +6,7 @@ import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {
 	Alert,
+	Button,
 	Card,
 	CardBody,
 	CardHeader,
@@ -214,19 +215,12 @@ export default function SelectNotesComponent() {
 								className="w-full"
 							/>
 						</div>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedNoteId
-									? "bg-gray-800 hover:bg-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleNavigate}
-							disabled={!selectedNoteId}
-						>
-							選択したノートを開く
-						</button>
-						</button>
+						<Button
+							onClick={fetchNotes}
+							disabled={loading}
+							>
+								選択したノートを開く
+							</Button>
 						<PopupDialog buttonTitle="選択項目を削除" title="選択したノートを削除しますか？" actionProps={{ onClick: handleDelete }} triggerButtonProps={{ disabled: !selectedNoteId || isDeleting }} />
 					</div>
 

@@ -6,6 +6,7 @@ import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {
 	Alert,
+	Button,
 	Card,
 	CardBody,
 	CardHeader,
@@ -288,18 +289,9 @@ export default function ExerciseSelectComponent() {
 								className="w-full"
 							/>
 						</div>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedExerciseId
-									? "bg-gray-800 hover:bg-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleNavigate}
-							disabled={!selectedExerciseId}
-						>
+						<Button onClick={handleNavigate} disabled={!selectedExerciseId}>
 							選択した問題ページを開く
-						</button>
+						</Button>
 						<PopupDialog
 							buttonTitle="選択項目を削除"
 							title="選択項目を削除しますか？"

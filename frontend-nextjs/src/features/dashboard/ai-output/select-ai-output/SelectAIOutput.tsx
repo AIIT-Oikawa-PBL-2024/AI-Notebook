@@ -12,6 +12,7 @@ import {
 	Dialog,
 	DialogBody,
 	DialogHeader,
+	Button,
 	Input,
 	Radio,
 	Spinner,
@@ -278,36 +279,18 @@ export default function OutputSelectComponent() {
 								className="w-full"
 							/>
 						</div>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedOutputId
-									? "bg-gray-800 hover:bg-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleNavigate}
-							disabled={!selectedOutputId}
-						>
+						<Button onClick={handleNavigate} disabled={!selectedOutputId}>
 							選択したAI要約ページを開く
-						</button>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedOutputId
-									? "bg-gray-800 hover:bg-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleCreateNote}
-							disabled={!selectedOutputId}
-						>
+						</Button>
 						<PopupDialog
 							buttonTitle="AI要約を削除"
 							title="選択したAI要約を削除しますか？"
 							actionProps={{ onClick: handleDelete }}
 							triggerButtonProps={{ disabled: !selectedOutputId || isDeleting }}
 						/>
+						<Button onClick={handleCreateNote} disabled={!selectedOutputId}>
 							ノートを作成
-						</button>
+						</Button>
 					</div>
 
 					{loading ? (
