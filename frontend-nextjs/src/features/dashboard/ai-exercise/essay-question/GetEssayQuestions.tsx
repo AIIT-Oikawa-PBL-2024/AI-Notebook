@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetEssayQuestion } from "@/features/dashboard/ai-exercise/essay-question/useGetEssayQuestion";
+import { useSubmitAnswers } from "@/features/dashboard/ai-exercise/essay-question/useSubmitAnswers";
 import {
 	Alert,
 	Button,
@@ -19,11 +20,34 @@ type ResultState = {
 	showResults: boolean;
 	retryMode: boolean;
 	skippedQuestions: string[];
+	scoringDetails: {
+		question_id: string;
+		scoring_result: string;
+		explanation: string;
+		answer: string; // 回答例を追加
+	}[];
+};
+
+type ScoringResult = {
+	question_id: string;
+	scoring_result: string;
+	explanation: string;
 };
 
 interface Props {
 	exerciseId?: string;
 }
+
+const formatAnswersForRequest = (
+	answers: Record<string, string>,
+	exercise_id: number,
+) => {
+	const user_answer = Object.values(answers);
+	return {
+		exercise_id,
+		user_answer,
+	};
+};
 
 export const GetEssayQuestions = ({ exerciseId }: Props) => {
 	const {
@@ -35,9 +59,11 @@ export const GetEssayQuestions = ({ exerciseId }: Props) => {
 		clearCache,
 	} = useGetEssayQuestion(exerciseId);
 
-	const [selectedAnswers, setSelectedAnswers] = useState<
-		Record<string, string>
-	>(() => {
+	const { error: submitError, submitAnswers } = useSubmitAnswers();
+
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const [answers, setAnswers] = useState<Record<string, string>>(() => {
 		if (typeof window !== "undefined") {
 			const cached = localStorage.getItem(ANSWERS_STORAGE_KEY);
 			return cached ? JSON.parse(cached) : {};
@@ -54,49 +80,30 @@ export const GetEssayQuestions = ({ exerciseId }: Props) => {
 						showResults: false,
 						retryMode: false,
 						skippedQuestions: [] as string[],
+						scoringDetails: [], // 初期値を空配列に設定
 					};
 		}
 		return {
 			showResults: false,
 			retryMode: false,
 			skippedQuestions: [] as string[],
+			scoringDetails: [],
 		};
 	});
 
+	const [scoringResults, setScoringResults] = useState<ScoringResult[]>([]);
+
 	useEffect(() => {
 		if (typeof window !== "undefined") {
-			localStorage.setItem(
-				ANSWERS_STORAGE_KEY,
-				JSON.stringify(selectedAnswers),
-			);
+			localStorage.setItem(ANSWERS_STORAGE_KEY, JSON.stringify(answers));
 		}
-	}, [selectedAnswers]);
+	}, [answers]);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(resultState));
 		}
 	}, [resultState]);
-
-	const submitAnswersToBackend = async () => {
-		try {
-			const response = await fetch("/api/submit-essay", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ answers: selectedAnswers }),
-			});
-			const result = await response.json();
-			setResultState((prev) => ({
-				...prev,
-				showResults: true,
-			}));
-			console.log("Backend response:", result);
-		} catch (error) {
-			console.error("Error submitting answers:", error);
-		}
-	};
 
 	if (loading) {
 		return (
@@ -151,23 +158,61 @@ export const GetEssayQuestions = ({ exerciseId }: Props) => {
 	const title = exercise.title;
 
 	const handleAnswerChange = (questionId: string, value: string) => {
-		setSelectedAnswers((prev) => ({
+		setAnswers((prev) => ({
 			...prev,
 			[questionId]: value,
 		}));
 	};
 
-	const handleSubmit = () => {
-		submitAnswersToBackend();
+	const handleSubmit = async () => {
+		try {
+			setIsSubmitting(true); // 送信中フラグをオン
+			if (!exercise) {
+				console.error("Exercise data is not available.");
+				return;
+			}
+			const formattedRequest = formatAnswersForRequest(answers, exercise.id);
+			const result = await submitAnswers(formattedRequest);
+
+			const parsedResults = JSON.parse(result.scoring_results);
+			const scoringDetails = parsedResults.content[0]?.input?.questions?.map(
+				(q: {
+					question_id: string;
+					scoring_result: string;
+					explanation: string;
+				}) => ({
+					question_id: q.question_id,
+					scoring_result: q.scoring_result,
+					explanation: q.explanation,
+					answer:
+						questions.find((item) => item.question_id === q.question_id)
+							?.answer || "", // 回答例をマッピング
+				}),
+			);
+
+			const newResultState = {
+				...resultState,
+				showResults: true,
+				scoringDetails,
+			};
+
+			setResultState(newResultState);
+			localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(newResultState));
+		} catch (err) {
+			console.error("Error submitting answers:", err);
+		} finally {
+			setIsSubmitting(false); // 送信中フラグをオフ
+		}
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
 	const handleReset = () => {
-		setSelectedAnswers({});
+		setAnswers({});
 		setResultState({
 			showResults: false,
 			retryMode: false,
 			skippedQuestions: [],
+			scoringDetails: [],
 		});
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
@@ -185,22 +230,42 @@ export const GetEssayQuestions = ({ exerciseId }: Props) => {
 				)}
 			</div>
 
-			{questions.map((question, index) => (
-				<Card key={question.question_id} className="mb-6 shadow-sm">
-					<CardBody>
-						<Typography variant="h6" className="mb-4">
-							問題 {index + 1}. {question.question_text}
-						</Typography>
-						<Textarea
-							placeholder="ここに回答を入力してください"
-							value={selectedAnswers[question.question_id] || ""}
-							onChange={(e) =>
-								handleAnswerChange(question.question_id, e.target.value)
-							}
-						/>
-					</CardBody>
-				</Card>
-			))}
+			{questions.map((question, index) => {
+				const result = resultState.scoringDetails.find(
+					(r) => r.question_id === question.question_id,
+				);
+
+				return (
+					<Card key={question.question_id} className="mb-6 shadow-sm">
+						<CardBody>
+							<Typography variant="h6" className="mb-4">
+								問題 {index + 1}. {question.question_text}
+							</Typography>
+							<Textarea
+								placeholder="ここに回答を入力してください"
+								value={answers[question.question_id] || ""}
+								onChange={(e) =>
+									handleAnswerChange(question.question_id, e.target.value)
+								}
+								disabled={resultState.showResults}
+							/>
+							{resultState.showResults && result && (
+								<div className="mt-4">
+									<Typography className="text-blue-900">
+										採点結果: {result.scoring_result}
+									</Typography>
+									<Typography className="text-blue-700">
+										理由: {result.explanation}
+									</Typography>
+									<Typography className="text-green-700 mt-2">
+										回答例: {result.answer || "回答例はありません"}
+									</Typography>
+								</div>
+							)}
+						</CardBody>
+					</Card>
+				);
+			})}
 
 			<div className="flex justify-between items-center mt-6">
 				{resultState.showResults ? (
@@ -213,13 +278,18 @@ export const GetEssayQuestions = ({ exerciseId }: Props) => {
 				) : (
 					<Button
 						onClick={handleSubmit}
-						disabled={Object.keys(selectedAnswers).length !== questions.length}
+						disabled={Object.keys(answers).length !== questions.length}
 						color="blue"
 					>
-						回答を送信する
+						{isSubmitting ? "送信中..." : "回答を送信する"}
 					</Button>
 				)}
 			</div>
+			{submitError && (
+				<Alert color="red" className="mt-4">
+					エラーが発生しました: {submitError}
+				</Alert>
+			)}
 		</div>
 	);
 };

@@ -241,6 +241,9 @@ export default function ExerciseSelectComponent() {
 			case "stream":
 				router.push(`/ai-exercise/stream/${selectedExerciseId}`);
 				break;
+			case "essay_question":
+				router.push(`/ai-exercise/essay-question/${selectedExerciseId}`);
+				break;
 			default:
 				alert("このタイプのルーティングは未対応です。");
 		}

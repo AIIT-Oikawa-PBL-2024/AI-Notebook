@@ -12,6 +12,7 @@ from app.models.files import File
 from app.models.outputs import Output
 from app.models.exercises import Exercise
 from app.models.exercises_files import exercise_file
+from app.models.exercises_user_answer import ExerciseUserAnswer
 from app.models.outputs_files import output_file
 from unittest.mock import Mock, patch
 from fastapi import Request
@@ -69,6 +70,7 @@ async def setup_and_teardown_database() -> AsyncGenerator[AsyncSession, None]:
         try:
             print("Cleaning up existing data...")  # デバッグ用
             await session.execute(delete(exercise_file))
+            await session.execute(delete(ExerciseUserAnswer))
             await session.execute(delete(output_file))
             await session.execute(delete(Exercise))
             await session.execute(delete(Output))

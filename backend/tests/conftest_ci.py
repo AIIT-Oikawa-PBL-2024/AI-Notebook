@@ -11,6 +11,7 @@ from app.main import app
 from app.models.files import File
 from app.models.outputs import Output
 from app.models.exercises import Exercise
+from app.models.exercises_user_answer import ExerciseUserAnswer
 from unittest.mock import Mock, patch
 from fastapi import Request
 from fastapi.security import HTTPAuthorizationCredentials
@@ -89,6 +90,7 @@ async def setup_and_teardown_database() -> AsyncGenerator[AsyncSession, None]:
         # 全てのクリーンアップを1つのトランザクションで実行
         try:
             print("Cleaning up existing data...")  # デバッグ用
+            await session.execute(delete(ExerciseUserAnswer))
             await session.execute(delete(Exercise))
             await session.execute(delete(Output))
             await session.execute(delete(File))
