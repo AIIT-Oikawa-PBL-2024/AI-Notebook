@@ -1,16 +1,17 @@
 import { Button, type ButtonProps } from "@material-tailwind/react";
+import type React from "react";
+import { forwardRef } from "react";
 import {
-	AlertDialogCancel,
-	AlertDialogDescription,
-	AlertDialogHeader,
-	AlertDialogTrigger,
-	AlertDialogTitle,
-	AlertDialogContent,
-	AlertDialogFooter,
-	AlertDialogAction,
 	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import React, { forwardRef } from "react";
 
 type Props = {
 	buttonTitle: string;
