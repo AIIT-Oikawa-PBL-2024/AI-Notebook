@@ -1,8 +1,10 @@
+import { Toaster } from "@/components/elements/Toaster";
 import { ButtonWithIcon } from "@/features/dashboard/fileupload/Button";
 import { useFileUpload } from "@/features/dashboard/fileupload/hooks/useFileUpload";
 import { Spinner } from "@material-tailwind/react";
 import type React from "react";
 import { type ChangeEvent, type DragEvent, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface FileInfo {
 	name: string;
@@ -102,15 +104,22 @@ const FileUploadComponent: React.FC = () => {
 		try {
 			const success = await uploadFiles(files);
 			if (success) {
-				alert("ファイルが正常にアップロードされました");
+				Toaster({
+					message: "ファイルが正常にアップロードされました",
+					type: "success",
+				});
 				setFiles([]);
 			} else {
-				alert("ファイルのアップロードに失敗しました");
+				Toaster({
+					message: "ファイルのアップロードに失敗しました",
+					type: "warning",
+				});
 			}
 		} catch (error) {
-			alert(
-				`エラー: ${error instanceof Error ? error.message : "不明なエラーが発生しました"}`,
-			);
+			Toaster({
+				message: `エラー: ${error instanceof Error ? error.message : "不明なエラーが発生しました"}`,
+				type: "error",
+			});
 		}
 	};
 

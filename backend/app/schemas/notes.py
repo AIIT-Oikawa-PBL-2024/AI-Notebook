@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -43,12 +45,18 @@ class NoteByCurrentUserResponse(NoteBase):
     :vartype id: int
     :ivar user_id: ユーザーID
     :vartype user_id: str
+    :ivar created_at: ノートの作成日時
+    :vartype created_at: datetime
+    :ivar updated_at: ノートの更新日時
+    :vartype updated_at: datetime
     :ivar model_config: モデルの設定
     :vartype model_config: ConfigDict
     """
 
     id: int
     user_id: str
+    created_at: datetime
+    updated_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 

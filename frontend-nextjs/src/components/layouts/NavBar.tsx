@@ -77,7 +77,7 @@ export default function NavBar() {
 						<ListItemPrefix>
 							<ListBulletIcon className="h-5 w-5" />
 						</ListItemPrefix>
-						AI出力リスト
+						AI要約リスト
 					</ListItem>
 				</Link>
 				<Link href="/ai-output/stream">
@@ -85,7 +85,7 @@ export default function NavBar() {
 						<ListItemPrefix>
 							<ComputerDesktopIcon className="h-5 w-5" />
 						</ListItemPrefix>
-						AI出力
+						AI要約
 					</ListItem>
 				</Link>
 				<Link href="/ai-exercise/select-exercises">
@@ -110,6 +110,22 @@ export default function NavBar() {
 							<DocumentCheckIcon className="h-5 w-5" />
 						</ListItemPrefix>
 						選択問題テスト
+					</ListItem>
+				</Link>
+				<Link href="/ai-exercise/essay-question">
+					<ListItem>
+						<ListItemPrefix>
+							<DocumentCheckIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						記述問題テスト
+					</ListItem>
+				</Link>
+				<Link href="/select-notes">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						ノートリスト
 					</ListItem>
 				</Link>
 				<Link href="/notebook">

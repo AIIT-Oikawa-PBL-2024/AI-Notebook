@@ -1,3 +1,4 @@
+import { useNoteInitialData } from "@/features/dashboard/ai-output/select-ai-output/useNoteInitialData";
 import { NotebookForm } from "@/features/dashboard/notebook/components/NotebookForm";
 import { useNotebookActions } from "@/features/dashboard/notebook/hooks/useNotebookActions";
 import { useForm } from "@conform-to/react";
@@ -66,11 +67,20 @@ vi.mock("@conform-to/react", () => ({
 	useForm: vi.fn(),
 }));
 
+// useNoteInitialDataのモック
+vi.mock(
+	"@/features/dashboard/ai-output/select-ai-output/useNoteInitialData",
+	() => ({
+		useNoteInitialData: vi.fn(),
+	}),
+);
+
 describe("NotebookForm", () => {
 	const mockCreateNotebook: Mock = vi.fn();
 	const mockUpdateNotebook: Mock = vi.fn();
 	const mockDeleteNotebook: Mock = vi.fn();
 	const mockGetNotebooks: Mock = vi.fn();
+	const mockGetAndRemoveInitialData: Mock = vi.fn();
 
 	const createMockFields = (values?: {
 		title?: string;
@@ -108,6 +118,12 @@ describe("NotebookForm", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+
+		(useNoteInitialData as unknown as Mock).mockReturnValue({
+			getAndRemoveInitialData: mockGetAndRemoveInitialData,
+			setInitialData: vi.fn(),
+		});
+
 		(useNotebookActions as unknown as Mock).mockReturnValue({
 			createNotebook: mockCreateNotebook,
 			updateNotebook: mockUpdateNotebook,
@@ -210,5 +226,76 @@ describe("NotebookForm", () => {
 		});
 
 		expect(titleInput).toHaveValue("Test Title");
+	});
+
+	it("LocalStorageからデータを読み込んで表示する", async () => {
+		const localStorageData = {
+			title: "LocalStorage Title",
+			content: "LocalStorage Content",
+		};
+
+		mockGetAndRemoveInitialData.mockReturnValue(localStorageData);
+
+		(useForm as Mock).mockReturnValue([
+			{ id: "test-form", onSubmit: vi.fn() },
+			createMockFields(localStorageData),
+		]);
+
+		render(<NotebookForm />);
+
+		await waitFor(() => {
+			expect(screen.getByPlaceholderText("ノートタイトル")).toHaveValue(
+				"LocalStorage Title",
+			);
+		});
+	});
+
+	it("LocalStorageのデータがpropsの初期データより優先される", async () => {
+		const localStorageData = {
+			title: "LocalStorage Title",
+			content: "LocalStorage Content",
+		};
+
+		const propsInitialData = {
+			title: "Props Title",
+			content: "Props Content",
+		};
+
+		mockGetAndRemoveInitialData.mockReturnValue(localStorageData);
+
+		(useForm as Mock).mockReturnValue([
+			{ id: "test-form", onSubmit: vi.fn() },
+			createMockFields(localStorageData), // LocalStorageのデータが使用される
+		]);
+
+		render(<NotebookForm initialNoteData={propsInitialData} />);
+
+		await waitFor(() => {
+			expect(screen.getByPlaceholderText("ノートタイトル")).toHaveValue(
+				"LocalStorage Title",
+			);
+		});
+	});
+
+	it("LocalStorageにデータがない場合はpropsの初期データが使用される", async () => {
+		const propsInitialData = {
+			title: "Props Title",
+			content: "Props Content",
+		};
+
+		mockGetAndRemoveInitialData.mockReturnValue(undefined);
+
+		(useForm as Mock).mockReturnValue([
+			{ id: "test-form", onSubmit: vi.fn() },
+			createMockFields(propsInitialData),
+		]);
+
+		render(<NotebookForm initialNoteData={propsInitialData} />);
+
+		await waitFor(() => {
+			expect(screen.getByPlaceholderText("ノートタイトル")).toHaveValue(
+				"Props Title",
+			);
+		});
 	});
 });

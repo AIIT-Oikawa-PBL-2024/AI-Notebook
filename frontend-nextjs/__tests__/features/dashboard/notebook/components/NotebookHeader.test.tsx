@@ -31,6 +31,14 @@ vi.mock("@material-tailwind/react", () => ({
 	),
 }));
 
+// next/navigation のモック
+vi.mock("next/navigation", () => ({
+	useRouter: vi.fn(() => ({
+		push: vi.fn(),
+		replace: vi.fn(),
+	})),
+}));
+
 describe("NotebookFormHeader", () => {
 	const mockFields: HeaderFields = {
 		title: {
@@ -72,11 +80,14 @@ describe("NotebookFormHeader", () => {
 
 	it("削除ボタンは noteId と onDelete が存在する場合のみ表示される", () => {
 		const { rerender } = render(<NotebookFormHeader fields={mockFields} />);
+		// noteId と onDelete がない場合は削除ボタンは表示されない
 		expect(screen.queryByText("削除")).not.toBeInTheDocument();
 
+		// noteId のみの場合も削除ボタンは表示されない
 		rerender(<NotebookFormHeader fields={mockFields} noteId={1} />);
 		expect(screen.queryByText("削除")).not.toBeInTheDocument();
 
+		// noteId と onDelete の両方がある場合のみ削除ボタンが表示される
 		const mockOnDelete = vi.fn();
 		rerender(
 			<NotebookFormHeader

@@ -208,6 +208,8 @@ export default function ExerciseSelectComponent() {
 				return "選択問題";
 			case "stream":
 				return "総合問題";
+			case "essay_question":
+				return "記述問題";
 			default:
 				return type;
 		}
@@ -415,7 +417,7 @@ export default function ExerciseSelectComponent() {
 												onChange={() => handleSelect(exercise.id)}
 											/>
 										</td>
-										<td className="p-4">
+										<td className="p-4 max-w-[200px]">
 											<Typography
 												variant="small"
 												className="font-normal break-words text-xs"

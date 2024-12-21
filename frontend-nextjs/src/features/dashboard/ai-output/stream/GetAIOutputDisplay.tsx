@@ -52,7 +52,7 @@ export function GetAIOutputDisplay({ outputId }: Props) {
 			);
 
 			if (!response.ok) {
-				throw new Error("AI出力の取得に失敗しました");
+				throw new Error("AI要約の取得に失敗しました");
 			}
 
 			const data = await response.json();
@@ -112,7 +112,7 @@ export function GetAIOutputDisplay({ outputId }: Props) {
 	if (!output) {
 		return (
 			<div className="container mx-auto p-4">
-				<Alert variant="gradient">AI出力が見つかりません</Alert>
+				<Alert variant="gradient">AI要約が見つかりません</Alert>
 			</div>
 		);
 	}

@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]    
   pull_request:
-    branches: [ "main" ] 
+    branches: [ "main", "feature/sprint11" ]
   workflow_dispatch:  # 手動実行を可能にする   
 
 permissions:
@@ -214,4 +214,3 @@ jobs:
       uses: davelosert/vitest-coverage-report-action@v2
       with:
         working-directory: frontend-nextjs
-
