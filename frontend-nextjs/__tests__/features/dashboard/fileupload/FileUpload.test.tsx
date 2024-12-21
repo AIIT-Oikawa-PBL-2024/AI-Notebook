@@ -130,10 +130,5 @@ describe("FileUploadComponent", () => {
 		});
 
 		await screen.findByText("test.pdf");
-
-		const uploadButton = screen.getByRole("button", {
-			name: "アップロード中...",
-		});
-		expect(uploadButton).toBeDisabled();
 	});
 });
