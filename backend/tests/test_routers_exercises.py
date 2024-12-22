@@ -417,9 +417,6 @@ async def test_essay_question_success(
     mock_generate_essay_json: Mock,
     session_cleanup: AsyncSession,
 ) -> None:
-    """
-    選択問題生成の正常系テスト
-    """
     # テスト用のファイルデータを作成
     file_data = File(
         file_name="test_file.pdf",
@@ -466,3 +463,43 @@ async def test_essay_question_success(
     assert exercise is not None
     assert exercise.exercise_type == "essay_question"
     assert json.loads(str(exercise.response))["question"] == "テスト問題"
+
+
+@pytest.mark.asyncio
+@patch("app.routers.exercises.generate_scoring_result_json")
+async def test_user_answer_success(
+    mock_generate_scoring_result_json: Mock,
+    session_cleanup: AsyncSession,
+) -> None:
+    """
+    user_answerの正常系テスト
+    """
+    # テスト用のexerciseデータを作成
+    exercise = Exercise(
+        id=1,  # リクエストと一致するIDを明示的に設定
+        title="test_title",
+        response=json.dumps({"test": "response"}),
+        user_id="test_user",
+        created_at=datetime.now(timezone(timedelta(hours=9))),
+        exercise_type="multiple_choice",
+    )
+    session_cleanup.add(exercise)
+    await session_cleanup.commit()
+    await session_cleanup.refresh(exercise)
+
+    # モックの設定
+    mock_response = {"answer": ["answer1", "answer2"], "scoring_results": "採点結果"}
+    mock_generate_scoring_result_json.return_value = mock_response
+
+    # リクエストの実行
+    transport = ASGITransport(app=app)  # type: ignore
+    headers = {"Authorization": "Bearer fake_token"}
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.post(
+            "/exercises/user_answer",
+            json={"exercise_id": 1, "user_answer": ["answer1", "answer2"]},
+            headers=headers,
+        )
+
+    # アサーション
+    assert response.status_code == 200

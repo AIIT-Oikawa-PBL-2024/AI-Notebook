@@ -22,6 +22,7 @@ interface ExerciseResponse {
 			type: string;
 		},
 	];
+	exercise_id: number;
 }
 
 const STORAGE_KEY = "cached_essay_question";
