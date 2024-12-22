@@ -602,7 +602,9 @@ async def create_user_answer(
         # logging.info(f"Retrieved exercise {exercise.response} for user {uid}")
 
         response = await generate_scoring_result_json(
-            exercise=exercise.response,
+            exercise=exercise.response
+            if isinstance(exercise.response, str)
+            else str(exercise.response),
             user_answers=user_answer.user_answer,
             uid=uid,
         )

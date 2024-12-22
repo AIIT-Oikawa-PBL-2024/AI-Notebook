@@ -173,7 +173,7 @@ const mockAuthContext = {
 		reload: vi.fn(),
 		toJSON: vi.fn(),
 	},
-	idToken: "mock-id-token",
+	idToken: null,
 	loading: false,
 	error: null,
 	isAuthenticated: true,

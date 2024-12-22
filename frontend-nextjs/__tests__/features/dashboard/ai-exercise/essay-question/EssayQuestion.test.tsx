@@ -126,7 +126,7 @@ Object.defineProperty(window, "scrollTo", {
 
 // AuthContext用のモックデータ
 const mockAuthContext = {
-	idToken: "mock-id-token",
+	idToken: null,
 	loading: false,
 	error: null,
 	isAuthenticated: true,
