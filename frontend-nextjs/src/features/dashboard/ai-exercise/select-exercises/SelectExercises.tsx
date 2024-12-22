@@ -1,10 +1,12 @@
 "use client";
 
+import { PopupDialog } from "@/components/elements/PopupDialog";
 import { useExerciseDelete } from "@/features/dashboard/ai-exercise/select-exercises/useExerciseDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
 import {
 	Alert,
+	Button,
 	Card,
 	CardBody,
 	CardHeader,
@@ -260,14 +262,8 @@ export default function ExerciseSelectComponent() {
 	});
 
 	const handleDelete = async () => {
-		if (!selectedExerciseId) {
-			alert("アイテムを選択してください。");
-			return;
-		}
-
-		if (window.confirm("選択した問題を削除してもよろしいですか？")) {
-			await deleteExercise(selectedExerciseId);
-		}
+		if (!selectedExerciseId) return;
+		await deleteExercise(selectedExerciseId);
 	};
 
 	return (
@@ -296,30 +292,17 @@ export default function ExerciseSelectComponent() {
 								className="w-full"
 							/>
 						</div>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedExerciseId
-									? "bg-gray-800 hover:bg-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleNavigate}
-							disabled={!selectedExerciseId}
-						>
+						<Button onClick={handleNavigate} disabled={!selectedExerciseId}>
 							選択した問題ページを開く
-						</button>
-						<button
-							type="button"
-							className={`px-4 py-2 text-white rounded whitespace-nowrap ${
-								selectedExerciseId && !isDeleting
-									? "bg-blue-gray-800 hover:bg-blue-gray-600"
-									: "bg-gray-400 cursor-not-allowed"
-							}`}
-							onClick={handleDelete}
-							disabled={!selectedExerciseId || isDeleting}
-						>
-							{isDeleting ? "削除中..." : "選択した問題を削除"}
-						</button>
+						</Button>
+						<PopupDialog
+							buttonTitle="選択項目を削除"
+							title="選択項目を削除しますか？"
+							actionProps={{ onClick: handleDelete }}
+							triggerButtonProps={{
+								disabled: !selectedExerciseId || loading || isDeleting,
+							}}
+						/>
 					</div>
 
 					{loading ? (
