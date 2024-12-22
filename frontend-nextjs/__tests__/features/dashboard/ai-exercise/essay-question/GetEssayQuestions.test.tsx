@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 import { useGetEssayQuestion } from "@/features/dashboard/ai-exercise/essay-question/useGetEssayQuestion";
+import { AuthContext } from "@/providers/AuthProvider";
 
 // Material Tailwindのモック
 vi.mock("@material-tailwind/react", () => ({
@@ -38,6 +39,34 @@ vi.mock("@material-tailwind/react", () => ({
 		onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	}) => <textarea value={value} onChange={onChange} />,
 }));
+
+// useSubmitAnswersのモック
+vi.mock(
+	"@/features/dashboard/ai-exercise/essay-question/useSubmitAnswers",
+	() => ({
+		useSubmitAnswers: () => ({
+			error: "",
+			submitAnswers: vi.fn().mockResolvedValue({
+				scoring_results: JSON.stringify({
+					content: [
+						{
+							input: {
+								questions: [],
+								refreshToken: "mock-refresh-token",
+								delete: vi.fn(),
+								getIdToken: vi.fn(),
+								getIdTokenResult: vi.fn(),
+								linkWithCredential: vi.fn(),
+								reload: vi.fn(),
+								toJSON: vi.fn(),
+							},
+						},
+					],
+				}),
+			}),
+		}),
+	}),
+);
 
 // カスタムフックのモック
 vi.mock(
@@ -122,6 +151,48 @@ Object.defineProperty(window, "scrollTo", {
 	value: vi.fn(),
 });
 
+// AuthContext用のモックデータ
+const mockAuthContext = {
+	user: {
+		providerId: "mock-provider-id",
+		uid: "test-user-1",
+		email: "test@example.com",
+		emailVerified: true,
+		isAnonymous: false,
+		metadata: {},
+		providerData: [],
+		phoneNumber: null,
+		displayName: null,
+		photoURL: null,
+		tenantId: null,
+		refreshToken: "mock-refresh-token",
+		delete: vi.fn(),
+		getIdToken: vi.fn(),
+		getIdTokenResult: vi.fn(),
+		linkWithCredential: vi.fn(),
+		reload: vi.fn(),
+		toJSON: vi.fn(),
+	},
+	idToken: "mock-id-token",
+	loading: false,
+	error: null,
+	isAuthenticated: true,
+	login: vi.fn(),
+	logout: vi.fn(),
+	setUser: vi.fn(),
+	setIdToken: vi.fn(),
+	clearError: vi.fn(),
+	registerUser: vi.fn(),
+	reAuthenticate: vi.fn(),
+};
+
+// テスト用のラッパーコンポーネント
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+	<AuthContext.Provider value={mockAuthContext}>
+		{children}
+	</AuthContext.Provider>
+);
+
 describe("GetEssayQuestions", () => {
 	beforeEach(() => {
 		mockLocalStorage.clear();
@@ -139,7 +210,9 @@ describe("GetEssayQuestions", () => {
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions exerciseId="test-id" />);
+		render(<GetEssayQuestions exerciseId="test-id" />, {
+			wrapper: TestWrapper,
+		});
 		expect(screen.getByRole("progressbar")).toBeInTheDocument();
 		expect(screen.getByText("問題を生成中...")).toBeInTheDocument();
 	});
@@ -156,7 +229,9 @@ describe("GetEssayQuestions", () => {
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions exerciseId="test-id" />);
+		render(<GetEssayQuestions exerciseId="test-id" />, {
+			wrapper: TestWrapper,
+		});
 		expect(
 			screen.getByText(`エラーが発生しました: ${mockError}`),
 		).toBeInTheDocument();
@@ -173,7 +248,9 @@ describe("GetEssayQuestions", () => {
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions exerciseId="test-id" />);
+		render(<GetEssayQuestions exerciseId="test-id" />, {
+			wrapper: TestWrapper,
+		});
 		expect(screen.getByText(mockExercise.title)).toBeInTheDocument();
 		expect(screen.getByText(/テスト問題1$/)).toBeInTheDocument();
 		expect(screen.getByText(/テスト問題2$/)).toBeInTheDocument();
@@ -190,7 +267,9 @@ describe("GetEssayQuestions", () => {
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions exerciseId="test-id" />);
+		render(<GetEssayQuestions exerciseId="test-id" />, {
+			wrapper: TestWrapper,
+		});
 		const textareas = screen.getAllByRole("textbox");
 
 		fireEvent.change(textareas[0], { target: { value: "回答1" } });
@@ -211,7 +290,7 @@ describe("GetEssayQuestions", () => {
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions />);
+		render(<GetEssayQuestions />, { wrapper: TestWrapper });
 		expect(screen.getByText(mockExercise.title)).toBeInTheDocument();
 	});
 });

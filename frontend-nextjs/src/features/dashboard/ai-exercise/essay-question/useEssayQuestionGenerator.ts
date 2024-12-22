@@ -8,7 +8,6 @@ interface Question {
 	question_text: string;
 	answer: string;
 	explanation: string;
-	exercise_id: number;
 }
 
 interface ExerciseResponse {

@@ -1,9 +1,12 @@
-import { GetEssayQuestions } from "@/features/dashboard/ai-exercise/essay-question/GetEssayQuestions";
+import { EssayQuestions } from "@/features/dashboard/ai-exercise/essay-question/EssayQuestions";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
-import { useGetEssayQuestion } from "@/features/dashboard/ai-exercise/essay-question/useGetEssayQuestion";
+import { useEssayQuestionGenerator } from "@/features/dashboard/ai-exercise/essay-question/useEssayQuestionGenerator";
+import { useSubmitAnswers } from "@/features/dashboard/ai-exercise/essay-question/useSubmitAnswers";
+import { AuthContext } from "@/providers/AuthProvider";
 
+// Material Tailwindのモック
 vi.mock("@material-tailwind/react", () => ({
 	Alert: ({ children }: { children: React.ReactNode }) => (
 		<aside>{children}</aside>
@@ -32,32 +35,35 @@ vi.mock("@material-tailwind/react", () => ({
 	Textarea: ({
 		value,
 		onChange,
+		disabled,
 	}: {
 		value: string;
 		onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-	}) => <textarea value={value} onChange={onChange} />,
+		disabled?: boolean;
+	}) => <textarea value={value} onChange={onChange} disabled={disabled} />,
 }));
 
+// カスタムフックのモック
 vi.mock(
-	"@/features/dashboard/ai-exercise/essay-question/useGetEssayQuestion",
+	"@/features/dashboard/ai-exercise/essay-question/useEssayQuestionGenerator",
 	() => ({
-		useGetEssayQuestion: vi.fn(),
+		useEssayQuestionGenerator: vi.fn(),
+	}),
+);
+
+vi.mock(
+	"@/features/dashboard/ai-exercise/essay-question/useSubmitAnswers",
+	() => ({
+		useSubmitAnswers: vi.fn(),
 	}),
 );
 
 const mockExercise = {
-	id: 1,
-	title: "Mock Exercise Title",
-	response: "Mock Response",
-	exercise_type: "essay",
-	user_id: "mock-user-1",
-	created_at: "2023-01-01T00:00:00Z",
-	files: [],
+	id: "mock-exercise-id",
+	exercise_id: 1,
 	content: [
 		{
-			id: "content-1",
-			name: "essay-question",
-			type: "exercise",
+			id: "mock-content-id",
 			input: {
 				questions: [
 					{
@@ -72,14 +78,14 @@ const mockExercise = {
 						answer: "回答例2",
 						explanation: "この問題の解説です。",
 					},
-				],
+				] as const,
 			},
+			name: "mock-content-name",
+			type: "mock-content-type",
 		},
 	] as [
 		{
 			id: string;
-			name: string;
-			type: string;
 			input: {
 				questions: {
 					question_id: string;
@@ -88,79 +94,168 @@ const mockExercise = {
 					explanation: string;
 				}[];
 			};
+			name: string;
+			type: string;
 		},
 	],
 };
 
-describe("GetEssayQuestions", () => {
+const mockLocalStorage = {
+	store: {} as Record<string, string>,
+	getItem(key: string) {
+		return this.store[key] || null;
+	},
+	setItem(key: string, value: string) {
+		this.store[key] = value;
+	},
+	removeItem(key: string) {
+		delete this.store[key];
+	},
+	clear() {
+		this.store = {};
+	},
+};
+
+Object.defineProperty(window, "localStorage", {
+	value: mockLocalStorage,
+});
+
+Object.defineProperty(window, "scrollTo", {
+	value: vi.fn(),
+});
+
+// AuthContext用のモックデータ
+const mockAuthContext = {
+	idToken: "mock-id-token",
+	loading: false,
+	error: null,
+	isAuthenticated: true,
+	login: vi.fn(),
+	logout: vi.fn(),
+	setUser: vi.fn(),
+	setIdToken: vi.fn(),
+	clearError: vi.fn(),
+	registerUser: vi.fn(),
+	reAuthenticate: vi.fn(),
+	user: {
+		id: "test-user-1",
+		email: "test@example.com",
+		emailVerified: true,
+		isAnonymous: false,
+		metadata: {},
+		providerId: "mock-provider-id",
+		uid: "mock-uid",
+		providerData: [],
+		phoneNumber: null,
+		displayName: "Test User",
+		photoURL: null,
+		refreshToken: "mock-refresh-token",
+		tenantId: "mock-tenant-id",
+		delete: vi.fn(),
+		getIdToken: vi.fn(),
+		getIdTokenResult: vi.fn(),
+		linkWithCredential: vi.fn(),
+		reload: vi.fn(),
+		sendEmailVerification: vi.fn(),
+		toJSON: vi.fn(),
+	},
+};
+
+// テスト用のラッパーコンポーネント
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+	<AuthContext.Provider value={mockAuthContext}>
+		{children}
+	</AuthContext.Provider>
+);
+
+describe("EssayQuestions", () => {
 	beforeEach(() => {
+		mockLocalStorage.clear();
 		vi.clearAllMocks();
 	});
 
 	it("ローディング中の表示を正しく行う", () => {
-		vi.mocked(useGetEssayQuestion).mockReturnValue({
+		vi.mocked(useEssayQuestionGenerator).mockReturnValue({
 			loading: true,
 			error: "",
 			exercise: null,
-			parsedResponse: null,
 			resetExercise: vi.fn(),
 			clearCache: vi.fn(),
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions />);
+		vi.mocked(useSubmitAnswers).mockReturnValue({
+			isSubmitting: false,
+			error: "",
+			submitAnswers: vi.fn(),
+		});
+
+		render(<EssayQuestions />, { wrapper: TestWrapper });
 		expect(screen.getByRole("progressbar")).toBeInTheDocument();
 		expect(screen.getByText("問題を生成中...")).toBeInTheDocument();
 	});
 
 	it("エラー時の表示を正しく行う", () => {
 		const mockError = "テストエラー";
-		vi.mocked(useGetEssayQuestion).mockReturnValue({
+		vi.mocked(useEssayQuestionGenerator).mockReturnValue({
 			loading: false,
 			error: mockError,
 			exercise: null,
-			parsedResponse: null,
 			resetExercise: vi.fn(),
 			clearCache: vi.fn(),
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions />);
+		vi.mocked(useSubmitAnswers).mockReturnValue({
+			isSubmitting: false,
+			error: "",
+			submitAnswers: vi.fn(),
+		});
+
+		render(<EssayQuestions />, { wrapper: TestWrapper });
 		expect(
 			screen.getByText(`エラーが発生しました: ${mockError}`),
 		).toBeInTheDocument();
-		expect(screen.getByText("再試行")).toBeInTheDocument();
-		expect(screen.getByText("キャッシュをクリア")).toBeInTheDocument();
 	});
 
 	it("問題が正しく表示される", () => {
-		vi.mocked(useGetEssayQuestion).mockReturnValue({
+		vi.mocked(useEssayQuestionGenerator).mockReturnValue({
 			loading: false,
 			error: "",
 			exercise: mockExercise,
-			parsedResponse: mockExercise,
 			resetExercise: vi.fn(),
 			clearCache: vi.fn(),
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions />);
-		expect(screen.getByText(/テスト問題1/)).toBeInTheDocument();
-		expect(screen.getByText(/テスト問題2/)).toBeInTheDocument();
+		vi.mocked(useSubmitAnswers).mockReturnValue({
+			isSubmitting: false,
+			error: "",
+			submitAnswers: vi.fn(),
+		});
+
+		render(<EssayQuestions />, { wrapper: TestWrapper });
+		expect(screen.getByText(/テスト問題1$/)).toBeInTheDocument();
+		expect(screen.getByText(/テスト問題2$/)).toBeInTheDocument();
 	});
 
 	it("回答を入力できる", () => {
-		vi.mocked(useGetEssayQuestion).mockReturnValue({
+		vi.mocked(useEssayQuestionGenerator).mockReturnValue({
 			loading: false,
 			error: "",
 			exercise: mockExercise,
-			parsedResponse: mockExercise,
 			resetExercise: vi.fn(),
 			clearCache: vi.fn(),
 			checkCache: () => ({ exercise: null, generationStatus: null }),
 		});
 
-		render(<GetEssayQuestions />);
+		vi.mocked(useSubmitAnswers).mockReturnValue({
+			isSubmitting: false,
+			error: "",
+			submitAnswers: vi.fn(),
+		});
+
+		render(<EssayQuestions />, { wrapper: TestWrapper });
 		const textareas = screen.getAllByRole("textbox");
 
 		fireEvent.change(textareas[0], { target: { value: "回答1" } });
@@ -168,5 +263,62 @@ describe("GetEssayQuestions", () => {
 
 		expect(textareas[0]).toHaveValue("回答1");
 		expect(textareas[1]).toHaveValue("回答2");
+	});
+
+	it("回答を送信できる", async () => {
+		const mockSubmitAnswers = vi.fn().mockResolvedValue({
+			scoring_results: JSON.stringify({
+				content: [
+					{
+						input: {
+							questions: [
+								{
+									question_id: "1",
+									scoring_result: "正解",
+									explanation: "良い回答です",
+								},
+								{
+									question_id: "2",
+									scoring_result: "不正解",
+									explanation: "もう少し詳しく説明してください",
+								},
+							],
+						},
+					},
+				],
+			}),
+		});
+
+		vi.mocked(useEssayQuestionGenerator).mockReturnValue({
+			loading: false,
+			error: "",
+			exercise: mockExercise,
+			resetExercise: vi.fn(),
+			clearCache: vi.fn(),
+			checkCache: () => ({ exercise: null, generationStatus: null }),
+		});
+
+		vi.mocked(useSubmitAnswers).mockReturnValue({
+			isSubmitting: false,
+			error: "",
+			submitAnswers: mockSubmitAnswers,
+		});
+
+		render(<EssayQuestions />, { wrapper: TestWrapper });
+		const textareas = screen.getAllByRole("textbox");
+
+		// 回答を入力
+		fireEvent.change(textareas[0], { target: { value: "回答1" } });
+		fireEvent.change(textareas[1], { target: { value: "回答2" } });
+
+		// 送信ボタンをクリック
+		const submitButton = screen.getByText("回答を送信する");
+		fireEvent.click(submitButton);
+
+		// 送信関数が呼ばれたことを確認
+		expect(mockSubmitAnswers).toHaveBeenCalledWith({
+			exercise_id: mockExercise.exercise_id,
+			user_answer: ["回答1", "回答2"],
+		});
 	});
 });
