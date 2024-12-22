@@ -22,14 +22,15 @@ def get_auth_dependency() -> Callable:
 app.include_router(files.router, dependencies=[Depends(get_auth_dependency())])
 app.include_router(outputs_stream.router, dependencies=[Depends(get_auth_dependency())])
 app.include_router(notes.router, dependencies=[Depends(get_auth_dependency())])
-app.include_router(
-    exercises.router, dependencies=[Depends(get_auth_dependency())]
-)
+app.include_router(exercises.router, dependencies=[Depends(get_auth_dependency())])
 
 # CORSの設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://ai-notebook-429194103408.asia-northeast1.run.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
