@@ -242,6 +242,10 @@ export const GetEssayQuestions = ({ exerciseId }: Props) => {
 								問題 {index + 1}. {question.question_text}
 							</Typography>
 							<Textarea
+								className="mt-1 focus:outline-none !border !border-gray-300 focus:!border-gray-900 rounded-lg"
+								labelProps={{
+									className: "before:content-none after:content-none",
+								}}
 								placeholder="ここに回答を入力してください"
 								value={answers[question.question_id] || ""}
 								onChange={(e) =>
