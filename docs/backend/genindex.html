@@ -83,6 +83,7 @@
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  
@@ -90,6 +91,14 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.answer">answer (app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+
+      <ul>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.answer">(app.schemas.exercises_user_answer.ExerciseUserAnswerBase の属性)</a>
+</li>
+      </ul></li>
+      <li><a href="app.models.html#app.models.exercises.Exercise.answers">answers (app.models.exercises.Exercise の属性)</a>
+</li>
       <li>
     app
 
@@ -168,6 +177,13 @@
 </li>
       </ul></li>
       <li>
+    app.models.exercises_user_answer
+
+      <ul>
+        <li><a href="app.models.html#module-app.models.exercises_user_answer">module</a>
+</li>
+      </ul></li>
+      <li>
     app.models.files
 
       <ul>
@@ -223,6 +239,13 @@
 
       <ul>
         <li><a href="app.schemas.html#module-app.schemas.exercises">module</a>
+</li>
+      </ul></li>
+      <li>
+    app.schemas.exercises_user_answer
+
+      <ul>
+        <li><a href="app.schemas.html#module-app.schemas.exercises_user_answer">module</a>
 </li>
       </ul></li>
       <li>
@@ -302,6 +325,13 @@
         <li><a href="app.utils.html#module-app.utils.operate_cloud_storage">module</a>
 </li>
       </ul></li>
+      <li>
+    app.utils.user_answer
+
+      <ul>
+        <li><a href="app.utils.html#module-app.utils.user_answer">module</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -338,15 +368,19 @@
         <li><a href="app.routers.html#app.routers.notes.create_note">(app.routers.notes モジュール)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="app.cruds.html#app.cruds.outputs.create_output">create_output() (app.cruds.outputs モジュール)</a>
 </li>
       <li><a href="app.html#app.migrate_cloud_db.create_tables">create_tables() (app.migrate_cloud_db モジュール)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="app.cruds.html#app.cruds.exercises.create_user_answer">create_user_answer() (app.cruds.exercises モジュール)</a>
+</li>
       <li><a href="app.models.html#app.models.exercises.Exercise.created_at">created_at (app.models.exercises.Exercise の属性)</a>
 
       <ul>
+        <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.created_at">(app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+</li>
         <li><a href="app.models.html#app.models.files.File.created_at">(app.models.files.File の属性)</a>
 </li>
         <li><a href="app.models.html#app.models.notes.Note.created_at">(app.models.notes.Note の属性)</a>
@@ -356,6 +390,10 @@
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseCreate.created_at">(app.schemas.exercises.ExerciseCreate の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRead.created_at">(app.schemas.exercises.ExerciseRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.created_at">(app.schemas.exercises_user_answer.ExerciseUserAnswerCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.created_at">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.files.File.created_at">(app.schemas.files.File の属性)</a>
 </li>
@@ -400,6 +438,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="app.models.html#app.models.exercises.Exercise">Exercise (app.models.exercises のクラス)</a>
 </li>
+      <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.exercise">exercise (app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+</li>
+      <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.exercise_id">exercise_id (app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+
+      <ul>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.exercise_id">(app.schemas.exercises_user_answer.ExerciseUserAnswerCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.exercise_id">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.exercise_id">(app.schemas.exercises_user_answer.ExerciseUserAnswerRequest の属性)</a>
+</li>
+      </ul></li>
       <li><a href="app.models.html#app.models.exercises.Exercise.exercise_type">exercise_type (app.models.exercises.Exercise の属性)</a>
 
       <ul>
@@ -417,6 +467,16 @@
       <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRequest">ExerciseRequest (app.schemas.exercises のクラス)</a>
 </li>
       <li><a href="app.models.html#app.models.files.File.exercises">exercises (app.models.files.File の属性)</a>
+</li>
+      <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer">ExerciseUserAnswer (app.models.exercises_user_answer のクラス)</a>
+</li>
+      <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase">ExerciseUserAnswerBase (app.schemas.exercises_user_answer のクラス)</a>
+</li>
+      <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate">ExerciseUserAnswerCreate (app.schemas.exercises_user_answer のクラス)</a>
+</li>
+      <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead">ExerciseUserAnswerRead (app.schemas.exercises_user_answer のクラス)</a>
+</li>
+      <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest">ExerciseUserAnswerRequest (app.schemas.exercises_user_answer のクラス)</a>
 </li>
       <li><a href="app.utils.html#app.utils.gemini_extract_text_from_audio.extract_text_from_audio">extract_text_from_audio() (app.utils.gemini_extract_text_from_audio モジュール)</a>
 </li>
@@ -498,6 +558,8 @@
 </li>
       <li><a href="app.utils.html#app.utils.essay_question.generate_essay_json">generate_essay_json() (app.utils.essay_question モジュール)</a>
 </li>
+      <li><a href="app.utils.html#app.utils.user_answer.generate_scoring_result_json">generate_scoring_result_json() (app.utils.user_answer モジュール)</a>
+</li>
       <li><a href="app.utils.html#app.utils.operate_cloud_storage.generate_upload_signed_url_v4">generate_upload_signed_url_v4() (app.utils.operate_cloud_storage モジュール)</a>
 </li>
       <li><a href="app.html#app.migrate_cloud_db.get_database_url">get_database_url() (app.migrate_cloud_db モジュール)</a>
@@ -514,10 +576,10 @@
 </li>
       <li><a href="app.cruds.html#app.cruds.files.get_file_by_id_and_user_id">get_file_by_id_and_user_id() (app.cruds.files モジュール)</a>
 </li>
-      <li><a href="app.cruds.html#app.cruds.files.get_file_id_by_name_and_userid">get_file_id_by_name_and_userid() (app.cruds.files モジュール)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="app.cruds.html#app.cruds.files.get_file_id_by_name_and_userid">get_file_id_by_name_and_userid() (app.cruds.files モジュール)</a>
+</li>
       <li><a href="app.cruds.html#app.cruds.files.get_files_by_user_id">get_files_by_user_id() (app.cruds.files モジュール)</a>
 </li>
       <li><a href="app.utils.html#app.utils.claude_request_stream.get_media_type">get_media_type() (app.utils.claude_request_stream モジュール)</a>
@@ -559,6 +621,8 @@
       <li><a href="app.models.html#app.models.exercises.Exercise.id">id (app.models.exercises.Exercise の属性)</a>
 
       <ul>
+        <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.id">(app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+</li>
         <li><a href="app.models.html#app.models.files.File.id">(app.models.files.File の属性)</a>
 </li>
         <li><a href="app.models.html#app.models.notes.Note.id">(app.models.notes.Note の属性)</a>
@@ -566,6 +630,8 @@
         <li><a href="app.models.html#app.models.outputs.Output.id">(app.models.outputs.Output の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRead.id">(app.schemas.exercises.ExerciseRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.id">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.files.File.id">(app.schemas.files.File の属性)</a>
 </li>
@@ -611,6 +677,14 @@
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRequest.model_computed_fields">(app.schemas.exercises.ExerciseRequest の属性)</a>
 </li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.model_computed_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerBase の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.model_computed_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.model_computed_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.model_computed_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerRequest の属性)</a>
+</li>
         <li><a href="app.schemas.html#app.schemas.files.File.model_computed_fields">(app.schemas.files.File の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.files.FileBase.model_computed_fields">(app.schemas.files.FileBase の属性)</a>
@@ -653,6 +727,14 @@
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRequest.model_config">(app.schemas.exercises.ExerciseRequest の属性)</a>
 </li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.model_config">(app.schemas.exercises_user_answer.ExerciseUserAnswerBase の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.model_config">(app.schemas.exercises_user_answer.ExerciseUserAnswerCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.model_config">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.model_config">(app.schemas.exercises_user_answer.ExerciseUserAnswerRequest の属性)</a>
+</li>
         <li><a href="app.schemas.html#app.schemas.files.File.model_config">(app.schemas.files.File の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.files.FileBase.model_config">(app.schemas.files.FileBase の属性)</a>
@@ -694,6 +776,14 @@
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRead.model_fields">(app.schemas.exercises.ExerciseRead の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRequest.model_fields">(app.schemas.exercises.ExerciseRequest の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.model_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerBase の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.model_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.model_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.model_fields">(app.schemas.exercises_user_answer.ExerciseUserAnswerRequest の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.files.File.model_fields">(app.schemas.files.File の属性)</a>
 </li>
@@ -756,6 +846,8 @@
 </li>
         <li><a href="app.models.html#module-app.models.exercises_files">app.models.exercises_files</a>
 </li>
+        <li><a href="app.models.html#module-app.models.exercises_user_answer">app.models.exercises_user_answer</a>
+</li>
         <li><a href="app.models.html#module-app.models.files">app.models.files</a>
 </li>
         <li><a href="app.models.html#module-app.models.notes">app.models.notes</a>
@@ -771,6 +863,8 @@
         <li><a href="app.schemas.html#module-app.schemas">app.schemas</a>
 </li>
         <li><a href="app.schemas.html#module-app.schemas.exercises">app.schemas.exercises</a>
+</li>
+        <li><a href="app.schemas.html#module-app.schemas.exercises_user_answer">app.schemas.exercises_user_answer</a>
 </li>
         <li><a href="app.schemas.html#module-app.schemas.files">app.schemas.files</a>
 </li>
@@ -793,6 +887,8 @@
         <li><a href="app.utils.html#module-app.utils.multiple_choice_question">app.utils.multiple_choice_question</a>
 </li>
         <li><a href="app.utils.html#module-app.utils.operate_cloud_storage">app.utils.operate_cloud_storage</a>
+</li>
+        <li><a href="app.utils.html#module-app.utils.user_answer">app.utils.user_answer</a>
 </li>
       </ul></li>
   </ul></td>
@@ -878,6 +974,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.scoring_results">scoring_results (app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+
+      <ul>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.scoring_results">(app.schemas.exercises_user_answer.ExerciseUserAnswerBase の属性)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -929,9 +1037,13 @@
       </ul></li>
       <li><a href="app.utils.html#app.utils.operate_cloud_storage.upload_files">upload_files() (app.utils.operate_cloud_storage モジュール)</a>
 </li>
+      <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.user_answer">user_answer (app.schemas.exercises_user_answer.ExerciseUserAnswerRequest の属性)</a>
+</li>
       <li><a href="app.models.html#app.models.exercises.Exercise.user_id">user_id (app.models.exercises.Exercise の属性)</a>
 
       <ul>
+        <li><a href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.user_id">(app.models.exercises_user_answer.ExerciseUserAnswer の属性)</a>
+</li>
         <li><a href="app.models.html#app.models.files.File.user_id">(app.models.files.File の属性)</a>
 </li>
         <li><a href="app.models.html#app.models.notes.Note.user_id">(app.models.notes.Note の属性)</a>
@@ -941,6 +1053,10 @@
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseCreate.user_id">(app.schemas.exercises.ExerciseCreate の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.exercises.ExerciseRead.user_id">(app.schemas.exercises.ExerciseRead の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.user_id">(app.schemas.exercises_user_answer.ExerciseUserAnswerCreate の属性)</a>
+</li>
+        <li><a href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.user_id">(app.schemas.exercises_user_answer.ExerciseUserAnswerRead の属性)</a>
 </li>
         <li><a href="app.schemas.html#app.schemas.files.File.user_id">(app.schemas.files.File の属性)</a>
 </li>

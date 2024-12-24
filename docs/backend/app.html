@@ -103,6 +103,7 @@
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.cruds.html#module-app.cruds.exercises">app.cruds.exercises module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.exercises.create_exercise"><code class="docutils literal notranslate"><span class="pre">create_exercise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.exercises.create_user_answer"><code class="docutils literal notranslate"><span class="pre">create_user_answer()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.exercises.delete_exercise_by_user"><code class="docutils literal notranslate"><span class="pre">delete_exercise_by_user()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.exercises.get_exercise_by_id_and_user"><code class="docutils literal notranslate"><span class="pre">get_exercise_by_id_and_user()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.cruds.html#app.cruds.exercises.get_exercise_files_by_user"><code class="docutils literal notranslate"><span class="pre">get_exercise_files_by_user()</span></code></a></li>
@@ -143,6 +144,7 @@
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.exercises">app.models.exercises module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise"><code class="docutils literal notranslate"><span class="pre">Exercise</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise.answers"><code class="docutils literal notranslate"><span class="pre">Exercise.answers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise.created_at"><code class="docutils literal notranslate"><span class="pre">Exercise.created_at</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise.exercise_type"><code class="docutils literal notranslate"><span class="pre">Exercise.exercise_type</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises.Exercise.files"><code class="docutils literal notranslate"><span class="pre">Exercise.files</span></code></a></li>
@@ -155,6 +157,19 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.exercises_files">app.models.exercises_files module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.exercises_user_answer">app.models.exercises_user_answer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.answer"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.answer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.created_at"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.exercise"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.exercise</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.exercise_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.exercise_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.scoring_results"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.scoring_results</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer.user_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.files">app.models.files module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.files.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.files.File.created_at"><code class="docutils literal notranslate"><span class="pre">File.created_at</span></code></a></li>
@@ -250,6 +265,44 @@
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises.ExerciseRequest.model_config"><code class="docutils literal notranslate"><span class="pre">ExerciseRequest.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises.ExerciseRequest.model_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseRequest.model_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises.ExerciseRequest.title"><code class="docutils literal notranslate"><span class="pre">ExerciseRequest.title</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.schemas.html#module-app.schemas.exercises_user_answer">app.schemas.exercises_user_answer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.answer"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerBase.answer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerBase.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.model_config"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerBase.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.model_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerBase.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerBase.scoring_results"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerBase.scoring_results</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.created_at"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.exercise_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate.exercise_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.model_config"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.model_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate.user_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerCreate.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.created_at"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.exercise_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.exercise_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.model_config"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.model_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRead.user_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRead.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.exercise_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRequest.exercise_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRequest.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.model_config"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRequest.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.model_fields"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRequest.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerRequest.user_answer"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswerRequest.user_answer</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -444,6 +497,10 @@
 <li class="toctree-l3"><a class="reference internal" href="app.utils.html#app.utils.operate_cloud_storage.generate_upload_signed_url_v4"><code class="docutils literal notranslate"><span class="pre">generate_upload_signed_url_v4()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.utils.html#app.utils.operate_cloud_storage.post_files"><code class="docutils literal notranslate"><span class="pre">post_files()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="app.utils.html#app.utils.operate_cloud_storage.upload_files"><code class="docutils literal notranslate"><span class="pre">upload_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.utils.html#module-app.utils.user_answer">app.utils.user_answer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.utils.html#app.utils.user_answer.generate_scoring_result_json"><code class="docutils literal notranslate"><span class="pre">generate_scoring_result_json()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.utils.html#app-utils-user-auth-module">app.utils.user_auth module</a></li>

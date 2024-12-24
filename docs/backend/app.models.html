@@ -49,6 +49,7 @@
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-app.models.exercises">app.models.exercises module</a><ul>
 <li><a class="reference internal" href="#app.models.exercises.Exercise"><code class="docutils literal notranslate"><span class="pre">Exercise</span></code></a><ul>
+<li><a class="reference internal" href="#app.models.exercises.Exercise.answers"><code class="docutils literal notranslate"><span class="pre">Exercise.answers</span></code></a></li>
 <li><a class="reference internal" href="#app.models.exercises.Exercise.created_at"><code class="docutils literal notranslate"><span class="pre">Exercise.created_at</span></code></a></li>
 <li><a class="reference internal" href="#app.models.exercises.Exercise.exercise_type"><code class="docutils literal notranslate"><span class="pre">Exercise.exercise_type</span></code></a></li>
 <li><a class="reference internal" href="#app.models.exercises.Exercise.files"><code class="docutils literal notranslate"><span class="pre">Exercise.files</span></code></a></li>
@@ -61,6 +62,19 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.models.exercises_files">app.models.exercises_files module</a></li>
+<li><a class="reference internal" href="#module-app.models.exercises_user_answer">app.models.exercises_user_answer module</a><ul>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer</span></code></a><ul>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.answer"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.answer</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.created_at"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.created_at</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.exercise"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.exercise</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.exercise_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.exercise_id</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.id</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.scoring_results"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.scoring_results</span></code></a></li>
+<li><a class="reference internal" href="#app.models.exercises_user_answer.ExerciseUserAnswer.user_id"><code class="docutils literal notranslate"><span class="pre">ExerciseUserAnswer.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-app.models.files">app.models.files module</a><ul>
 <li><a class="reference internal" href="#app.models.files.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
 <li><a class="reference internal" href="#app.models.files.File.created_at"><code class="docutils literal notranslate"><span class="pre">File.created_at</span></code></a></li>
@@ -154,6 +168,11 @@
 </dd>
 </dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises.Exercise.answers">
+<span class="sig-name descname"><span class="pre">answers</span></span><a class="headerlink" href="#app.models.exercises.Exercise.answers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="app.models.exercises.Exercise.created_at">
 <span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#app.models.exercises.Exercise.created_at" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -193,6 +212,63 @@
 </section>
 <section id="module-app.models.exercises_files">
 <span id="app-models-exercises-files-module"></span><h2>app.models.exercises_files module<a class="headerlink" href="#module-app.models.exercises_files" title="Link to this heading"></a></h2>
+</section>
+<section id="module-app.models.exercises_user_answer">
+<span id="app-models-exercises-user-answer-module"></span><h2>app.models.exercises_user_answer module<a class="headerlink" href="#module-app.models.exercises_user_answer" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.models.exercises_user_answer.</span></span><span class="sig-name descname"><span class="pre">ExerciseUserAnswer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/models/exercises_user_answer.html#ExerciseUserAnswer"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code></p>
+<p>ユーザーの回答を表すクラス。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>int</em>) -- 回答のID</p></li>
+<li><p><strong>exercise_id</strong> (<em>int</em>) -- 練習問題のID</p></li>
+<li><p><strong>user_id</strong> (<em>str</em>) -- ユーザーのID（Firebase UID）</p></li>
+<li><p><strong>answer</strong> (<em>str</em>) -- ユーザーの回答</p></li>
+<li><p><strong>scoring_results</strong> (<em>str</em>) -- 採点結果</p></li>
+<li><p><strong>created_at</strong> (<em>datetime</em>) -- 回答日時</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.answer">
+<span class="sig-name descname"><span class="pre">answer</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.answer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.exercise">
+<span class="sig-name descname"><span class="pre">exercise</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.exercise" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.exercise_id">
+<span class="sig-name descname"><span class="pre">exercise_id</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.exercise_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.scoring_results">
+<span class="sig-name descname"><span class="pre">scoring_results</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.scoring_results" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.models.exercises_user_answer.ExerciseUserAnswer.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#app.models.exercises_user_answer.ExerciseUserAnswer.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-app.models.files">
 <span id="app-models-files-module"></span><h2>app.models.files module<a class="headerlink" href="#module-app.models.files" title="Link to this heading"></a></h2>

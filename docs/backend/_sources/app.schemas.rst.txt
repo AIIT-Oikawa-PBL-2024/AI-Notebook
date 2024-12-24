@@ -12,6 +12,14 @@ app.schemas.exercises module
    :undoc-members:
    :show-inheritance:
 
+app.schemas.exercises\_user\_answer module
+------------------------------------------
+
+.. automodule:: app.schemas.exercises_user_answer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.schemas.files module
 ------------------------
 

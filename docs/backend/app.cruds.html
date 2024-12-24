@@ -49,6 +49,7 @@
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-app.cruds.exercises">app.cruds.exercises module</a><ul>
 <li><a class="reference internal" href="#app.cruds.exercises.create_exercise"><code class="docutils literal notranslate"><span class="pre">create_exercise()</span></code></a></li>
+<li><a class="reference internal" href="#app.cruds.exercises.create_user_answer"><code class="docutils literal notranslate"><span class="pre">create_user_answer()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.exercises.delete_exercise_by_user"><code class="docutils literal notranslate"><span class="pre">delete_exercise_by_user()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.exercises.get_exercise_by_id_and_user"><code class="docutils literal notranslate"><span class="pre">get_exercise_by_id_and_user()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.exercises.get_exercise_files_by_user"><code class="docutils literal notranslate"><span class="pre">get_exercise_files_by_user()</span></code></a></li>
@@ -138,6 +139,11 @@ ExerciseCreateスキーマには既にuser_idが含まれているため、追�
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.exercises.create_user_answer">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.exercises.</span></span><span class="sig-name descname"><span class="pre">create_user_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_answer_create</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.schemas.html#app.schemas.exercises_user_answer.ExerciseUserAnswerCreate" title="app.schemas.exercises_user_answer.ExerciseUserAnswerCreate"><span class="pre">ExerciseUserAnswerCreate</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="app.models.html#app.models.exercises_user_answer.ExerciseUserAnswer" title="app.models.exercises_user_answer.ExerciseUserAnswer"><span class="pre">ExerciseUserAnswer</span></a></span></span><a class="reference internal" href="_modules/app/cruds/exercises.html#create_user_answer"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.exercises.create_user_answer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.cruds.exercises.delete_exercise_by_user">

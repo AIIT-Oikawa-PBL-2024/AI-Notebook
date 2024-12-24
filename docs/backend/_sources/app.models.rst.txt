@@ -20,6 +20,14 @@ app.models.exercises\_files module
    :undoc-members:
    :show-inheritance:
 
+app.models.exercises\_user\_answer module
+-----------------------------------------
+
+.. automodule:: app.models.exercises_user_answer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.models.files module
 -----------------------
 
