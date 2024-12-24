@@ -3,16 +3,20 @@ from datetime import datetime
 from unittest.mock import Mock, AsyncMock
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.future import select
 
 import app.models.exercises as exercises_models
 import app.models.files as files_models
 import app.schemas.exercises as exercises_schemas
+import app.schemas.exercises_user_answer as exercises_user_answer_schemas
+import app.models.exercises_user_answer as exercises_user_answer_models
 from app.cruds.exercises import (
     create_exercise,
     get_exercises_by_user,
     get_exercise_by_id_and_user,
     delete_exercise_by_user,
     get_exercise_files_by_user,
+    create_user_answer,
 )
 
 
@@ -78,6 +82,35 @@ def sample_files(sample_datetime: datetime) -> list[files_models.File]:
             created_at=sample_datetime,
         ),
     ]
+
+
+@pytest.fixture
+def sample_user_answer(
+    sample_datetime: datetime,
+) -> exercises_user_answer_models.ExerciseUserAnswer:
+    """ExerciseUserAnswerモデルのサンプルデータを作成するフィクスチャ"""
+    return exercises_user_answer_models.ExerciseUserAnswer(
+        id=1,
+        exercise_id=1,
+        user_id="test-user-123",
+        answer="This is a test answer",
+        scoring_results="This is a test scoring result",
+        created_at=sample_datetime,
+    )
+
+
+@pytest.fixture
+def sample_user_answer_create(
+    sample_datetime: datetime,
+) -> exercises_user_answer_schemas.ExerciseUserAnswerCreate:
+    """ExerciseUserAnswerCreateスキーマのサンプルデータを作成するフィクスチャ"""
+    return exercises_user_answer_schemas.ExerciseUserAnswerCreate(
+        exercise_id=1,
+        user_id="test-user-123",
+        answer="This is a test answer",
+        scoring_results="This is a test scoring result",
+        created_at=sample_datetime,
+    )
 
 
 @pytest.mark.asyncio
@@ -218,3 +251,23 @@ async def test_get_exercise_files_by_user_not_found(mock_db: AsyncMock) -> None:
     # テスト実行とアサーション
     with pytest.raises(ValueError, match="Exercise with ID 1 not found for user test-user-123"):
         await get_exercise_files_by_user(mock_db, 1, "test-user-123")
+
+
+@pytest.mark.asyncio
+async def test_create_user_answer_success(
+    mock_db: AsyncMock,
+    sample_user_answer_create: exercises_user_answer_schemas.ExerciseUserAnswerCreate,
+) -> None:
+    # テスト実行
+    result = await create_user_answer(mock_db, sample_user_answer_create)
+
+    # アサーション
+    assert result is not None
+    assert mock_db.add.called
+    assert mock_db.commit.called
+    assert mock_db.refresh.called
+    assert result.exercise_id == sample_user_answer_create.exercise_id
+    assert result.user_id == sample_user_answer_create.user_id
+    assert result.answer == sample_user_answer_create.answer
+    assert result.scoring_results == sample_user_answer_create.scoring_results
+    assert result.created_at == sample_user_answer_create.created_at
