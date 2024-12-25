@@ -14,7 +14,7 @@ export const DeleteButton = ({ noteId, onDelete }: DeleteButtonProps) => {
 	const handleDelete = async () => {
 		try {
 			await deleteNotebook(noteId);
-			router.push("/");
+			router.push("/select-notes");
 		} catch (error) {
 			console.error("削除エラー:", error);
 		}
