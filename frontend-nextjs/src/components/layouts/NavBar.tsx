@@ -41,49 +41,11 @@ const groupIcons: Record<
 	string,
 	React.ComponentType<{ className?: string }>
 > = {
-	AI要約: DocumentTextIcon,
-	AI練習問題: QuestionMarkCircleIcon,
 	ノート: BookOpenIcon,
 };
 
 // Define navigation groups
 const navigationGroups = [
-	{
-		name: "AI要約",
-		items: [
-			{
-				name: "AI要約リスト",
-				href: "/ai-output/select-ai-output",
-				icon: ListBulletIcon,
-			},
-			{ name: "AI要約", href: "/ai-output/stream", icon: ComputerDesktopIcon },
-		],
-	},
-	{
-		name: "AI練習問題",
-		items: [
-			{
-				name: "AI練習問題リスト",
-				href: "/ai-exercise/select-exercises",
-				icon: ListBulletIcon,
-			},
-			{
-				name: "AI練習問題",
-				href: "/ai-exercise/stream",
-				icon: PencilSquareIcon,
-			},
-			{
-				name: "選択問題テスト",
-				href: "/ai-exercise/multiple-choice",
-				icon: DocumentCheckIcon,
-			},
-			{
-				name: "記述問題テスト",
-				href: "/ai-exercise/essay-question",
-				icon: DocumentCheckIcon,
-			},
-		],
-	},
 	{
 		name: "ノート",
 		items: [
@@ -150,6 +112,22 @@ export default function NavBar() {
 							<FolderIcon className="h-5 w-5" />
 						</ListItemPrefix>
 						ファイル選択
+					</ListItem>
+				</Link>
+				<Link href="/ai-output/select-ai-output">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI要約リスト
+					</ListItem>
+				</Link>
+				<Link href="/ai-exercise/select-exercises">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						AI練習問題リスト
 					</ListItem>
 				</Link>
 
