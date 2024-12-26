@@ -123,7 +123,7 @@ export function GetAIOutputDisplay({ outputId }: Props) {
 				<CardHeader className="mb-4 grid h-28 place-items-center border-b border-gray-200">
 					<div className="flex flex-col items-center gap-2">
 						<Typography variant="h3" className="text-gray-900">
-							AI 出力
+							AI 要約
 						</Typography>
 						{output.title && (
 							<Typography variant="h5" className="text-gray-700">
