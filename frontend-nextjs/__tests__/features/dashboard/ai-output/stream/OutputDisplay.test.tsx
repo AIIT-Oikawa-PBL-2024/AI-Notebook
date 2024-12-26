@@ -63,6 +63,6 @@ describe("OutputDisplay", () => {
 		expect(screen.getByTestId("card")).toBeInTheDocument();
 		expect(screen.getByTestId("card-header")).toBeInTheDocument();
 		expect(screen.getByTestId("card-body")).toBeInTheDocument();
-		expect(screen.getByText("AI ノート")).toBeInTheDocument();
+		expect(screen.getByText("AI 要約")).toBeInTheDocument();
 	});
 });
