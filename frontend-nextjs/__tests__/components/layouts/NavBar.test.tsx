@@ -137,17 +137,13 @@ describe("NavBar", () => {
 		expect(screen.getByText("ファイル選択")).toBeInTheDocument();
 	});
 
-	it("AI要約グループが展開されること", () => {
+	it("AI要約メニュー項目が表示されること", () => {
 		render(<NavBar />);
-		const groupHeader = screen.getByTestId("accordion-header-AI要約");
-		fireEvent.click(groupHeader);
 		expect(screen.getByText("AI要約リスト")).toBeInTheDocument();
 	});
 
-	it("AI練習問題グループが展開されること", () => {
+	it("AI練習問題メニュー項目が表示されること", () => {
 		render(<NavBar />);
-		const groupHeader = screen.getByTestId("accordion-header-AI練習問題");
-		fireEvent.click(groupHeader);
 		expect(screen.getByText("AI練習問題リスト")).toBeInTheDocument();
 	});
 
