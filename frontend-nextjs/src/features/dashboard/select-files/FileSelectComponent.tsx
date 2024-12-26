@@ -237,7 +237,7 @@ export default function FileSelectComponent() {
 			<Card className="w-full">
 				<CardHeader className="mb-4 grid h-28 place-items-center border-b border-gray-200">
 					<Typography variant="h3" className="text-gray-900">
-						AI 要約/練習問題
+						ファイル選択
 					</Typography>
 				</CardHeader>
 
