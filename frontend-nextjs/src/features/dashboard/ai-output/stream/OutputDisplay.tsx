@@ -21,7 +21,7 @@ export function OutputDisplay({ loading, error, output }: OutputDisplayProps) {
 		<Card className="w-full">
 			<CardHeader className="mb-4 grid h-28 place-items-center border-b border-gray-200">
 				<Typography variant="h3" className="text-gray-900">
-					AI ノート
+					AI 要約
 				</Typography>
 			</CardHeader>
 			<CardBody className="flex flex-col gap-4">

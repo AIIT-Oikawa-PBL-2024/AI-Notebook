@@ -98,7 +98,7 @@ describe("FileSelectComponent", () => {
 
 		// タイトルを入力
 		const titleInput = screen.getByPlaceholderText(
-			"AI要約/演習のタイトルを入力してください（最大100文字）",
+			"AI要約/練習問題のタイトルを入力してください（最大100文字）",
 		);
 		fireEvent.change(titleInput, { target: { value: "テストノート" } });
 
@@ -116,7 +116,7 @@ describe("FileSelectComponent", () => {
 		});
 	});
 
-	it("ファイルを選択して演習問題を作成できること", async () => {
+	it("ファイルを選択して練習問題を作成できること", async () => {
 		render(<FileSelectComponent />);
 
 		await waitFor(() => {
@@ -127,7 +127,7 @@ describe("FileSelectComponent", () => {
 		fireEvent.click(checkboxes[1]);
 
 		const titleInput = screen.getByPlaceholderText(
-			"AI要約/演習のタイトルを入力してください（最大100文字）",
+			"AI要約/練習問題のタイトルを入力してください（最大100文字）",
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト演習" } });
 
@@ -153,7 +153,7 @@ describe("FileSelectComponent", () => {
 		fireEvent.click(checkboxes[1]);
 
 		const titleInput = screen.getByPlaceholderText(
-			"AI要約/演習のタイトルを入力してください（最大100文字）",
+			"AI要約/練習問題のタイトルを入力してください（最大100文字）",
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト選択問題" } });
 
