@@ -1,16 +1,16 @@
-"""add relationship
+"""update answers table
 
-Revision ID: a03982887391
-Revises: 1d88d95ae783
-Create Date: 2024-11-30 01:14:55.238114
+Revision ID: b3201e22d182
+Revises: 5dac468e846d
+Create Date: 2024-12-27 03:23:51.254195
 
 """
 
 from typing import Sequence, Union
 
 # revision identifiers, used by Alembic.
-revision: str = "a03982887391"
-down_revision: Union[str, None] = "1d88d95ae783"
+revision: str = "b3201e22d182"
+down_revision: Union[str, None] = "5dac468e846d"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

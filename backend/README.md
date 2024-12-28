@@ -25,8 +25,10 @@
 
 - DB マイグレーション(backend の DevContainer 内で実行)
   - 開発用 DB
-    - `$ cd app/db/alembic_dev`
-    - `$ alembic upgrade head`
+  - `$ cd app/db/alembic_dev`
+  - 新たにテーブルを作成した場合`app/db/alembic_dev/env.py`と`app/migrate_cloud_db.py`にテーブルのモデルを追加
+  - マイグレーションスクリプトを生成`alembic revision --autogenerate -m "add XXXX table"`  
+  - マイグレーション適用`$ alembic upgrade head`
     - alimbicコマンドがうまく実行されない場合は'poetry run alembic upgrade head'を実行
     - [エラーが出る場合はドキュメント確認](https://alembic.sqlalchemy.org/en/latest/tutorial.html#running-our-first-migration)
   - テスト用 DB

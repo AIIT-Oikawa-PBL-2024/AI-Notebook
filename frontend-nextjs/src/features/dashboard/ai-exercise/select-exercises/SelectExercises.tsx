@@ -50,6 +50,16 @@ type SortField =
 	| "title";
 type SortDirection = "asc" | "desc";
 
+// クリアすべきローカルストレージキーの定義
+const STORAGE_KEYS_TO_CLEAR = [
+	"cached_answers",
+	"cached_results_state",
+	"cached_multi_choice_question",
+	"multi_choice_generation_status",
+	"cached_essay_answers",
+	"cached_essay_results_state",
+];
+
 export default function ExerciseSelectComponent() {
 	const router = useRouter();
 	const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -222,6 +232,7 @@ export default function ExerciseSelectComponent() {
 		return sortConfig.direction === "asc" ? "↑" : "↓";
 	};
 
+	// 修正: ローカルストレージをクリアしてからナビゲート
 	const handleNavigate = useCallback(() => {
 		if (!selectedExerciseId) {
 			alert("アイテムを選択してください。");
@@ -236,6 +247,12 @@ export default function ExerciseSelectComponent() {
 			return;
 		}
 
+		// ローカルストレージから特定のキーを削除
+		for (const key of STORAGE_KEYS_TO_CLEAR) {
+			localStorage.removeItem(key);
+		}
+
+		// 選択されたエクササイズのタイプに応じてルーティング
 		switch (selectedExercise.exercise_type) {
 			case "multiple_choice":
 				router.push(`/ai-exercise/multiple-choice/${selectedExerciseId}`);

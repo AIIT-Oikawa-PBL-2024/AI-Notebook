@@ -1,6 +1,12 @@
 "use client";
 
 import { useMultiChoiceQuestionGenerator } from "@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator";
+import { useSaveAnswers } from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
+import type {
+	AnswerResponseData,
+	Question,
+	SaveAnswerPayload,
+} from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
 import {
 	Alert,
 	Button,
@@ -21,6 +27,7 @@ type ResultState = {
 	skippedQuestions: string[];
 };
 
+// 複数選択問題を表示し、ユーザーの回答を管理・送信するコンポーネント
 export const MultipleChoiceQuestions = () => {
 	const { loading, error, exercise, resetExercise, clearCache } =
 		useMultiChoiceQuestionGenerator();
@@ -55,6 +62,15 @@ export const MultipleChoiceQuestions = () => {
 
 	const { showResults, retryMode, skippedQuestions } = resultState;
 
+	// useSaveAnswers フックを初期化
+	const {
+		saveAnswers,
+		loading: saving,
+		error: saveError,
+		success,
+	} = useSaveAnswers();
+
+	// 選択した回答をローカルストレージに保存
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			localStorage.setItem(
@@ -64,6 +80,7 @@ export const MultipleChoiceQuestions = () => {
 		}
 	}, [selectedAnswers]);
 
+	// 結果状態をローカルストレージに保存
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(resultState));
@@ -72,8 +89,11 @@ export const MultipleChoiceQuestions = () => {
 
 	if (loading) {
 		return (
-			<div className="flex h-screen items-center justify-center">
-				<Spinner className="h-8 w-8" />
+			<div
+				className="flex h-screen items-center justify-center"
+				aria-live="polite"
+			>
+				<Spinner className="h-8 w-8" aria-label="Loading spinner" role="img" />
 				<span className="ml-2">問題を生成中...</span>
 			</div>
 		);
@@ -115,8 +135,9 @@ export const MultipleChoiceQuestions = () => {
 		);
 	}
 
-	const questions = exercise.content[0].input.questions;
+	const questions: Question[] = exercise.content[0].input.questions;
 
+	// 回答キャッシュをクリアします
 	const clearAnswerCache = () => {
 		localStorage.removeItem(ANSWERS_STORAGE_KEY);
 		localStorage.removeItem(RESULTS_STORAGE_KEY);
@@ -128,6 +149,7 @@ export const MultipleChoiceQuestions = () => {
 		});
 	};
 
+	// ユーザーの回答を選択します
 	const handleAnswerSelect = (questionId: string, value: string) => {
 		setSelectedAnswers((prev) => ({
 			...prev,
@@ -135,26 +157,61 @@ export const MultipleChoiceQuestions = () => {
 		}));
 	};
 
-	const handleSubmit = () => {
+	// ユーザーの回答をバックエンドに送信して保存
+	const handleSubmit = async () => {
 		setResultState((prev) => ({
 			...prev,
 			showResults: true,
 		}));
 		// ページトップへスムーズにスクロール
 		window.scrollTo({ top: 0, behavior: "smooth" });
+
+		// 保存するデータを準備
+		const title =
+			typeof window !== "undefined" ? localStorage.getItem("title") || "" : "";
+		const relatedFiles =
+			typeof window !== "undefined"
+				? JSON.parse(localStorage.getItem("selectedFiles") || "[]")
+				: [];
+
+		const responses: AnswerResponseData[] = questions.map((question) => {
+			const userChoice = selectedAnswers[question.question_id];
+			const isCorrect = userChoice === question.answer;
+			return {
+				question_id: question.question_id,
+				question_text: question.question_text,
+				choices: question.choices,
+				user_selected_choice: userChoice,
+				correct_choice: question.answer,
+				is_correct: isCorrect,
+				explanation: question.explanation, // 解説文を含める
+			};
+		});
+
+		const payload: SaveAnswerPayload = {
+			title,
+			relatedFiles,
+			responses,
+		};
+
+		// カスタムフックを使用して回答を保存
+		await saveAnswers(payload);
 	};
 
+	// ユーザーの回答をリセット
 	const handleReset = () => {
 		clearAnswerCache();
 		// ページトップへスムーズにスクロール
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
+	// 完全にリセットし、新しい問題を生成
 	const handleCompleteReset = () => {
 		clearCache();
 		clearAnswerCache();
 	};
 
+	// 不正解のみをリトライ
 	const handleRetryIncorrect = () => {
 		const correctQuestions = questions
 			.filter(
@@ -168,10 +225,11 @@ export const MultipleChoiceQuestions = () => {
 			retryMode: true,
 			skippedQuestions: correctQuestions,
 		});
-		// ページトップへスムーズにスクロール
+		resetExercise(); // ここで resetExercise を呼び出す
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
+	// スコアを計算
 	const getScore = () => {
 		return questions.reduce((score, question) => {
 			return (
@@ -181,10 +239,8 @@ export const MultipleChoiceQuestions = () => {
 		}, 0);
 	};
 
-	const getChoiceLabel = (
-		question: (typeof questions)[0],
-		choiceId: string,
-	) => {
+	// 選択肢のラベルを取得
+	const getChoiceLabel = (question: Question, choiceId: string) => {
 		return question.choices[choiceId as keyof typeof question.choices];
 	};
 
@@ -262,7 +318,7 @@ export const MultipleChoiceQuestions = () => {
 																)}
 																{isUserChoice && !isCorrectAnswer && (
 																	<span className="text-red-700 font-medium ml-2">
-																		(あなたの回答)
+																		(あなたの解答)
 																	</span>
 																)}
 															</>
@@ -289,7 +345,7 @@ export const MultipleChoiceQuestions = () => {
 									>
 										<div className="flex gap-2 mb-2">
 											<Typography className="text-gray-900">
-												あなたの回答:
+												あなたの解答:
 											</Typography>
 											<Typography
 												className={
@@ -329,6 +385,24 @@ export const MultipleChoiceQuestions = () => {
 				);
 			})}
 
+			{/* 保存中のステータスを表示 */}
+			{saving && (
+				<div className="flex items-center mb-4">
+					<Spinner className="h-6 w-6" />
+					<span className="ml-2">回答を保存中...</span>
+				</div>
+			)}
+			{saveError && (
+				<Alert color="red" className="mb-4">
+					{saveError}
+				</Alert>
+			)}
+			{success && (
+				<Alert color="green" className="mb-4">
+					回答が正常に保存されました。
+				</Alert>
+			)}
+
 			<div className="flex justify-between items-center mt-6">
 				{showResults ? (
 					<div className="w-full flex justify-between items-center">
@@ -353,12 +427,13 @@ export const MultipleChoiceQuestions = () => {
 					<Button
 						onClick={handleSubmit}
 						disabled={
-							Object.keys(selectedAnswers).length !== displayQuestions.length
+							Object.keys(selectedAnswers).length !== displayQuestions.length ||
+							saving // 保存中はボタンを無効化
 						}
 						color="blue"
 						className="ml-auto"
 					>
-						回答を確認する
+						正解を確認する
 					</Button>
 				)}
 			</div>

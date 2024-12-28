@@ -1,0 +1,598 @@
+"use client";
+
+import { PopupDialog } from "@/components/elements/PopupDialog";
+import { useDeleteAnswers } from "@/features/dashboard/ai-exercise/select-answers/useDeleteAnswers";
+import {
+	type AnswerResponse,
+	useFetchAnswers,
+} from "@/features/dashboard/ai-exercise/select-answers/useFetchAnswers";
+import {
+	Alert,
+	Button,
+	Card,
+	CardBody,
+	CardHeader,
+	Checkbox,
+	Dialog,
+	DialogBody,
+	DialogHeader,
+	Input,
+	Spinner,
+	Typography,
+} from "@material-tailwind/react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+// クリアすべきローカルストレージキーの定義
+const STORAGE_KEYS_TO_CLEAR = [
+	"cached_answers",
+	"cached_results_state",
+	"cached_multi_choice_question",
+	"multi_choice_generation_status",
+	"cached_essay_answers",
+	"cached_essay_results_state",
+];
+
+export default function SelectAnswers() {
+	const router = useRouter();
+	const { answers, loading, error, refetch } = useFetchAnswers();
+	const [selectedAnswerIds, setSelectedAnswerIds] = useState<number[]>([]);
+	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
+	const [sortConfig, setSortConfig] = useState<{
+		field: keyof AnswerResponse;
+		direction: "asc" | "desc";
+	}>({
+		field: "updated_at",
+		direction: "desc",
+	});
+	const [openModal, setOpenModal] = useState<boolean>(false);
+	const [selectedAnswer, setSelectedAnswer] = useState<AnswerResponse | null>(
+		null,
+	);
+
+	const {
+		deleteAnswers,
+		loading: deleting,
+		error: deleteError,
+	} = useDeleteAnswers();
+
+	// 検索語のデバウンス処理
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm);
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [searchTerm]);
+
+	// 日付フォーマット関数
+	const formatDate = useCallback((dateStr: string) => {
+		return new Date(dateStr).toLocaleString();
+	}, []);
+
+	// フィルタリングとソート
+	const filteredAndSortedAnswers = useMemo(() => {
+		return [...answers]
+			.filter((answer) => {
+				if (!debouncedSearchTerm) return true;
+				const searchLower = debouncedSearchTerm.toLowerCase();
+				return (
+					answer.title.toLowerCase().includes(searchLower) ||
+					answer.question_text.toLowerCase().includes(searchLower) ||
+					answer.user_selected_choice.toLowerCase().includes(searchLower) ||
+					answer.correct_choice.toLowerCase().includes(searchLower) ||
+					answer.related_files.some((file) =>
+						file.toLowerCase().includes(searchLower),
+					) ||
+					formatDate(answer.updated_at).toLowerCase().includes(searchLower)
+				);
+			})
+			.sort((a, b) => {
+				const direction = sortConfig.direction === "asc" ? 1 : -1;
+				const aField = a[sortConfig.field];
+				const bField = b[sortConfig.field];
+
+				if (typeof aField === "string" && typeof bField === "string") {
+					return direction * aField.localeCompare(bField);
+				}
+
+				if (typeof aField === "boolean" && typeof bField === "boolean") {
+					return direction * (aField === bField ? 0 : aField ? 1 : -1);
+				}
+
+				if (
+					sortConfig.field === "updated_at" ||
+					sortConfig.field === "created_at"
+				) {
+					return (
+						direction *
+						(new Date(aField as string).getTime() -
+							new Date(bField as string).getTime())
+					);
+				}
+
+				return 0;
+			});
+	}, [answers, sortConfig, debouncedSearchTerm, formatDate]);
+
+	// 選択ハンドラ
+	const handleSelect = useCallback((id: number) => {
+		setSelectedAnswerIds((prev) => {
+			if (prev.includes(id)) {
+				return prev.filter((selectedId) => selectedId !== id);
+			}
+			return [...prev, id];
+		});
+	}, []);
+
+	// 全選択 / 全解除
+	const handleSelectAll = useCallback(() => {
+		if (selectedAnswerIds.length === filteredAndSortedAnswers.length) {
+			// 全解除
+			setSelectedAnswerIds([]);
+		} else {
+			// 全選択
+			const allIds = filteredAndSortedAnswers.map((a) => a.id);
+			setSelectedAnswerIds(allIds);
+		}
+	}, [selectedAnswerIds.length, filteredAndSortedAnswers]);
+
+	// ソートハンドラ
+	const handleSort = useCallback((field: keyof AnswerResponse) => {
+		setSortConfig((prevConfig) => ({
+			field,
+			direction:
+				prevConfig.field === field && prevConfig.direction === "asc"
+					? "desc"
+					: "asc",
+		}));
+	}, []);
+
+	// ソートアイコン取得関数
+	const getSortIcon = (field: keyof AnswerResponse) => {
+		if (sortConfig.field !== field) return "↕️";
+		return sortConfig.direction === "asc" ? "↑" : "↓";
+	};
+
+	// モーダルを開くハンドラ
+	const handleOpenModal = useCallback((answer: AnswerResponse) => {
+		setSelectedAnswer(answer);
+		setOpenModal(true);
+	}, []);
+
+	// ナビゲーションハンドラ
+	const handleNavigate = useCallback(() => {
+		if (selectedAnswerIds.length === 0) {
+			alert("アイテムを選択してください。");
+			return;
+		}
+
+		// 追加: ローカルストレージから特定のキーを削除
+		for (const key of STORAGE_KEYS_TO_CLEAR) {
+			localStorage.removeItem(key);
+		}
+
+		// 選択された解答を取得
+		const selectedAnswers = answers.filter((answer) =>
+			selectedAnswerIds.includes(answer.id),
+		);
+
+		// 選択された解答をローカルストレージに保存
+		localStorage.setItem("selectedAnswers", JSON.stringify(selectedAnswers));
+
+		// ページ遷移
+		router.push("/ai-exercise/select-answers/answers");
+	}, [selectedAnswerIds, answers, router]);
+
+	// 削除ボタンクリック時のハンドラ
+	const handleDelete = useCallback(async () => {
+		if (selectedAnswerIds.length === 0) {
+			alert("削除する回答を選択してください。");
+			return;
+		}
+
+		try {
+			const result = await deleteAnswers(selectedAnswerIds);
+			if (result.deleted_ids.length > 0) {
+				console.log(`削除に成功した回答ID: ${result.deleted_ids.join(", ")}`);
+			}
+			if (result.not_found_ids.length > 0) {
+				console.log(
+					`見つからなかった回答ID: ${result.not_found_ids.join(", ")}`,
+				);
+			}
+			if (result.unauthorized_ids.length > 0) {
+				console.log(
+					`削除権限がなかった回答ID: ${result.unauthorized_ids.join(", ")}`,
+				);
+			}
+			// 削除が完了したら一覧を再取得
+			refetch();
+			// 削除後は選択をリセット
+			setSelectedAnswerIds([]);
+		} catch (err) {
+			console.error(err);
+		}
+	}, [selectedAnswerIds, deleteAnswers, refetch]);
+
+	// コンテンツを省略する関数
+	const truncateContent = (str: string, maxLength = 100): string => {
+		return str.length > maxLength ? `${str.substring(0, maxLength)}...` : str;
+	};
+
+	// 選択肢IDをフォーマットする関数
+	const formatChoiceId = (choiceId: string): string => {
+		// choice_a -> A, choice_b -> B などに変換
+		const match = choiceId.match(/choice_([a-d])/i);
+		if (match) {
+			return match[1].toUpperCase();
+		}
+		return choiceId;
+	};
+
+	// 全選択状態かどうかの判定
+	const isAllSelected =
+		filteredAndSortedAnswers.length > 0 &&
+		selectedAnswerIds.length === filteredAndSortedAnswers.length;
+
+	return (
+		<div className="container mx-auto p-4">
+			<Card>
+				<CardHeader className="mb-4 grid h-28 place-items-center border-b border-gray-200">
+					<Typography variant="h3" className="text-gray-900">
+						解答リスト
+					</Typography>
+				</CardHeader>
+
+				<CardBody className="flex flex-col gap-4">
+					{/* 取得エラー表示 */}
+					{error && (
+						<Alert
+							variant="gradient"
+							color="red"
+							onClose={() => {
+								// ここで setError("") などでエラーをクリアしてもOK
+							}}
+						>
+							{error}
+						</Alert>
+					)}
+
+					{/* 削除エラー表示 */}
+					{deleteError && (
+						<Alert
+							variant="gradient"
+							color="red"
+							onClose={() => {
+								// ここでフックのエラーをクリアしてもOK
+							}}
+						>
+							{deleteError}
+						</Alert>
+					)}
+
+					<div className="p-4 flex flex-row items-center gap-4">
+						<div className="flex-grow md:flex-grow-0 md:w-72">
+							<Input
+								type="search"
+								label="検索"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+								className="w-full"
+							/>
+						</div>
+
+						{/* 右上に並べるボタン: 再チャレンジ & 削除 */}
+						<div className="ml-auto flex flex-row gap-2">
+							<Button
+								onClick={handleNavigate}
+								disabled={selectedAnswerIds.length === 0}
+							>
+								問題に再チャレンジ
+							</Button>
+							<PopupDialog
+								buttonTitle="選択項目を削除"
+								title="選択項目を削除しますか？"
+								actionProps={{ onClick: handleDelete }}
+								triggerButtonProps={{
+									disabled:
+										selectedAnswerIds.length === 0 || loading || deleting,
+								}}
+							/>
+						</div>
+					</div>
+
+					{loading ? (
+						<div
+							className="flex justify-center items-center p-8"
+							data-testid="loading-spinner"
+						>
+							<Spinner className="h-8 w-8" />
+						</div>
+					) : !answers.length ? (
+						<Alert variant="gradient">解答が見つかりません</Alert>
+					) : (
+						<table className="w-full min-w-max table-auto text-left">
+							<thead>
+								<tr>
+									<th className="border-b p-4">
+										<Checkbox
+											checked={isAllSelected}
+											onChange={handleSelectAll}
+											aria-label="全選択"
+										/>
+									</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("title")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none"
+											>
+												タイトル
+											</Typography>
+											<span>{getSortIcon("title")}</span>
+										</button>
+									</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("question_text")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none"
+											>
+												質問文
+											</Typography>
+											<span>{getSortIcon("question_text")}</span>
+										</button>
+									</th>
+									<th className="border-b p-4">選択肢</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("is_correct")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none"
+											>
+												正誤
+											</Typography>
+											<span>{getSortIcon("is_correct")}</span>
+										</button>
+									</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("updated_at")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none"
+											>
+												更新日時
+											</Typography>
+											<span>{getSortIcon("updated_at")}</span>
+										</button>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{filteredAndSortedAnswers.map((answer) => (
+									<tr key={answer.id} className="hover:bg-gray-100">
+										<td className="p-4">
+											<Checkbox
+												name={`answer-select-${answer.id}`}
+												checked={selectedAnswerIds.includes(answer.id)}
+												onChange={(e) => {
+													e.stopPropagation();
+													handleSelect(answer.id);
+												}}
+												aria-label={`選択 ${answer.title}`}
+											/>
+										</td>
+										<td className="p-4 max-w-[200px]">
+											<Typography
+												variant="small"
+												className="font-normal break-words text-xs"
+											>
+												{answer.title}
+											</Typography>
+										</td>
+										<td className="p-4 max-w-[300px]">
+											{/* 質問文をクリック可能にする */}
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation(); // 他のイベントの発火を防ぐ
+													handleOpenModal(answer);
+												}}
+												onKeyDown={(e) => {
+													if (e.key === "Enter" || e.key === " ") {
+														e.preventDefault();
+														handleOpenModal(answer);
+													}
+												}}
+												className="w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+												aria-label={`質問文を開く: ${answer.question_text}`}
+											>
+												<Typography
+													variant="small"
+													className="font-normal max-w-xs whitespace-pre-wrap text-xs hover:underline"
+												>
+													{truncateContent(answer.question_text, 100)}
+												</Typography>
+											</button>
+										</td>
+										<td className="p-4 max-w-[300px]">
+											<Typography
+												variant="small"
+												className="font-normal break-words text-xs"
+											>
+												A: {answer.choice_a} <br />
+												B: {answer.choice_b} <br />
+												C: {answer.choice_c} <br />
+												D: {answer.choice_d}
+											</Typography>
+										</td>
+										<td className="p-4">
+											<Typography
+												variant="small"
+												className={`font-normal text-xs ${
+													answer.is_correct ? "text-green-600" : "text-red-600"
+												}`}
+											>
+												{answer.is_correct ? "正解" : "不正解"}
+											</Typography>
+										</td>
+										<td className="p-4">
+											<Typography
+												variant="small"
+												className="font-normal text-xs"
+											>
+												{formatDate(answer.updated_at)}
+											</Typography>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					)}
+				</CardBody>
+			</Card>
+
+			{/* モーダル */}
+			<Dialog open={openModal} handler={() => setOpenModal(false)} size="lg">
+				<DialogHeader>問題・解答の詳細</DialogHeader>
+				<DialogBody divider className="h-96 overflow-auto">
+					{selectedAnswer && (
+						<div className="space-y-4">
+							{/* 質問文 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									質問文
+								</Typography>
+								<Typography className="whitespace-pre-wrap text-sm">
+									{selectedAnswer.question_text}
+								</Typography>
+							</div>
+
+							{/* 選択肢 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									選択肢
+								</Typography>
+								<Typography className="text-sm">
+									A: {selectedAnswer.choice_a} <br />
+									B: {selectedAnswer.choice_b} <br />
+									C: {selectedAnswer.choice_c} <br />
+									D: {selectedAnswer.choice_d}
+								</Typography>
+							</div>
+
+							{/* ユーザーの解答 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									ユーザーの解答
+								</Typography>
+								<Typography className="text-sm">
+									{formatChoiceId(selectedAnswer.user_selected_choice)}
+								</Typography>
+							</div>
+
+							{/* 正解 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									正解
+								</Typography>
+								<Typography className="text-sm">
+									{formatChoiceId(selectedAnswer.correct_choice)}
+								</Typography>
+							</div>
+
+							{/* 正誤 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									正誤
+								</Typography>
+								<Typography
+									className={`text-sm ${
+										selectedAnswer.is_correct
+											? "text-green-600"
+											: "text-red-600"
+									}`}
+								>
+									{selectedAnswer.is_correct ? "正解" : "不正解"}
+								</Typography>
+							</div>
+							{/* 解説 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									解説
+								</Typography>
+								<Typography className="whitespace-pre-wrap text-sm">
+									{selectedAnswer.explanation}
+								</Typography>
+							</div>
+
+							{/* 関連ファイル */}
+							{selectedAnswer.related_files.length > 0 && (
+								<div>
+									<Typography variant="h6" className="font-semibold">
+										関連ファイル
+									</Typography>
+									<ul className="list-disc list-inside">
+										{selectedAnswer.related_files.map((file) => (
+											<li key={file}>
+												{file.startsWith("http://") ||
+												file.startsWith("https://") ? (
+													<a
+														href={file}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="text-blue-500 underline"
+													>
+														{file}
+													</a>
+												) : (
+													<span>{file}</span>
+												)}
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+
+							{/* 作成日時と更新日時 */}
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									作成日時
+								</Typography>
+								<Typography className="text-sm">
+									{formatDate(selectedAnswer.created_at)}
+								</Typography>
+							</div>
+							<div>
+								<Typography variant="h6" className="font-semibold">
+									更新日時
+								</Typography>
+								<Typography className="text-sm">
+									{formatDate(selectedAnswer.updated_at)}
+								</Typography>
+							</div>
+						</div>
+					)}
+				</DialogBody>
+			</Dialog>
+		</div>
+	);
+}

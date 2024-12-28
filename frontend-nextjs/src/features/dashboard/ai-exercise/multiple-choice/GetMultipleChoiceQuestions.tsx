@@ -1,6 +1,13 @@
 "use client";
 
 import { useGetMultiChoiceQuestion } from "@/features/dashboard/ai-exercise/multiple-choice/useGetMultiChoiceQuestion";
+
+import { useSaveAnswers } from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
+import type {
+	AnswerResponseData,
+	SaveAnswerPayload,
+} from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
+
 import {
 	Alert,
 	Button,
@@ -34,6 +41,14 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 		resetExercise,
 		clearCache,
 	} = useGetMultiChoiceQuestion(exerciseId);
+
+	// 解答保存フックを呼び出す
+	const {
+		saveAnswers,
+		loading: saving, // 保存中ステータス
+		error: saveError, // 保存エラー
+		success, // 保存成功ステータス
+	} = useSaveAnswers();
 
 	const [selectedAnswers, setSelectedAnswers] = useState<
 		Record<string, string>
@@ -82,8 +97,11 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 
 	if (loading) {
 		return (
-			<div className="flex h-screen items-center justify-center">
-				<Spinner className="h-8 w-8" />
+			<div
+				className="flex h-screen items-center justify-center"
+				aria-live="polite"
+			>
+				<Spinner className="h-8 w-8" aria-label="Loading spinner" role="img" />
 				<span className="ml-2">問題を生成中...</span>
 			</div>
 		);
@@ -150,18 +168,51 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 		}));
 	};
 
-	const handleSubmit = () => {
+	// 非同期関数にしてバックエンドにデータを送信
+	const handleSubmit = async () => {
+		// 解答を確認モードにする
 		setResultState((prev) => ({
 			...prev,
 			showResults: true,
 		}));
-		// ページトップへスムーズにスクロール
+
+		// 解答送信時にページトップへスムーズにスクロール
 		window.scrollTo({ top: 0, behavior: "smooth" });
+
+		// 送信する回答データを整形
+		const responses: AnswerResponseData[] = questions.map((question) => {
+			const userChoice = selectedAnswers[question.question_id];
+			const isCorrect = userChoice === question.answer;
+			return {
+				question_id: question.question_id,
+				question_text: question.question_text,
+				choices: question.choices,
+				user_selected_choice: userChoice,
+				correct_choice: question.answer,
+				is_correct: isCorrect,
+				explanation: question.explanation, // 解説
+			};
+		});
+
+		// 必要に応じて関連するファイルIDなどを取得（なければ空配列などでOK）
+		const relatedFiles =
+			typeof window !== "undefined"
+				? JSON.parse(localStorage.getItem("selectedFiles") || "[]")
+				: [];
+
+		// 保存用のペイロードを作成
+		const payload: SaveAnswerPayload = {
+			title: title ?? "",
+			relatedFiles,
+			responses,
+		};
+
+		// バックエンドに解答を保存
+		await saveAnswers(payload);
 	};
 
 	const handleReset = () => {
 		clearAnswerCache();
-		// ページトップへスムーズにスクロール
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
@@ -178,7 +229,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 			retryMode: true,
 			skippedQuestions: correctQuestions,
 		});
-		// ページトップへスムーズにスクロール
+		resetExercise(); // ここで resetExercise を呼び出す
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
@@ -240,7 +291,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 													handleAnswerSelect(question.question_id, key)
 												}
 												disabled={showResults}
-												checked={isUserChoice} // defaultCheckedからcheckedに変更
+												checked={isUserChoice}
 												label={
 													<div className="flex items-center gap-2">
 														<span
@@ -269,7 +320,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 																)}
 																{isUserChoice && !isCorrectAnswer && (
 																	<span className="text-red-700 font-medium ml-2">
-																		(あなたの回答)
+																		(あなたの解答)
 																	</span>
 																)}
 															</>
@@ -296,7 +347,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 									>
 										<div className="flex gap-2 mb-2">
 											<Typography className="text-gray-900">
-												あなたの回答:
+												あなたの解答:
 											</Typography>
 											<Typography
 												className={
@@ -336,6 +387,26 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 				);
 			})}
 
+			{/* 保存中のステータス表示 */}
+			{saving && (
+				<div className="flex items-center mb-4">
+					<Spinner className="h-6 w-6" />
+					<span className="ml-2">回答を保存中...</span>
+				</div>
+			)}
+			{/* 保存エラー表示 */}
+			{saveError && (
+				<Alert color="red" className="mb-4">
+					{saveError}
+				</Alert>
+			)}
+			{/* 保存成功表示 */}
+			{success && (
+				<Alert color="green" className="mb-4">
+					回答が正常に保存されました。
+				</Alert>
+			)}
+
 			<div className="flex justify-between items-center mt-6">
 				{showResults ? (
 					<div className="w-full flex justify-between items-center">
@@ -355,14 +426,16 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 					</div>
 				) : (
 					<Button
+						// 非同期にして保存中はボタンを無効化
 						onClick={handleSubmit}
 						disabled={
-							Object.keys(selectedAnswers).length !== displayQuestions.length
+							Object.keys(selectedAnswers).length !== displayQuestions.length ||
+							saving
 						}
 						color="blue"
 						className="ml-auto"
 					>
-						回答を確認する
+						正解を確認する
 					</Button>
 				)}
 			</div>

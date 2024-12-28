@@ -130,6 +130,14 @@ export default function NavBar() {
 						AI練習問題リスト
 					</ListItem>
 				</Link>
+				<Link href="/ai-exercise/select-answers">
+					<ListItem>
+						<ListItemPrefix>
+							<ListBulletIcon className="h-5 w-5" />
+						</ListItemPrefix>
+						解答リスト
+					</ListItem>
+				</Link>
 
 				{/* Grouped navigation items */}
 				{navigationGroups.map((group) => (
