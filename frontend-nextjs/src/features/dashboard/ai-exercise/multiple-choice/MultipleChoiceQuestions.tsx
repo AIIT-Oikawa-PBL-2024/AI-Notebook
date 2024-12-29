@@ -482,13 +482,15 @@ export const MultipleChoiceQuestions = () => {
 							スコア: {getScore()} / {displayQuestions.length}
 						</Typography>
 						<div className="flex gap-4">
-							<Button onClick={handleSimilarQuestions} color="deep-orange">
-								不正解の類似問題を生成
-							</Button>
 							{!retryMode && getScore() !== questions.length && (
-								<Button onClick={handleRetryIncorrect} color="amber">
-									不正解のみやり直す
-								</Button>
+								<>
+									<Button onClick={handleSimilarQuestions} color="deep-orange">
+										不正解の類似問題を生成
+									</Button>
+									<Button onClick={handleRetryIncorrect} color="amber">
+										不正解のみやり直す
+									</Button>
+								</>
 							)}
 							<Button onClick={handleReset} color="blue">
 								{retryMode ? "最初からやり直す" : "もう一度挑戦する"}
