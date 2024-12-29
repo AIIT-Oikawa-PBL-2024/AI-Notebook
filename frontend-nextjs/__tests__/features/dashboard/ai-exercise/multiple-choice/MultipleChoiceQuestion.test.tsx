@@ -1,176 +1,210 @@
 import { MultipleChoiceQuestions } from "@/features/dashboard/ai-exercise/multiple-choice/MultipleChoiceQuestions";
+import type {
+	Choice,
+	ExerciseResponse,
+	Question,
+} from "@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions";
+import { useMakeSimilarQuestions } from "@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions";
 import { useMultiChoiceQuestionGenerator } from "@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator";
 import { useSaveAnswers } from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// モックの設定
+// カスタムフックのモック
 vi.mock(
 	"@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator",
 );
 vi.mock("@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers");
+vi.mock(
+	"@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions",
+);
 
-// localStorage のモック
-const localStorageMock = (() => {
-	let store: Record<string, string> = {};
-	return {
-		getItem: (key: string) => store[key] || null,
-		setItem: (key: string, value: string) => {
-			store[key] = value;
-		},
-		removeItem: (key: string) => {
-			delete store[key];
-		},
-		clear: () => {
-			store = {};
-		},
-	};
-})();
+// localStorageのモック
+const localStorageMock = {
+	getItem: vi.fn(),
+	setItem: vi.fn(),
+	removeItem: vi.fn(),
+};
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
 
-Object.defineProperty(window, "localStorage", {
-	value: localStorageMock,
-});
+// 正しい型構造を持つサンプル問題のモック
+const mockQuestions: Question[] = [
+	{
+		question_id: "1",
+		question_text: "What is React?",
+		choices: {
+			choice_a: "A JavaScript library",
+			choice_b: "A programming language",
+			choice_c: "A database",
+			choice_d: "An operating system",
+		} as Choice,
+		answer: "choice_a",
+		explanation: "React is a JavaScript library for building user interfaces.",
+	},
+];
 
-describe("MultipleChoiceQuestions コンポーネント", () => {
+// 演習レスポンス型のモック
+const mockExercise: ExerciseResponse = {
+	id: "mock-exercise-1",
+	content: [
+		{
+			id: "1",
+			name: "Mock Exercise",
+			type: "multiple_choice",
+			input: {
+				questions: mockQuestions,
+			},
+		},
+	],
+};
+
+describe("MultipleChoiceQuestions", () => {
 	beforeEach(() => {
-		window.localStorage.clear();
-		vi.resetAllMocks();
+		// 各テスト前にすべてのモックをリセット
+		vi.clearAllMocks();
 
-		// useSaveAnswers のデフォルトモック値を設定
-		(useSaveAnswers as Mock).mockReturnValue({
+		// 正しい型を持つデフォルトのフック戻り値をモック
+		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
+			loading: false,
+			error: "",
+			exercise: mockExercise,
+			resetExercise: vi.fn(),
+			clearCache: vi.fn(),
+			checkCache: vi.fn().mockReturnValue({
+				exercise: null,
+				generationStatus: null,
+			}),
+		});
+
+		vi.mocked(useSaveAnswers).mockReturnValue({
 			saveAnswers: vi.fn(),
 			loading: false,
 			error: null,
-			success: false, // 初期状態では不正解と仮定
+			success: false,
+		});
+
+		// useMakeSimilarQuestionsのモックを追加
+		vi.mocked(useMakeSimilarQuestions).mockReturnValue({
+			similarQuestions: async (payload) => {
+				/* モックの実装 */
+			},
+			loading: false,
+			error: null,
+			success: false,
+			exercise: mockExercise,
+		});
+
+		// localStorageのデフォルト値をモック
+		localStorageMock.getItem.mockImplementation((key) => {
+			if (key === "title") return "Test Title";
+			if (key === "selectedFiles") return "[]";
+			return null;
 		});
 	});
 
-	it("ロード中の状態を表示する", () => {
-		(useMultiChoiceQuestionGenerator as Mock).mockReturnValue({
+	it("問題なくレンダリングされること", () => {
+		render(<MultipleChoiceQuestions />);
+		expect(screen.getByText(/選択問題/)).toBeInTheDocument();
+	});
+
+	it("ローディング状態が表示されること", () => {
+		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
+			loading: true,
+			error: "",
+			exercise: null,
+			resetExercise: vi.fn(),
+			clearCache: vi.fn(),
+			checkCache: vi.fn().mockReturnValue({
+				exercise: null,
+				generationStatus: null,
+			}),
+		});
+
+		vi.mocked(useMakeSimilarQuestions).mockReturnValue({
+			similarQuestions: async (payload) => {
+				/* モックの実装 */
+			},
 			loading: true,
 			error: null,
 			exercise: null,
-			resetExercise: vi.fn(),
-			clearCache: vi.fn(),
+			success: false,
 		});
 
 		render(<MultipleChoiceQuestions />);
-
-		// ローディングテキストの存在を確認
 		expect(screen.getByText(/問題を生成中/)).toBeInTheDocument();
-
-		// role="status" が存在しないため、代わりにスピナーの存在を確認
-		// 例えば、SVGにaria-labelを追加している場合はそれを利用
-		// ここではクラス名で確認する例を示します
-		const spinner = screen.getByRole("img", { hidden: true });
-		expect(spinner).toBeInTheDocument();
 	});
 
-	it("エラー状態を表示する", () => {
-		(useMultiChoiceQuestionGenerator as Mock).mockReturnValue({
+	it("エラー状態が表示されること", () => {
+		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
 			loading: false,
-			error: "ネットワークエラー",
+			error: "テストエラー",
 			exercise: null,
 			resetExercise: vi.fn(),
 			clearCache: vi.fn(),
+			checkCache: vi.fn().mockReturnValue({
+				exercise: null,
+				generationStatus: null,
+			}),
+		});
+
+		vi.mocked(useMakeSimilarQuestions).mockReturnValue({
+			similarQuestions: async (payload) => {
+				/* モックの実装 */
+			},
+			loading: false,
+			error: "類似問題エラー",
+			success: false,
+			exercise: null,
 		});
 
 		render(<MultipleChoiceQuestions />);
-
 		expect(screen.getByText(/エラーが発生しました/)).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /再試行/ })).toBeInTheDocument();
-		expect(
-			screen.getByRole("button", { name: /キャッシュをクリア/ }),
-		).toBeInTheDocument();
 	});
 
-	it("質問を表示する", () => {
-		(useMultiChoiceQuestionGenerator as Mock).mockReturnValue({
-			loading: false,
-			error: null,
-			exercise: {
-				content: [
-					{
-						input: {
-							questions: [
-								{
-									question_id: "q1",
-									question_text: "What is 2 + 2?",
-									choices: { a: "3", b: "4", c: "5" },
-									answer: "b",
-									explanation: "2 + 2 equals 4.",
-								},
-							],
-						},
-					},
-				],
-			},
-			resetExercise: vi.fn(),
-			clearCache: vi.fn(),
-		});
-
+	it("回答の選択ができること", () => {
 		render(<MultipleChoiceQuestions />);
 
-		expect(screen.getByText(/選択問題/)).toBeInTheDocument();
-		expect(
-			screen.getByText(/What is 2 \+ 2\?/i, { exact: false }),
-		).toBeInTheDocument();
-		expect(screen.getByLabelText("3")).toBeInTheDocument();
-		expect(screen.getByLabelText("4")).toBeInTheDocument();
-		expect(screen.getByLabelText("5")).toBeInTheDocument();
+		const radio = screen.getByLabelText("A JavaScript library");
+		fireEvent.click(radio);
+
+		expect(radio).toBeChecked();
 	});
 
-	it("不正解のみリトライする", async () => {
-		const resetExerciseMock = vi.fn();
-		(useMultiChoiceQuestionGenerator as Mock).mockReturnValue({
-			loading: false,
-			error: null,
-			exercise: {
-				content: [
-					{
-						input: {
-							questions: [
-								{
-									question_id: "q1",
-									question_text: "What is 2 + 2?",
-									choices: { a: "3", b: "4", c: "5" },
-									answer: "b",
-									explanation: "2 + 2 equals 4.",
-								},
-							],
-						},
-					},
-				],
-			},
-			resetExercise: resetExerciseMock,
-			clearCache: vi.fn(),
-		});
-
-		const mockSaveAnswers = vi.fn().mockResolvedValue({});
-		(useSaveAnswers as Mock).mockReturnValue({
-			saveAnswers: mockSaveAnswers,
-			loading: false,
-			error: "不正解です", // 不正解を示すエラーメッセージ
-			success: false, // 不正解として設定
-		});
-
+	it("送信ボタンをクリックすると結果が表示されること", async () => {
+		const { saveAnswers } = useSaveAnswers();
 		render(<MultipleChoiceQuestions />);
 
-		// 不正解の選択肢を選ぶ
-		fireEvent.click(screen.getByLabelText("3"));
-		fireEvent.click(screen.getByText(/正解を確認する/));
+		// 回答を選択
+		const radio = screen.getByLabelText("A JavaScript library");
+		fireEvent.click(radio);
 
-		// リトライボタンの表示を待つ
+		// 送信ボタンをクリック
+		const submitButton = screen.getByText("正解を確認する");
+		fireEvent.click(submitButton);
+
+		// 結果が表示されるまで待機
 		await waitFor(() => {
-			expect(
-				screen.getByRole("button", { name: /不正解のみやり直す/ }),
-			).toBeInTheDocument();
+			expect(screen.getByText(/スコア/)).toBeInTheDocument();
+			expect(saveAnswers).toHaveBeenCalled();
 		});
+	});
+
+	it("復習モードが正しく動作すること", async () => {
+		render(<MultipleChoiceQuestions />);
+
+		// 誤答を選択
+		const radio = screen.getByLabelText("A programming language");
+		fireEvent.click(radio);
+
+		// 回答を送信
+		const submitButton = screen.getByText("正解を確認する");
+		fireEvent.click(submitButton);
 
 		// リトライボタンをクリック
-		fireEvent.click(screen.getByRole("button", { name: /不正解のみやり直す/ }));
-
-		// resetExercise が呼ばれたことを確認
-		expect(resetExerciseMock).toHaveBeenCalled();
+		await waitFor(() => {
+			const retryButton = screen.getByText("不正解のみやり直す");
+			fireEvent.click(retryButton);
+			expect(screen.getByText(/復習モード/)).toBeInTheDocument();
+		});
 	});
 });

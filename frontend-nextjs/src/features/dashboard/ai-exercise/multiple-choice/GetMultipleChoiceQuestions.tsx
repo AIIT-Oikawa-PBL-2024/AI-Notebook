@@ -1,13 +1,9 @@
 "use client";
 
+import { Toaster } from "@/components/elements/Toaster";
 import { useGetMultiChoiceQuestion } from "@/features/dashboard/ai-exercise/multiple-choice/useGetMultiChoiceQuestion";
-
+import { useMakeSimilarQuestions } from "@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions";
 import { useSaveAnswers } from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
-import type {
-	AnswerResponseData,
-	SaveAnswerPayload,
-} from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
-
 import {
 	Alert,
 	Button,
@@ -17,7 +13,7 @@ import {
 	Spinner,
 	Typography,
 } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const ANSWERS_STORAGE_KEY = "cached_answers";
 const RESULTS_STORAGE_KEY = "cached_results_state";
@@ -26,29 +22,46 @@ type ResultState = {
 	showResults: boolean;
 	retryMode: boolean;
 	skippedQuestions: string[];
+	showingSimilarQuestions: boolean;
 };
 
 interface Props {
 	exerciseId?: string;
 }
 
+interface RelatedFile {
+	file_name: string;
+	file_size: number;
+	id: number;
+	user_id: string;
+	created_at: string;
+}
+
 export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 	const {
-		loading,
-		error,
-		exercise,
-		parsedResponse,
+		loading: originalLoading,
+		error: originalError,
+		exercise: originalExercise,
+		parsedResponse: originalParsedResponse,
 		resetExercise,
 		clearCache,
 	} = useGetMultiChoiceQuestion(exerciseId);
 
-	// 解答保存フックを呼び出す
+	const {
+		similarQuestions,
+		loading: similarLoading,
+		error: similarError,
+		exercise: similarExercise,
+	} = useMakeSimilarQuestions();
+
 	const {
 		saveAnswers,
-		loading: saving, // 保存中ステータス
-		error: saveError, // 保存エラー
-		success, // 保存成功ステータス
+		loading: saving,
+		error: saveError,
+		success,
 	} = useSaveAnswers();
+
+	const [similarQuestionsLoading, setSimilarQuestionsLoading] = useState(false);
 
 	const [selectedAnswers, setSelectedAnswers] = useState<
 		Record<string, string>
@@ -68,17 +81,45 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 				: {
 						showResults: false,
 						retryMode: false,
-						skippedQuestions: [] as string[],
+						skippedQuestions: [],
+						showingSimilarQuestions: false,
 					};
 		}
 		return {
 			showResults: false,
 			retryMode: false,
-			skippedQuestions: [] as string[],
+			skippedQuestions: [],
+			showingSimilarQuestions: false,
 		};
 	});
 
-	const { showResults, retryMode, skippedQuestions } = resultState;
+	const { showResults, retryMode, skippedQuestions, showingSimilarQuestions } =
+		resultState;
+
+	const loading = originalLoading || similarLoading;
+	const error = originalError || similarError;
+	const exercise = showingSimilarQuestions ? similarExercise : originalExercise;
+	const parsedResponse = showingSimilarQuestions
+		? similarExercise
+		: originalParsedResponse;
+
+	useEffect(() => {
+		if (success) {
+			Toaster({
+				message: "解答が正常に保存されました。",
+				type: "success",
+			});
+		}
+	}, [success]);
+
+	useEffect(() => {
+		if (saveError) {
+			Toaster({
+				message: "解答の保存中にエラーが発生しました",
+				type: "warning",
+			});
+		}
+	}, [saveError]);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -95,14 +136,23 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 		}
 	}, [resultState]);
 
-	if (loading) {
+	useEffect(() => {
+		console.log(
+			"コンポーネントマウント時の selectedFiles:",
+			localStorage.getItem("selectedFiles"),
+		);
+	}, []);
+
+	if (loading || similarQuestionsLoading) {
 		return (
 			<div
 				className="flex h-screen items-center justify-center"
 				aria-live="polite"
 			>
 				<Spinner className="h-8 w-8" aria-label="Loading spinner" role="img" />
-				<span className="ml-2">問題を生成中...</span>
+				<span className="ml-2">
+					{similarQuestionsLoading ? "類似問題を生成中..." : "問題を生成中..."}
+				</span>
 			</div>
 		);
 	}
@@ -148,7 +198,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 	}
 
 	const questions = parsedResponse.content[0].input.questions;
-	const title = exercise.title;
+	const title = "title" in exercise ? exercise.title : undefined;
 
 	const clearAnswerCache = () => {
 		localStorage.removeItem(ANSWERS_STORAGE_KEY);
@@ -158,6 +208,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 			showResults: false,
 			retryMode: false,
 			skippedQuestions: [],
+			showingSimilarQuestions: false,
 		});
 	};
 
@@ -168,19 +219,75 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 		}));
 	};
 
-	// 非同期関数にしてバックエンドにデータを送信
+	const handleGenerateSimilarQuestions = async () => {
+		const incorrectResponses = questions
+			.filter(
+				(question) => selectedAnswers[question.question_id] !== question.answer,
+			)
+			.map((question) => ({
+				question_id: question.question_id,
+				question_text: question.question_text,
+				choices: question.choices,
+				user_selected_choice: selectedAnswers[question.question_id],
+				correct_choice: question.answer,
+				is_correct: false,
+				explanation: question.explanation,
+			}));
+
+		if (incorrectResponses.length === 0) {
+			Toaster({
+				message: "不正解の問題がありません。",
+				type: "warning",
+			});
+			return;
+		}
+
+		setSimilarQuestionsLoading(true);
+		try {
+			// 元の問題のタイトルを使用（ない場合は空文字）
+			const originalTitle = "title" in exercise ? exercise.title : "";
+			// タイトルに「（類似問題）」を付加
+			const similarTitle = `${originalTitle}（類似問題）`;
+
+			// 元の問題の関連ファイルを使用
+			const relatedFiles =
+				typeof window !== "undefined"
+					? JSON.parse(localStorage.getItem("selectedFiles") || "[]")
+					: [];
+
+			const payload = {
+				title: similarTitle,
+				relatedFiles: relatedFiles.map((file: RelatedFile) => file.file_name),
+				responses: incorrectResponses,
+			};
+
+			await similarQuestions(payload);
+			setResultState((prev) => ({
+				...prev,
+				showingSimilarQuestions: true,
+				showResults: false,
+			}));
+			setSelectedAnswers({});
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		} catch (error) {
+			Toaster({
+				message: "類似問題の生成中にエラーが発生しました",
+				type: "error",
+			});
+		} finally {
+			setSimilarQuestionsLoading(false);
+		}
+	};
+
 	const handleSubmit = async () => {
-		// 解答を確認モードにする
 		setResultState((prev) => ({
 			...prev,
 			showResults: true,
 		}));
 
-		// 解答送信時にページトップへスムーズにスクロール
 		window.scrollTo({ top: 0, behavior: "smooth" });
 
-		// 送信する回答データを整形
-		const responses: AnswerResponseData[] = questions.map((question) => {
+		const responses = questions.map((question) => {
 			const userChoice = selectedAnswers[question.question_id];
 			const isCorrect = userChoice === question.answer;
 			return {
@@ -190,25 +297,35 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 				user_selected_choice: userChoice,
 				correct_choice: question.answer,
 				is_correct: isCorrect,
-				explanation: question.explanation, // 解説
+				explanation: question.explanation,
 			};
 		});
 
-		// 必要に応じて関連するファイルIDなどを取得（なければ空配列などでOK）
+		// ローカルストレージから直接titleとrelatedFilesを取得
+		const savedTitle = localStorage.getItem("title");
+		// 元の問題の関連ファイルを使用
 		const relatedFiles =
 			typeof window !== "undefined"
 				? JSON.parse(localStorage.getItem("selectedFiles") || "[]")
 				: [];
+		console.log("取得した relatedFiles:", relatedFiles);
+		console.log(
+			"localStorage の selectedFiles:",
+			localStorage.getItem("selectedFiles"),
+		);
 
-		// 保存用のペイロードを作成
-		const payload: SaveAnswerPayload = {
-			title: title ?? "",
-			relatedFiles,
-			responses,
+		const payload = {
+			title: savedTitle || "",
+			relatedFiles: relatedFiles.map((file: RelatedFile) => file.file_name),
+			responses: responses,
 		};
 
-		// バックエンドに解答を保存
-		await saveAnswers(payload);
+		console.log("送信するペイロード:", payload);
+		try {
+			await saveAnswers(payload);
+		} catch (error) {
+			console.error("保存時のエラー詳細:", error);
+		}
 	};
 
 	const handleReset = () => {
@@ -228,8 +345,9 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 			showResults: false,
 			retryMode: true,
 			skippedQuestions: correctQuestions,
+			showingSimilarQuestions: false,
 		});
-		resetExercise(); // ここで resetExercise を呼び出す
+		resetExercise();
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
@@ -257,7 +375,9 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 		<div className="container mx-auto p-4 max-w-4xl">
 			<div className="flex flex-col items-center mb-6">
 				<Typography variant="h2" className="text-center">
-					選択問題{retryMode ? "（復習モード）" : ""}
+					選択問題
+					{retryMode ? "（復習モード）" : ""}
+					{showingSimilarQuestions ? "（類似問題）" : ""}
 				</Typography>
 				{title && (
 					<Typography variant="h4" className="text-gray-700 mt-2">
@@ -297,11 +417,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 														<span
 															className={
 																showResults
-																	? `${
-																			isCorrectAnswer
-																				? "text-green-700 font-semibold"
-																				: ""
-																		} ${
+																	? `${isCorrectAnswer ? "text-green-700 font-semibold" : ""} ${
 																			isUserChoice
 																				? "font-semibold text-gray-900"
 																				: "text-gray-600"
@@ -370,9 +486,7 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 										</div>
 										<Typography
 											variant="h6"
-											className={`mb-2 ${
-												isCorrect ? "text-blue-900" : "text-red-900"
-											}`}
+											className={`mb-2 ${isCorrect ? "text-blue-900" : "text-red-900"}`}
 										>
 											解説:
 										</Typography>
@@ -387,24 +501,11 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 				);
 			})}
 
-			{/* 保存中のステータス表示 */}
 			{saving && (
 				<div className="flex items-center mb-4">
 					<Spinner className="h-6 w-6" />
-					<span className="ml-2">回答を保存中...</span>
+					<span className="ml-2">解答を保存中...</span>
 				</div>
-			)}
-			{/* 保存エラー表示 */}
-			{saveError && (
-				<Alert color="red" className="mb-4">
-					{saveError}
-				</Alert>
-			)}
-			{/* 保存成功表示 */}
-			{success && (
-				<Alert color="green" className="mb-4">
-					回答が正常に保存されました。
-				</Alert>
 			)}
 
 			<div className="flex justify-between items-center mt-6">
@@ -414,11 +515,21 @@ export const GetMultipleChoiceQuestions = ({ exerciseId }: Props) => {
 							スコア: {getScore()} / {displayQuestions.length}
 						</Typography>
 						<div className="flex gap-4">
-							{!retryMode && getScore() !== questions.length && (
-								<Button onClick={handleRetryIncorrect} color="amber">
-									不正解のみやり直す
-								</Button>
-							)}
+							{!retryMode &&
+								!showingSimilarQuestions &&
+								getScore() !== questions.length && (
+									<>
+										<Button
+											onClick={handleGenerateSimilarQuestions}
+											color="deep-orange"
+										>
+											不正解の類似問題を生成
+										</Button>
+										<Button onClick={handleRetryIncorrect} color="amber">
+											不正解のみやり直す
+										</Button>
+									</>
+								)}
 							<Button onClick={handleReset} color="blue">
 								{retryMode ? "最初からやり直す" : "もう一度挑戦する"}
 							</Button>

@@ -218,6 +218,8 @@ export default function ExerciseSelectComponent() {
 		switch (type) {
 			case "multiple_choice":
 				return "選択問題";
+			case "similar_multiple_choice":
+				return "類似選択問題";
 			case "stream":
 				return "総合問題";
 			case "essay_question":
@@ -247,6 +249,26 @@ export default function ExerciseSelectComponent() {
 			return;
 		}
 
+		console.log(
+			"保存前の selectedFiles:",
+			localStorage.getItem("selectedFiles"),
+		);
+		console.log("選択された Exercise:", selectedExercise);
+		console.log("選択された Exercise の files:", selectedExercise.files);
+
+		// タイトルと関連ファイルを保存
+		localStorage.setItem("title", selectedExercise.title);
+		localStorage.setItem(
+			"selectedFiles",
+			JSON.stringify(selectedExercise.files),
+		);
+
+		console.log(
+			"保存後の selectedFiles:",
+			localStorage.getItem("selectedFiles"),
+		);
+		console.log("保存後の title:", localStorage.getItem("title"));
+
 		// ローカルストレージから特定のキーを削除
 		for (const key of STORAGE_KEYS_TO_CLEAR) {
 			localStorage.removeItem(key);
@@ -255,6 +277,9 @@ export default function ExerciseSelectComponent() {
 		// 選択されたエクササイズのタイプに応じてルーティング
 		switch (selectedExercise.exercise_type) {
 			case "multiple_choice":
+				router.push(`/ai-exercise/multiple-choice/${selectedExerciseId}`);
+				break;
+			case "similar_multiple_choice":
 				router.push(`/ai-exercise/multiple-choice/${selectedExerciseId}`);
 				break;
 			case "stream":

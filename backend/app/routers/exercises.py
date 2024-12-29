@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.cruds.exercises as exercises_cruds
 import app.models.exercises as exercises_models
+import app.schemas.answers as answers_schemas
 import app.schemas.exercises as exercises_schemas
 import app.schemas.exercises_user_answer as exercises_user_answer_schemas
 from app.cruds.files import get_file_id_by_name_and_userid
@@ -21,7 +22,10 @@ from app.database import get_db
 from app.models.exercises_files import exercise_file
 from app.utils.claude_request_stream import generate_content_stream
 from app.utils.essay_question import generate_essay_json
-from app.utils.multiple_choice_question import generate_content_json
+from app.utils.multiple_choice_question import (
+    generate_content_json,
+    generate_similar_questions_json,
+)
 from app.utils.user_answer import generate_scoring_result_json
 from app.utils.user_auth import get_uid
 
@@ -644,3 +648,152 @@ async def create_user_answer(
             status_code=500,
             detail="ユーザーの回答作成中にエラーが発生しました。システム管理者に連絡してください。",
         ) from e
+
+
+@router.post("/similar_multiple_choice_question")
+async def request_similar_question_json(
+    request: answers_schemas.SaveAnswerPayload,
+    uid: str = Depends(get_uid),
+    db: AsyncSession = db_dependency,
+) -> dict:
+    """ユーザーの解答データと関連ファイルから類似問題を生成するエンドポイント
+
+    類似問題の生成と保存を行い、生成された問題をJSON形式で返します。
+
+    :param request: 問題集のタイトル、関連ファイル、ユーザーの解答データを含むペイロード
+    :type request: answers_schemas.SaveAnswerPayload
+    :param uid: ユーザーID
+    :type uid: str
+    :param db: データベースセッション
+    :type db: AsyncSession
+    :returns: 生成された類似問題のデータ
+    :rtype: dict
+    :raises HTTPException: 以下の場合にエラーを発生させます
+        - 404: 指定されたファイルが見つからない場合
+        - 400: ファイル名の形式が無効な場合
+        - 500: データベース操作やコンテンツ生成でエラーが発生した場合
+
+    :Example:
+
+    >>> request_payload = {
+    ...     "title": "第1回確認テスト",
+    ...     "relatedFiles": ["file1.pdf", "file2.pdf"],
+    ...     "responses": [
+    ...         {
+    ...             "question_id": "q1",
+    ...             "question_text": "問題文...",
+    ...             "choices": {
+    ...                 "choice_a": "選択肢A",
+    ...                 "choice_b": "選択肢B",
+    ...                 "choice_c": "選択肢C",
+    ...                 "choice_d": "選択肢D"
+    ...             },
+    ...             "user_selected_choice": "A",
+    ...             "correct_choice": "C",
+    ...             "is_correct": false,
+    ...             "explanation": "解説文..."
+    ...         }
+    ...     ]
+    ... }
+    """
+    logging.info(f"Requesting content generation for files: {request.relatedFiles}")
+
+    # ユーザーIDとファイル名から関連するファイルIDを取得
+    file_ids = []
+    missing_files = []
+
+    for file_name in request.relatedFiles:  # files から relatedFiles に変更
+        try:
+            logging.info(f"Attempting to retrieve file ID for file_name: {file_name}")
+            file_id = await get_file_id_by_name_and_userid(db, file_name, uid)
+            if file_id is None:
+                logging.warning(
+                    f"File not found in database for file_name: {file_name} and user_id: {uid}"
+                )
+                missing_files.append(file_name)
+            else:
+                logging.info(f"Found file ID: {file_id} for file_name: {file_name}")
+                file_ids.append(file_id)
+        except Exception as e:
+            logging.error(f"Error retrieving file ID for file_name: {file_name}: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="データベースからファイル情報を取得する際にエラーが発生しました。",
+            ) from e
+
+    if missing_files:
+        raise HTTPException(
+            status_code=404,
+            detail="指定されたファイルの一部がデータベースに存在しません:"
+            + f" {', '.join(missing_files)}",
+        )
+
+    try:
+        # Convert responses to list of strings format
+        responses_list = [json.dumps(response.model_dump()) for response in request.responses]
+        response = await generate_similar_questions_json(
+            files=request.relatedFiles,
+            uid=uid,
+            title=request.title,
+            answers=responses_list,
+        )
+        logging.info(f"Generated response: {response}")
+    except NotFound as e:
+        logging.error(f"File not found in Google Cloud Storage: {e}")
+        raise HTTPException(
+            status_code=404,
+            detail="指定されたファイルがGoogle Cloud Storageに見つかりません。"
+            + "ファイル名を再確認してください。",
+        ) from e
+    except InvalidArgument as e:
+        logging.error(f"Invalid argument: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="ファイル名の形式が無効です。有効なファイル名を指定してください。",
+        ) from e
+    except GoogleAPIError as e:
+        logging.error(f"Google API error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Google APIからエラーが返されました。システム管理者に連絡してください。",
+        ) from e
+    except Exception as e:
+        logging.error(f"Error generating content: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="コンテンツの生成中に予期せぬエラーが発生しました。システム管理者に連絡してください。",
+        ) from e
+
+    if response:
+        try:
+            logging.info("Saving final content to database.")
+            # Exerciseインスタンスを作成し、exerciseファイルの関連付けは直接行う
+            exercise = exercises_models.Exercise(
+                title=request.title,
+                response=json.dumps(response),
+                user_id=uid,
+                created_at=datetime.now(JST),
+                exercise_type="similar_multiple_choice",
+            )
+
+            db.add(exercise)
+            await db.flush()
+
+            # 中間テーブルへの関連付けを追加
+            for file_id in file_ids:
+                await db.execute(
+                    insert(exercise_file).values(exercise_id=exercise.id, file_id=file_id)
+                )
+
+            await db.commit()
+            await db.refresh(exercise)
+            logging.info(f"Exercise saved to database with ID: {exercise.id}")
+
+        except Exception as e:
+            logging.error(f"Error saving exercise to database: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="コンテンツをデータベースに保存中にエラーが発生しました。システム管理者に連絡してください。",
+            ) from e
+
+    return response
