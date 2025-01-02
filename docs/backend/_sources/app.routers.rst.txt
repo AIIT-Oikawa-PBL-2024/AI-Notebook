@@ -4,6 +4,14 @@ app.routers package
 Submodules
 ----------
 
+app.routers.answers module
+--------------------------
+
+.. automodule:: app.routers.answers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.routers.exercises module
 ----------------------------
 

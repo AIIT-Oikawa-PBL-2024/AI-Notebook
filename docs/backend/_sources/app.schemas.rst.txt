@@ -4,6 +4,14 @@ app.schemas package
 Submodules
 ----------
 
+app.schemas.answers module
+--------------------------
+
+.. automodule:: app.schemas.answers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 app.schemas.exercises module
 ----------------------------
 
