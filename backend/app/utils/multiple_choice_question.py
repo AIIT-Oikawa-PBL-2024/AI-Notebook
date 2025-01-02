@@ -47,12 +47,12 @@ description = """
 - 重要なキーワードや概念を理解・記憶できる良問を心がけてください。
 - 問題のフォーマットは以下の形式に従ってください：
   question_[番号]: 問題文
-  choice_[番号]a: 選択肢A
-  choice_[番号]b: 選択肢B
-  choice_[番号]c: 選択肢C
-  choice_[番号]d: 選択肢D
-  answer_[番号]: 正解の選択肢
-  explanation_[番号]: 解説
+  choice_a: 選択肢A
+  choice_b: 選択肢B
+  choice_c: 選択肢C
+  choice_d: 選択肢D
+  answer: 正解の選択肢
+  explanation: 解説
 </rule>
 """
 
@@ -298,6 +298,168 @@ async def generate_content_json(
             {
                 "type": "text",
                 "text": f"上記の講義テキスト{title}の内容に基づいて、"
+                + f"{tool_name}ツールを使用して問題を作成して下さい。",
+            }
+        )
+        print("Added prompt to content")
+
+        # デバッグ用にコンテンツの内容を出力
+        print("Content structure:")
+        for i, item in enumerate(content, 1):
+            if item["type"] == "text":
+                print(f"{i}. Type: text, Length: {len(item['text'])}")
+            elif item["type"] == "image":
+                image_info = item["source"]
+                print(
+                    f"{i}. Type: image, Format: {image_info['media_type']}, "
+                    + f"Size: {len(image_info['data'])//1024}KB"
+                )
+
+        response = client.messages.create(
+            max_tokens=4096,
+            temperature=0.1,
+            messages=[
+                {
+                    "role": "user",
+                    "content": content,
+                }
+            ],
+            model=model_name,
+            tools=[tool_definition],  # type: ignore
+            tool_choice={"type": "tool", "name": tool_name},
+        )
+
+        # レスポンスの検証
+        if response.content and len(response.content) > 0:
+            if response.content[0].type == "tool_use":
+                questions = response.content[0].input.get("questions", [])
+                if any("<UNKNOWN>" in str(q) for q in questions):
+                    logging.error("Invalid response received with <UNKNOWN> values")
+                    raise ValueError("Failed to generate valid questions")
+
+        print("generate_content_json finished")
+        return response.to_dict()
+
+    except AttributeError as e:
+        logging.error(f"Model attribute error: {e}")
+        print(f"AttributeError: {e}")  # デバッグ用
+        raise
+    except TypeError as e:
+        logging.error(f"Type error in model generation: {e}")
+        print(f"TypeError: {e}")  # デバッグ用
+        raise
+    except InternalServerError as e:
+        logging.error(f"Internal server error: {e}")
+        print(f"InternalServerError: {e}")  # デバッグ用
+        raise
+    except GoogleAPIError as e:
+        logging.error(f"Google API error: {e}")
+        print(f"GoogleAPIError: {e}")  # デッグ用
+        raise
+    except Exception as e:
+        logging.error(f"Unexpected error during content generation: {e}")
+        print(f"Unexpected error: {e}")  # デバッグ用
+        raise
+
+
+# ファイル情報とユーザーの解答を入力して類似問題を生成
+async def generate_similar_questions_json(
+    files: list[str],
+    uid: str,
+    title: str,
+    answers: list[str],
+    model_name: str = MODEL_NAME,
+    bucket_name: str = BUCKET_NAME,
+) -> dict:
+    print("generate_content_json started")  # デバッグ用
+
+    content: list = []
+    image_files: list[dict] = []
+
+    try:
+        client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
+
+        # 全ファイルからのテキストを結合するための変数
+        all_extracted_text = ""
+
+        for file_name in files:
+            if not uid or not uid.strip():
+                raise ValueError("Invalid user ID")
+
+            safe_uid = uid.strip().rstrip("/")
+            file_name = unicodedata.normalize("NFC", f"{safe_uid}/{file_name}")
+            print(f"Processing file: {file_name}")
+
+            if await check_file_exists(bucket_name, file_name):
+                print(f"File {file_name} exists in bucket {bucket_name}")
+
+                if file_name.lower().endswith(".pdf"):
+                    print(f"Extracting text from PDF: {file_name}")
+                    extracted_text = await extract_text_from_pdf(bucket_name, file_name)
+                    print(f"Extracted text length: {len(extracted_text)}")
+                    # テキストを結合
+                    all_extracted_text += f"\n=== {file_name} ===\n{extracted_text}"
+
+                elif file_name.lower().endswith((".png", ".jpg", ".jpeg")):
+                    print(f"Reading image file: {file_name}")
+                    image_file = await read_file(bucket_name, file_name)
+
+                    file_extension = file_name.split(".")[-1].lower()
+                    image_files.append(
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": get_media_type(file_extension),
+                                "data": image_file,
+                            },
+                        }
+                    )
+
+                    print(f"Added image file: {file_name} to image_files")
+
+                elif file_name.lower().endswith(".mp4"):
+                    logging.info(f"Converting {file_name} to mp3 format.")
+                    if convert_mp4_to_mp3(bucket_name, file_name):
+                        print(f"Successfully converted {file_name} to mp3 format.")
+                        audio_text = extract_text_from_audio(bucket_name, file_name)
+                        all_extracted_text += f"\n=== {file_name} ===\n{audio_text}"
+                    else:
+                        logging.error(f"Failed to convert {file_name} to mp3 format.")
+                        raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
+
+                elif file_name.lower().endswith((".mp3", ".wav")):
+                    audio_text = extract_text_from_audio(bucket_name, file_name)
+                    all_extracted_text += f"\n=== {file_name} ===\n{audio_text}"
+
+        # まず抽出したテキストをコンテンツに追加
+        if all_extracted_text:
+            content.append({"type": "text", "text": f"講義テキスト:\n{all_extracted_text}"})
+            print(f"Added extracted text to content (length: {len(all_extracted_text)})")
+
+        # 画像ファイルを追加
+        if image_files:
+            for i, image in enumerate(image_files, 1):
+                content.extend([{"type": "text", "text": f"Image {i}:"}, image])
+            print(f"Added {len(image_files)} images to content")
+
+        # 最後にプロンプトを追加
+        content.append(
+            {
+                "type": "text",
+                "text": f"上記の講義テキスト{title}の内容に基づいて、"
+                + (
+                    "AIが作成した選択問題、ユーザーの解答、正解、正誤、"
+                    "解説が10問分、以下に与えられています。\n"
+                )
+                + f"{answers}\n"
+                + (
+                    "ユーザーの解答が誤っている問題の分野を見つけて、"
+                    "講義テキストから類似問題を作成して下さい。"
+                )
+                + "すでにAIが作成した問題と重複しないように注意して下さい。"
+                + "ユーザーが解答を誤った苦手な分野を集中的に克服することが目的です。"
+                + "AIが作成した問題、ユーザーの解答の正誤、解説を参考にして、"
                 + f"{tool_name}ツールを使用して問題を作成して下さい。",
             }
         )

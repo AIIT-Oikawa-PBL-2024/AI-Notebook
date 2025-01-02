@@ -1,175 +1,113 @@
 import { MultipleChoiceQuestions } from "@/features/dashboard/ai-exercise/multiple-choice/MultipleChoiceQuestions";
+import type {
+	Choice,
+	ExerciseResponse,
+	Question,
+} from "@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions";
+import { useMakeSimilarQuestions } from "@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions";
+import { useMultiChoiceQuestionGenerator } from "@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator";
+import { useSaveAnswers } from "@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import "@testing-library/jest-dom";
-import { useMultiChoiceQuestionGenerator } from "@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator";
 
-// 最初にvi.mockを定義
-vi.mock("@material-tailwind/react", () => ({
-	Alert: ({ children }: { children: React.ReactNode }) => (
-		<aside>{children}</aside>
-	),
-	Button: ({
-		children,
-		onClick,
-		disabled,
-	}: {
-		children: React.ReactNode;
-		onClick?: () => void;
-		disabled?: boolean;
-	}) => (
-		<button type="button" onClick={onClick} disabled={disabled}>
-			{children}
-		</button>
-	),
-	Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-	CardBody: ({ children }: { children: React.ReactNode }) => (
-		<div>{children}</div>
-	),
-	Radio: ({
-		name,
-		value,
-		onChange,
-		disabled,
-		checked,
-		label,
-	}: {
-		name: string;
-		value: string;
-		onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-		disabled?: boolean;
-		checked: boolean;
-		label: React.ReactNode;
-	}) => (
-		<input
-			type="radio"
-			name={name}
-			value={value}
-			onChange={onChange}
-			disabled={disabled}
-			checked={checked}
-			aria-label={label?.toString()}
-		/>
-	),
-	Spinner: () => <progress />,
-	Typography: ({ children }: { children: React.ReactNode }) => (
-		<div>{children}</div>
-	),
-}));
-
+// カスタムフックのモック
 vi.mock(
 	"@/features/dashboard/ai-exercise/multiple-choice/useMultiChoiceQuestionGenerator",
-	() => ({
-		useMultiChoiceQuestionGenerator: vi.fn(),
-	}),
+);
+vi.mock("@/features/dashboard/ai-exercise/multiple-choice/useSaveAnswers");
+vi.mock(
+	"@/features/dashboard/ai-exercise/multiple-choice/useMakeSimilarQuestions",
 );
 
-// 型定義
-interface TestChoice {
-	choice_a: string;
-	choice_b: string;
-	choice_c: string;
-	choice_d: string;
-}
+// localStorageのモック
+const localStorageMock = {
+	getItem: vi.fn(),
+	setItem: vi.fn(),
+	removeItem: vi.fn(),
+};
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
 
-interface TestQuestion {
-	question_id: string;
-	question_text: string;
-	choices: TestChoice;
-	answer: string;
-	explanation: string;
-}
+// 正しい型構造を持つサンプル問題のモック
+const mockQuestions: Question[] = [
+	{
+		question_id: "1",
+		question_text: "What is React?",
+		choices: {
+			choice_a: "A JavaScript library",
+			choice_b: "A programming language",
+			choice_c: "A database",
+			choice_d: "An operating system",
+		} as Choice,
+		answer: "choice_a",
+		explanation: "React is a JavaScript library for building user interfaces.",
+	},
+];
 
-interface TestExerciseResponse {
-	id: string;
-	content: [
-		{
-			id: string;
-			name: string;
-			type: string;
-			input: {
-				questions: TestQuestion[];
-			};
-		},
-	];
-}
-
-// モックデータ
-const mockExercise: TestExerciseResponse = {
+// 演習レスポンス型のモック
+const mockExercise: ExerciseResponse = {
 	id: "mock-exercise-1",
 	content: [
 		{
-			id: "content-1",
-			name: "multiple-choice",
-			type: "exercise",
+			id: "1",
+			name: "Mock Exercise",
+			type: "multiple_choice",
 			input: {
-				questions: [
-					{
-						question_id: "1",
-						question_text: "テスト問題1",
-						choices: {
-							choice_a: "選択肢1",
-							choice_b: "選択肢2",
-							choice_c: "選択肢3",
-							choice_d: "選択肢4",
-						},
-						answer: "choice_a",
-						explanation: "この問題の解説です。",
-					},
-					{
-						question_id: "2",
-						question_text: "テスト問題2",
-						choices: {
-							choice_a: "選択肢1",
-							choice_b: "選択肢2",
-							choice_c: "選択肢3",
-							choice_d: "選択肢4",
-						},
-						answer: "choice_b",
-						explanation: "この問題の解説です。",
-					},
-				],
+				questions: mockQuestions,
 			},
 		},
 	],
 };
 
-// ローカルストレージのモック
-interface MockLocalStorage {
-	store: Record<string, string>;
-	getItem(key: string): string | null;
-	setItem(key: string, value: string): void;
-	removeItem(key: string): void;
-	clear(): void;
-}
-
-const mockLocalStorage: MockLocalStorage = {
-	store: {},
-	getItem(key: string) {
-		return this.store[key] || null;
-	},
-	setItem(key: string, value: string) {
-		this.store[key] = value;
-	},
-	removeItem(key: string) {
-		delete this.store[key];
-	},
-	clear() {
-		this.store = {};
-	},
-};
-
-Object.defineProperty(window, "localStorage", {
-	value: mockLocalStorage,
-});
-
 describe("MultipleChoiceQuestions", () => {
 	beforeEach(() => {
-		mockLocalStorage.clear();
+		// 各テスト前にすべてのモックをリセット
 		vi.clearAllMocks();
+
+		// 正しい型を持つデフォルトのフック戻り値をモック
+		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
+			loading: false,
+			error: "",
+			exercise: mockExercise,
+			resetExercise: vi.fn(),
+			clearCache: vi.fn(),
+			checkCache: vi.fn().mockReturnValue({
+				exercise: null,
+				generationStatus: null,
+			}),
+		});
+
+		vi.mocked(useSaveAnswers).mockReturnValue({
+			saveAnswers: vi.fn(),
+			loading: false,
+			error: null,
+			success: false,
+		});
+
+		// useMakeSimilarQuestionsのモックを追加
+		vi.mocked(useMakeSimilarQuestions).mockReturnValue({
+			similarQuestions: async (payload) => {
+				/* モックの実装 */
+			},
+			loading: false,
+			error: null,
+			success: false,
+			exercise: mockExercise,
+		});
+
+		// localStorageのデフォルト値をモック
+		localStorageMock.getItem.mockImplementation((key) => {
+			if (key === "title") return "Test Title";
+			if (key === "selectedFiles") return "[]";
+			return null;
+		});
 	});
 
-	it("ローディング中の表示を正しく行う", () => {
+	it("問題なくレンダリングされること", () => {
+		render(<MultipleChoiceQuestions />);
+		expect(screen.getByText(/選択問題/)).toBeInTheDocument();
+	});
+
+	it("ローディング状態が表示されること", () => {
 		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
 			loading: true,
 			error: "",
@@ -182,16 +120,24 @@ describe("MultipleChoiceQuestions", () => {
 			}),
 		});
 
+		vi.mocked(useMakeSimilarQuestions).mockReturnValue({
+			similarQuestions: async (payload) => {
+				/* モックの実装 */
+			},
+			loading: true,
+			error: null,
+			exercise: null,
+			success: false,
+		});
+
 		render(<MultipleChoiceQuestions />);
-		expect(screen.getByRole("progressbar")).toBeInTheDocument();
-		expect(screen.getByText("問題を生成中...")).toBeInTheDocument();
+		expect(screen.getByText(/問題を生成中/)).toBeInTheDocument();
 	});
 
-	it("エラー時の表示を正しく行う", () => {
-		const mockError = "テストエラー";
+	it("エラー状態が表示されること", () => {
 		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
 			loading: false,
-			error: mockError,
+			error: "テストエラー",
 			exercise: null,
 			resetExercise: vi.fn(),
 			clearCache: vi.fn(),
@@ -201,119 +147,64 @@ describe("MultipleChoiceQuestions", () => {
 			}),
 		});
 
-		render(<MultipleChoiceQuestions />);
-		expect(
-			screen.getByText(`エラーが発生しました: ${mockError}`),
-		).toBeInTheDocument();
-		expect(screen.getByText("再試行")).toBeInTheDocument();
-		expect(screen.getByText("キャッシュをクリア")).toBeInTheDocument();
-	});
-
-	it("問題が正しく表示される", () => {
-		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
+		vi.mocked(useMakeSimilarQuestions).mockReturnValue({
+			similarQuestions: async (payload) => {
+				/* モックの実装 */
+			},
 			loading: false,
-			error: "",
-			exercise: mockExercise,
-			resetExercise: vi.fn(),
-			clearCache: vi.fn(),
-			checkCache: vi.fn().mockReturnValue({
-				exercise: null,
-				generationStatus: null,
-			}),
+			error: "類似問題エラー",
+			success: false,
+			exercise: null,
 		});
 
 		render(<MultipleChoiceQuestions />);
-		// 正規表現を使用してテキストを検索
-		expect(screen.getByText(/テスト問題1$/)).toBeInTheDocument();
-		expect(screen.getByText(/テスト問題2$/)).toBeInTheDocument();
+		expect(screen.getByText(/エラーが発生しました/)).toBeInTheDocument();
 	});
 
-	it("回答を選択して提出できる", async () => {
-		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
-			loading: false,
-			error: "",
-			exercise: mockExercise,
-			resetExercise: vi.fn(),
-			clearCache: vi.fn(),
-			checkCache: vi.fn().mockReturnValue({
-				exercise: null,
-				generationStatus: null,
-			}),
-		});
-
+	it("回答の選択ができること", () => {
 		render(<MultipleChoiceQuestions />);
 
-		const radios = screen.getAllByRole("radio");
-		const question1Choice = radios[0]; // 1問目の選択肢A
-		const question2Choice = radios[5]; // 2問目の選択肢B
+		const radio = screen.getByLabelText("A JavaScript library");
+		fireEvent.click(radio);
 
-		fireEvent.click(question1Choice);
-		fireEvent.click(question2Choice);
+		expect(radio).toBeChecked();
+	});
 
-		const submitButton = screen.getByText("回答を確認する");
-		expect(submitButton).not.toBeDisabled();
+	it("送信ボタンをクリックすると結果が表示されること", async () => {
+		const { saveAnswers } = useSaveAnswers();
+		render(<MultipleChoiceQuestions />);
 
+		// 回答を選択
+		const radio = screen.getByLabelText("A JavaScript library");
+		fireEvent.click(radio);
+
+		// 送信ボタンをクリック
+		const submitButton = screen.getByText("正解を確認する");
 		fireEvent.click(submitButton);
 
+		// 結果が表示されるまで待機
 		await waitFor(() => {
-			expect(screen.getByText(/スコア: \d+ \/ \d+/)).toBeInTheDocument();
+			expect(screen.getByText(/スコア/)).toBeInTheDocument();
+			expect(saveAnswers).toHaveBeenCalled();
 		});
 	});
 
-	it("不正解のみやり直しができる", async () => {
-		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
-			loading: false,
-			error: "",
-			exercise: mockExercise,
-			resetExercise: vi.fn(),
-			clearCache: vi.fn(),
-			checkCache: vi.fn().mockReturnValue({
-				exercise: null,
-				generationStatus: null,
-			}),
-		});
-
+	it("復習モードが正しく動作すること", async () => {
 		render(<MultipleChoiceQuestions />);
 
-		const radios = screen.getAllByRole("radio");
+		// 誤答を選択
+		const radio = screen.getByLabelText("A programming language");
+		fireEvent.click(radio);
 
-		// 一問目を間違える（選択肢B）
-		fireEvent.click(radios[1]);
-		// 二問目は正解（選択肢B）
-		fireEvent.click(radios[5]);
+		// 回答を送信
+		const submitButton = screen.getByText("正解を確認する");
+		fireEvent.click(submitButton);
 
-		fireEvent.click(screen.getByText("回答を確認する"));
-
+		// リトライボタンをクリック
 		await waitFor(() => {
 			const retryButton = screen.getByText("不正解のみやり直す");
 			fireEvent.click(retryButton);
+			expect(screen.getByText(/復習モード/)).toBeInTheDocument();
 		});
-
-		expect(screen.getByText("選択問題（復習モード）")).toBeInTheDocument();
-		expect(screen.queryByText(/テスト問題2$/)).not.toBeInTheDocument();
-	});
-
-	it("ローカルストレージに回答が保存される", async () => {
-		vi.mocked(useMultiChoiceQuestionGenerator).mockReturnValue({
-			loading: false,
-			error: "",
-			exercise: mockExercise,
-			resetExercise: vi.fn(),
-			clearCache: vi.fn(),
-			checkCache: vi.fn().mockReturnValue({
-				exercise: null,
-				generationStatus: null,
-			}),
-		});
-
-		render(<MultipleChoiceQuestions />);
-
-		const radios = screen.getAllByRole("radio");
-		fireEvent.click(radios[0]); // 最初の問題の最初の選択肢を選択
-
-		const cachedAnswers = JSON.parse(
-			mockLocalStorage.getItem("cached_answers") || "{}",
-		);
-		expect(cachedAnswers).toHaveProperty("1");
 	});
 });

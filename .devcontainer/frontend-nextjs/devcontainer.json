@@ -1,4 +1,4 @@
-do{
+{
     "name": "frontend-nextjs-dev-container",
     "dockerComposeFile": "../../docker-compose.yml",
     "service": "frontend-nextjs",

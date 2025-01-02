@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, pool
 from sqlalchemy.engine import Connection
 
 from app.database import Base
+from app.models.answers import Answer  # noqa: F401
 from app.models.exercises import Exercise  # noqa: F401
 from app.models.exercises_files import exercise_file  # noqa: F401
 from app.models.exercises_user_answer import ExerciseUserAnswer  # noqa: F401

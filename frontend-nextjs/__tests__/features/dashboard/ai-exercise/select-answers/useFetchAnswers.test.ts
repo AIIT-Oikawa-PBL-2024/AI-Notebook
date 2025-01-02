@@ -1,0 +1,128 @@
+import { useFetchAnswers } from "@/features/dashboard/ai-exercise/select-answers/useFetchAnswers";
+import { renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// モックデータ
+const mockAnswers = [
+	{
+		id: 1,
+		title: "テスト回答1",
+		related_files: ["file1.pdf"],
+		question_id: "1",
+		question_text: "テスト問題1",
+		choice_a: "選択肢A",
+		choice_b: "選択肢B",
+		choice_c: "選択肢C",
+		choice_d: "選択肢D",
+		user_selected_choice: "A",
+		correct_choice: "A",
+		is_correct: true,
+		explanation: "解説テキスト",
+		user_id: "user1",
+		created_at: "2024-01-01T00:00:00Z",
+		updated_at: "2024-01-01T00:00:00Z",
+	},
+];
+
+// useAuthFetchのモック
+const mockFetch = vi.fn();
+vi.mock("@/hooks/useAuthFetch", () => ({
+	useAuthFetch: () => mockFetch,
+}));
+
+describe("useFetchAnswersのテスト", {}, () => {
+	beforeEach(() => {
+		// 各テストの前にモックをリセット
+		mockFetch.mockReset();
+	});
+
+	it("正常系: 回答データを正常に取得できる場合", async () => {
+		// モックの実装
+		mockFetch.mockResolvedValueOnce({
+			ok: true,
+			json: () => Promise.resolve(mockAnswers),
+		});
+
+		// フックをレンダリング
+		const { result } = renderHook(() => useFetchAnswers());
+
+		// 初期状態の確認
+		expect(result.current.loading).toBe(true);
+		expect(result.current.error).toBe("");
+
+		// データ取得完了まで待機
+		await waitFor(() => {
+			expect(result.current.loading).toBe(false);
+		});
+
+		// 結果の検証
+		expect(result.current.answers).toEqual(mockAnswers);
+		expect(result.current.error).toBe("");
+	});
+
+	it("異常系: APIがエラーレスポンスを返す場合", async () => {
+		// エラーレスポンスのモック
+		mockFetch.mockResolvedValueOnce({
+			ok: false,
+		});
+
+		const { result } = renderHook(() => useFetchAnswers());
+
+		await waitFor(() => {
+			expect(result.current.loading).toBe(false);
+		});
+
+		expect(result.current.error).toBe("回答データの取得に失敗しました");
+		expect(result.current.answers).toEqual([]);
+	});
+
+	it("異常系: ネットワークエラーが発生する場合", async () => {
+		// ネットワークエラーのモック
+		mockFetch.mockRejectedValueOnce(new Error("Network Error"));
+
+		const { result } = renderHook(() => useFetchAnswers());
+
+		await waitFor(() => {
+			expect(result.current.loading).toBe(false);
+		});
+
+		expect(result.current.error).toBe("Network Error");
+		expect(result.current.answers).toEqual([]);
+	});
+
+	it("refetch関数: データを再取得できることを確認", async () => {
+		// 初回取得のモック
+		mockFetch.mockResolvedValueOnce({
+			ok: true,
+			json: () => Promise.resolve(mockAnswers),
+		});
+
+		const { result } = renderHook(() => useFetchAnswers());
+
+		await waitFor(() => {
+			expect(result.current.loading).toBe(false);
+		});
+
+		// 2回目の取得のモック
+		const updatedMockAnswers = [
+			...mockAnswers,
+			{
+				...mockAnswers[0],
+				id: 2,
+				title: "テスト回答2",
+			},
+		];
+
+		mockFetch.mockResolvedValueOnce({
+			ok: true,
+			json: () => Promise.resolve(updatedMockAnswers),
+		});
+
+		// refetch関数を実行
+		result.current.refetch();
+
+		await waitFor(() => {
+			expect(result.current.answers).toEqual(updatedMockAnswers);
+		});
+	});
+});

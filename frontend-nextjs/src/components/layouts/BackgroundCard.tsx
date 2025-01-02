@@ -19,7 +19,7 @@ export function BackgroundCard() {
 				color="transparent"
 				className="absolute inset-0 m-0 h-full w-full rounded-none bg-[url('/ai-notebook2.jpg')] bg-cover bg-center"
 			>
-				<div className="to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/80 via-black/50" />
+				<div className="to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/50 via-black/30" />
 			</CardHeader>
 			<CardBody className="relative py-14 px-6 md:px-12">
 				<Typography

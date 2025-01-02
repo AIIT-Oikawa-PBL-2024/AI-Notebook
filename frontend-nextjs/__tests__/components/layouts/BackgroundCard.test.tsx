@@ -94,7 +94,7 @@ describe("BackgroundCard", () => {
 		const gradientDiv = screen.getByTestId("card-header")
 			.firstChild as HTMLElement;
 		expect(gradientDiv).toHaveClass(
-			"to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/80 via-black/50",
+			"to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/50 via-black/30",
 		);
 	});
 

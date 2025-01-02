@@ -110,6 +110,9 @@ export function useGetMultiChoiceQuestion(id?: string) {
 			);
 			const title = localStorage.getItem("title");
 
+			console.log("問題生成時の selectedFiles:", selectedFiles);
+			console.log("問題生成時の title:", title);
+
 			if (!id && (!selectedFiles || !title)) {
 				throw new Error("必要な情報が見つかりません");
 			}
@@ -175,6 +178,10 @@ export function useGetMultiChoiceQuestion(id?: string) {
 	}, [id, generateExercise]);
 
 	const clearCache = useCallback(() => {
+		console.log(
+			"キャッシュクリア前の selectedFiles:",
+			localStorage.getItem("selectedFiles"),
+		);
 		hasInitialized.current = false; // 初期化フラグをリセット
 		if (!id) {
 			localStorage.removeItem(STORAGE_KEY);
@@ -186,6 +193,10 @@ export function useGetMultiChoiceQuestion(id?: string) {
 		setLoading(true);
 		isGenerating.current = false;
 		generateExercise(); // 問題を再生成
+		console.log(
+			"キャッシュクリア後の selectedFiles:",
+			localStorage.getItem("selectedFiles"),
+		);
 	}, [id, generateExercise]);
 
 	const checkCache = useCallback(() => {

@@ -4,7 +4,7 @@ from typing import Callable, Dict
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import exercises, files, notes, outputs_stream
+from app.routers import answers, exercises, files, notes, outputs_stream
 from app.utils.user_auth import authenticate_request, get_uid
 
 # FastAPIのインスタンスを作成
@@ -23,6 +23,7 @@ app.include_router(files.router, dependencies=[Depends(get_auth_dependency())])
 app.include_router(outputs_stream.router, dependencies=[Depends(get_auth_dependency())])
 app.include_router(notes.router, dependencies=[Depends(get_auth_dependency())])
 app.include_router(exercises.router, dependencies=[Depends(get_auth_dependency())])
+app.include_router(answers.router, dependencies=[Depends(get_auth_dependency())])
 
 # CORSの設定
 app.add_middleware(
