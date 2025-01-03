@@ -30,17 +30,18 @@ vi.mock("@/hooks/useAuthFetch", () => ({
 	useAuthFetch: () => mockFetch,
 }));
 
-describe("useFetchAnswersのテスト", {}, () => {
+describe("useFetchAnswersのテスト", () => {
 	beforeEach(() => {
 		// 各テストの前にモックをリセット
 		mockFetch.mockReset();
 	});
 
 	it("正常系: 回答データを正常に取得できる場合", async () => {
-		// モックの実装
+		// モックの実装: フックが期待する形式でレスポンスを返す
 		mockFetch.mockResolvedValueOnce({
 			ok: true,
-			json: () => Promise.resolve(mockAnswers),
+			json: () =>
+				Promise.resolve({ total: mockAnswers.length, answers: mockAnswers }),
 		});
 
 		// フックをレンダリング
@@ -58,6 +59,9 @@ describe("useFetchAnswersのテスト", {}, () => {
 		// 結果の検証
 		expect(result.current.answers).toEqual(mockAnswers);
 		expect(result.current.error).toBe("");
+		expect(result.current.totalCount).toBe(mockAnswers.length);
+		expect(result.current.currentPage).toBe(1);
+		expect(result.current.totalPages).toBe(Math.ceil(mockAnswers.length / 10)); // 初期limitは10
 	});
 
 	it("異常系: APIがエラーレスポンスを返す場合", async () => {
@@ -94,7 +98,8 @@ describe("useFetchAnswersのテスト", {}, () => {
 		// 初回取得のモック
 		mockFetch.mockResolvedValueOnce({
 			ok: true,
-			json: () => Promise.resolve(mockAnswers),
+			json: () =>
+				Promise.resolve({ total: mockAnswers.length, answers: mockAnswers }),
 		});
 
 		const { result } = renderHook(() => useFetchAnswers());
@@ -103,26 +108,51 @@ describe("useFetchAnswersのテスト", {}, () => {
 			expect(result.current.loading).toBe(false);
 		});
 
-		// 2回目の取得のモック
+		// 2回目の取得のモック: 新しいデータを返す
 		const updatedMockAnswers = [
 			...mockAnswers,
 			{
-				...mockAnswers[0],
 				id: 2,
 				title: "テスト回答2",
+				related_files: ["file2.pdf"],
+				question_id: "2",
+				question_text: "テスト問題2",
+				choice_a: "選択肢A2",
+				choice_b: "選択肢B2",
+				choice_c: "選択肢C2",
+				choice_d: "選択肢D2",
+				user_selected_choice: "B",
+				correct_choice: "C",
+				is_correct: false,
+				explanation: "解説テキスト2",
+				user_id: "user1",
+				created_at: "2024-01-02T00:00:00Z",
+				updated_at: "2024-01-02T00:00:00Z",
 			},
 		];
 
 		mockFetch.mockResolvedValueOnce({
 			ok: true,
-			json: () => Promise.resolve(updatedMockAnswers),
+			json: () =>
+				Promise.resolve({
+					total: updatedMockAnswers.length,
+					answers: updatedMockAnswers,
+				}),
 		});
 
-		// refetch関数を実行
-		result.current.refetch();
+		// refetch関数を実行 (例: ページ2、limit10)
+		result.current.refetch(2, 10);
 
 		await waitFor(() => {
-			expect(result.current.answers).toEqual(updatedMockAnswers);
+			expect(result.current.loading).toBe(false);
 		});
+
+		// 結果の検証
+		expect(result.current.answers).toEqual(updatedMockAnswers);
+		expect(result.current.totalCount).toBe(updatedMockAnswers.length);
+		expect(result.current.currentPage).toBe(2);
+		expect(result.current.totalPages).toBe(
+			Math.ceil(updatedMockAnswers.length / 10),
+		);
 	});
 });

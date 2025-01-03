@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -63,13 +63,15 @@ async def save_answers_to_db(
 
 
 async def get_answers_by_user(
-    db: AsyncSession, user_id: str
+    db: AsyncSession, user_id: str, skip: int = 0, limit: int = 100
 ) -> List[answers_schemas.AnswerResponse]:
     """
-    指定されたユーザーIDに紐づく回答データを取得します。
+    指定されたユーザーIDに紐づく回答データを取得します（ページネーション対応）。
 
     :param db: SQLAlchemyの非同期セッション
     :param user_id: ユーザーID
+    :param skip: 取得をスキップする件数
+    :param limit: 取得する最大件数
     :return: 回答データのリスト
     """
     try:
@@ -77,12 +79,38 @@ async def get_answers_by_user(
             select(answers_models.Answer)
             .where(answers_models.Answer.user_id == user_id)
             .order_by(desc(answers_models.Answer.created_at))
+            .offset(skip)
+            .limit(limit)
         )
         db_answers = result.scalars().all()
-        # from_orm の代わりに model_validate を使用
         answers = [answers_schemas.AnswerResponse.model_validate(answer) for answer in db_answers]
         logger.info(f"User {user_id} の回答データを取得しました。件数: {len(answers)}")
         return answers
+    except SQLAlchemyError as e:
+        logger.error(f"データベース操作中にエラーが発生しました: {e}", exc_info=True)
+        raise
+    except Exception as e:
+        logger.error(f"予期しないエラーが発生しました: {e}", exc_info=True)
+        raise
+
+
+async def count_user_answers(db: AsyncSession, user_id: str) -> int:
+    """
+    指定されたユーザーIDに紐づく回答データの総件数を取得します。
+
+    :param db: SQLAlchemyの非同期セッション
+    :param user_id: ユーザーID
+    :return: 回答データの総件数
+    """
+    try:
+        result = await db.execute(
+            select(func.count(answers_models.Answer.id)).where(
+                answers_models.Answer.user_id == user_id
+            )
+        )
+        total_count = result.scalar_one()
+        logger.info(f"User {user_id} の回答データ総件数: {total_count}")
+        return total_count
     except SQLAlchemyError as e:
         logger.error(f"データベース操作中にエラーが発生しました: {e}", exc_info=True)
         raise

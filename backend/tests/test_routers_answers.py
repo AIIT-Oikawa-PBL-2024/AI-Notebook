@@ -141,7 +141,7 @@ async def test_get_my_answers_success(session_cleanup: AsyncSession) -> None:
 
     assert len(json_data) == 2
     # それぞれのフィールドが返ってきているかを確認
-    titles = [item["title"] for item in json_data]
+    titles = [item["title"] for item in json_data["answers"]]
     assert "Title1" in titles
     assert "Title2" in titles
 
@@ -305,7 +305,7 @@ async def test_get_my_answers_no_data(session_cleanup: AsyncSession) -> None:
     # レスポンスのアサーション
     assert response.status_code == 200
     json_data = response.json()
-    assert json_data == []  # 空リストが返されることを確認
+    assert json_data["answers"] == []  # 空リストが返されることを確認
 
 
 @pytest.mark.asyncio

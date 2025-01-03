@@ -35,7 +35,19 @@ const STORAGE_KEYS_TO_CLEAR = [
 
 export default function SelectAnswers() {
 	const router = useRouter();
-	const { answers, loading, error, refetch } = useFetchAnswers();
+
+	// ▼ ページネーション対応の State / 関数を取得
+	const {
+		answers,
+		loading,
+		error,
+		refetch,
+		// ページネーション用
+		totalCount,
+		currentPage,
+		totalPages,
+	} = useFetchAnswers();
+
 	const [selectedAnswerIds, setSelectedAnswerIds] = useState<number[]>([]);
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
@@ -57,12 +69,14 @@ export default function SelectAnswers() {
 		error: deleteError,
 	} = useDeleteAnswers();
 
+	// ▼ 1ページあたりの件数を管理
+	const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+
 	// 検索語のデバウンス処理
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearchTerm(searchTerm);
 		}, 300);
-
 		return () => clearTimeout(timer);
 	}, [searchTerm]);
 
@@ -208,13 +222,13 @@ export default function SelectAnswers() {
 				);
 			}
 			// 削除が完了したら一覧を再取得
-			refetch();
+			refetch(currentPage, itemsPerPage);
 			// 削除後は選択をリセット
 			setSelectedAnswerIds([]);
 		} catch (err) {
 			console.error(err);
 		}
-	}, [selectedAnswerIds, deleteAnswers, refetch]);
+	}, [selectedAnswerIds, deleteAnswers, refetch, currentPage, itemsPerPage]);
 
 	// コンテンツを省略する関数
 	const truncateContent = (str: string, maxLength = 100): string => {
@@ -236,6 +250,38 @@ export default function SelectAnswers() {
 		filteredAndSortedAnswers.length > 0 &&
 		selectedAnswerIds.length === filteredAndSortedAnswers.length;
 
+	// ▼ ページ切り替え
+	const handlePageChange = useCallback(
+		(newPage: number) => {
+			// 新しいページ番号が有効な数値であることを確認
+			if (Number.isNaN(newPage)) {
+				console.warn("無効なページ番号です。");
+				return;
+			}
+
+			if (newPage < 1 || (totalPages && newPage > totalPages)) {
+				console.warn("ページ番号が範囲外です。");
+				return;
+			}
+			refetch(newPage, itemsPerPage);
+		},
+		[totalPages, itemsPerPage, refetch],
+	);
+
+	// ▼ 1ページあたりの件数を変更
+	const handleItemsPerPageChange = useCallback(
+		(newItemsPerPage: number) => {
+			if (Number.isNaN(newItemsPerPage) || newItemsPerPage <= 0) {
+				console.warn("無効な件数です。");
+				return;
+			}
+			setItemsPerPage(newItemsPerPage);
+			// 件数を変更したら1ページ目から再取得
+			refetch(1, newItemsPerPage);
+		},
+		[refetch],
+	);
+
 	return (
 		<div className="container mx-auto p-4">
 			<Card>
@@ -252,7 +298,8 @@ export default function SelectAnswers() {
 							variant="gradient"
 							color="red"
 							onClose={() => {
-								// ここで setError("") などでエラーをクリアしてもOK
+								// エラーをクリアするロジックを追加可能
+								// 例: setError("")
 							}}
 						>
 							{error}
@@ -265,7 +312,8 @@ export default function SelectAnswers() {
 							variant="gradient"
 							color="red"
 							onClose={() => {
-								// ここでフックのエラーをクリアしてもOK
+								// フックのエラーをクリアするロジックを追加可能
+								// 例: setDeleteError("")
 							}}
 						>
 							{deleteError}
@@ -313,159 +361,219 @@ export default function SelectAnswers() {
 					) : !answers.length ? (
 						<Alert variant="gradient">解答が見つかりません</Alert>
 					) : (
-						<table className="w-full min-w-max table-auto text-left">
-							<thead>
-								<tr>
-									<th className="border-b p-4">
-										<Checkbox
-											checked={isAllSelected}
-											onChange={handleSelectAll}
-											aria-label="全選択"
-										/>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("title")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												タイトル
-											</Typography>
-											<span>{getSortIcon("title")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("question_text")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												質問文
-											</Typography>
-											<span>{getSortIcon("question_text")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">選択肢</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("is_correct")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												正誤
-											</Typography>
-											<span>{getSortIcon("is_correct")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("updated_at")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												更新日時
-											</Typography>
-											<span>{getSortIcon("updated_at")}</span>
-										</button>
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{filteredAndSortedAnswers.map((answer) => (
-									<tr key={answer.id} className="hover:bg-gray-100">
-										<td className="p-4">
+						<>
+							<table className="w-full min-w-max table-auto text-left">
+								<thead>
+									<tr>
+										<th className="border-b p-4">
 											<Checkbox
-												name={`answer-select-${answer.id}`}
-												checked={selectedAnswerIds.includes(answer.id)}
-												onChange={(e) => {
-													e.stopPropagation();
-													handleSelect(answer.id);
-												}}
-												aria-label={`選択 ${answer.title}`}
+												checked={isAllSelected}
+												onChange={handleSelectAll}
+												aria-label="全選択"
 											/>
-										</td>
-										<td className="p-4 max-w-[200px]">
-											<Typography
-												variant="small"
-												className="font-normal break-words text-xs"
-											>
-												{answer.title}
-											</Typography>
-										</td>
-										<td className="p-4 max-w-[300px]">
-											{/* 質問文をクリック可能にする */}
+										</th>
+										<th className="border-b p-4">
 											<button
 												type="button"
-												onClick={(e) => {
-													e.stopPropagation(); // 他のイベントの発火を防ぐ
-													handleOpenModal(answer);
-												}}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" || e.key === " ") {
-														e.preventDefault();
-														handleOpenModal(answer);
-													}
-												}}
-												className="w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-												aria-label={`質問文を開く: ${answer.question_text}`}
+												onClick={() => handleSort("title")}
+												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
 											>
 												<Typography
 													variant="small"
-													className="font-normal max-w-xs whitespace-pre-wrap text-xs hover:underline"
+													className="font-normal leading-none"
 												>
-													{truncateContent(answer.question_text, 100)}
+													タイトル
 												</Typography>
+												<span>{getSortIcon("title")}</span>
 											</button>
-										</td>
-										<td className="p-4 max-w-[300px]">
-											<Typography
-												variant="small"
-												className="font-normal break-words text-xs"
+										</th>
+										<th className="border-b p-4">
+											<button
+												type="button"
+												onClick={() => handleSort("question_text")}
+												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
 											>
-												A: {answer.choice_a} <br />
-												B: {answer.choice_b} <br />
-												C: {answer.choice_c} <br />
-												D: {answer.choice_d}
-											</Typography>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className={`font-normal text-xs ${
-													answer.is_correct ? "text-green-600" : "text-red-600"
-												}`}
+												<Typography
+													variant="small"
+													className="font-normal leading-none"
+												>
+													質問文
+												</Typography>
+												<span>{getSortIcon("question_text")}</span>
+											</button>
+										</th>
+										<th className="border-b p-4">選択肢</th>
+										<th className="border-b p-4">
+											<button
+												type="button"
+												onClick={() => handleSort("is_correct")}
+												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
 											>
-												{answer.is_correct ? "正解" : "不正解"}
-											</Typography>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className="font-normal text-xs"
+												<Typography
+													variant="small"
+													className="font-normal leading-none"
+												>
+													正誤
+												</Typography>
+												<span>{getSortIcon("is_correct")}</span>
+											</button>
+										</th>
+										<th className="border-b p-4">
+											<button
+												type="button"
+												onClick={() => handleSort("updated_at")}
+												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
 											>
-												{formatDate(answer.updated_at)}
-											</Typography>
-										</td>
+												<Typography
+													variant="small"
+													className="font-normal leading-none"
+												>
+													更新日時
+												</Typography>
+												<span>{getSortIcon("updated_at")}</span>
+											</button>
+										</th>
 									</tr>
-								))}
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									{filteredAndSortedAnswers.map((answer) => (
+										<tr key={answer.id} className="hover:bg-gray-100">
+											<td className="p-4">
+												<Checkbox
+													name={`answer-select-${answer.id}`}
+													checked={selectedAnswerIds.includes(answer.id)}
+													onChange={(e) => {
+														e.stopPropagation();
+														handleSelect(answer.id);
+													}}
+													aria-label={`選択 ${answer.title}`}
+												/>
+											</td>
+											<td className="p-4 max-w-[200px]">
+												<Typography
+													variant="small"
+													className="font-normal break-words text-xs"
+												>
+													{answer.title}
+												</Typography>
+											</td>
+											<td className="p-4 max-w-[300px]">
+												{/* 質問文をクリック可能にする */}
+												<button
+													type="button"
+													onClick={(e) => {
+														e.stopPropagation(); // 他のイベントの発火を防ぐ
+														handleOpenModal(answer);
+													}}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" || e.key === " ") {
+															e.preventDefault();
+															handleOpenModal(answer);
+														}
+													}}
+													className="w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+													aria-label={`質問文を開く: ${answer.question_text}`}
+												>
+													<Typography
+														variant="small"
+														className="font-normal max-w-xs whitespace-pre-wrap text-xs hover:underline"
+													>
+														{truncateContent(answer.question_text, 100)}
+													</Typography>
+												</button>
+											</td>
+											<td className="p-4 max-w-[300px]">
+												<Typography
+													variant="small"
+													className="font-normal break-words text-xs"
+												>
+													A: {answer.choice_a} <br />
+													B: {answer.choice_b} <br />
+													C: {answer.choice_c} <br />
+													D: {answer.choice_d}
+												</Typography>
+											</td>
+											<td className="p-4">
+												<Typography
+													variant="small"
+													className={`font-normal text-xs ${
+														answer.is_correct
+															? "text-green-600"
+															: "text-red-600"
+													}`}
+												>
+													{answer.is_correct ? "正解" : "不正解"}
+												</Typography>
+											</td>
+											<td className="p-4">
+												<Typography
+													variant="small"
+													className="font-normal text-xs"
+												>
+													{formatDate(answer.updated_at)}
+												</Typography>
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+
+							{/* ▼ ページネーション UI */}
+							<div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+								{/* 1ページあたりの件数変更 */}
+								<div className="flex items-center space-x-2">
+									<Typography variant="small" color="blue-gray">
+										件数:
+									</Typography>
+									<select
+										className="border border-blue-gray-200 rounded p-1"
+										value={itemsPerPage}
+										onChange={(e) =>
+											handleItemsPerPageChange(Number(e.target.value))
+										}
+									>
+										<option value={5}>5</option>
+										<option value={10}>10</option>
+										<option value={25}>25</option>
+										<option value={50}>50</option>
+										<option value={100}>100</option>
+									</select>
+									<Typography variant="small" color="blue-gray">
+										件/ページ
+									</Typography>
+								</div>
+
+								{/* 前後ページ送り */}
+								<div className="flex items-center justify-center space-x-4">
+									<Button
+										color="blue"
+										variant="outlined"
+										onClick={() => handlePageChange(currentPage - 1)}
+										disabled={currentPage <= 1}
+									>
+										前へ
+									</Button>
+									<Typography variant="small" color="blue-gray">
+										{currentPage} / {totalPages} ページ
+									</Typography>
+									<Button
+										color="blue"
+										variant="outlined"
+										onClick={() => handlePageChange(currentPage + 1)}
+										disabled={totalPages === 0 || currentPage >= totalPages}
+									>
+										次へ
+									</Button>
+									<Typography
+										variant="small"
+										color="blue-gray"
+										className="ml-4"
+									>
+										全 {totalCount} 件
+									</Typography>
+								</div>
+							</div>
+						</>
 					)}
 				</CardBody>
 			</Card>

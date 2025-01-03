@@ -48,6 +48,11 @@ class AnswerResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AnswerListResponse(BaseModel):
+    total: int
+    answers: List[AnswerResponse]
+
+
 class DeleteResponse(BaseModel):
     message: str
 
