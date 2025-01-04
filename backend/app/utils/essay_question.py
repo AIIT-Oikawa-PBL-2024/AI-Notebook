@@ -182,6 +182,7 @@ async def generate_essay_json(
     files: list[str],
     uid: str,
     title: str,
+    difficulty: str,
     model_name: str = MODEL_NAME,
     bucket_name: str = BUCKET_NAME,
 ) -> dict:
@@ -191,6 +192,7 @@ async def generate_essay_json(
 
     content: list = []
     image_files: list[dict] = []
+    difficulty_jp = _convert_difficulty_in_japanese(difficulty)
 
     try:
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
@@ -264,7 +266,8 @@ async def generate_essay_json(
             {
                 "type": "text",
                 "text": f"上記の講義テキスト{title}の内容に基づいて、"
-                + f"{tool_name}ツールを使用して問題を作成して下さい。",
+                + f"{tool_name}ツールを使用して問題を作成して下さい。"
+                + f"なお、問題の難易度は{difficulty_jp}としてください。",
             }
         )
         print("Added prompt to content")
@@ -328,6 +331,17 @@ async def generate_essay_json(
         raise
 
 
+async def _convert_difficulty_in_japanese(original: str) -> str:
+    if original == "easy":
+        return "易しいレベル"
+    elif original == "medium":
+        return "普通レベル"
+    elif original == "hard":
+        return "難しいレベル"
+    else:
+        return ""
+
+
 # テスト用のコード
 async def main() -> None:
     """
@@ -338,6 +352,7 @@ async def main() -> None:
         ["1_ソフトウェア工学の誕生.pdf"],
         uid="test_uid",
         title="test_title",
+        difficulty="easy",
     )
     print(response)
 

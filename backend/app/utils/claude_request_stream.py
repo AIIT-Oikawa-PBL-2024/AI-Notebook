@@ -106,18 +106,31 @@ def get_media_type(extension: str) -> str:
     return media_types.get(extension.lower(), "image/jpeg")
 
 
+async def _convert_difficulty_in_japanese(original: str) -> str:
+    if original == "easy":
+        return "易しいレベル"
+    elif original == "medium":
+        return "普通レベル"
+    elif original == "hard":
+        return "難しいレベル"
+    else:
+        return ""
+
+
 # 複数のpdf, imageファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
     uid: str,
+    difficulty: str,
     model_name: str = MODEL_NAME,
     bucket_name: str = BUCKET_NAME,
 ) -> AsyncGenerator[str, None]:
     print("generate_content_stream started")  # デバッグ用
+    difficulty_jp = _convert_difficulty_in_japanese(difficulty)
 
     image_files: list[dict] = []
     content: list = []
-    prompt = """
+    prompt = f"""
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
         - #input_files: 複数のファイルは、大学院の講義資料です。
         - #instruction: 複数のテキスト, imageファイルを読み解いて、練習問題を作って下さい。
@@ -128,6 +141,7 @@ async def generate_content_stream(
         - #condition1: 重要なキーワードを覚えられるような問題にしてください。
         - #condition2: "表形式"は禁止します。"箇条書き"を使用してください。
         - #format: タイトルを付けて、4000文字程度のMarkdownで出力してください。
+        - #difficulty: なお、問題の難易度は{difficulty_jp}としてください。
     """
 
     try:
@@ -243,6 +257,7 @@ async def main() -> None:
         # ["kougi_sample.png", "kougi_sample2.png"],
         ["1_ソフトウェア工学の誕生.pdf"],
         "test_uid",
+        "easy",
     )
 
     async for content in response:

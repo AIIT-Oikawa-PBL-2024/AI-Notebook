@@ -9,6 +9,7 @@ from app.schemas.files import File
 class ExerciseRequest(BaseModel):
     files: list[str]
     title: str
+    difficulty: str
 
 
 class ExerciseBase(BaseModel):
@@ -38,11 +39,14 @@ class ExerciseCreate(ExerciseBase):
     :type created_at: datetime
     :param file_names: 関連するファイル名のリスト
     :type file_names: List[str]
+    :param difficulty: 練習問題の難易度
+    :type difficulty: str
     """
 
     user_id: str = Field(..., description="ユーザーのFirebase UID", max_length=128)
     created_at: datetime = Field(default_factory=datetime.now, description="作成日時")
     file_names: List[str] = Field(default_factory=list, description="関連するファイル名のリスト")
+    difficulty: str = Field(..., description="練習問題の難易度", max_length=10)
 
 
 class ExerciseRead(ExerciseBase):
