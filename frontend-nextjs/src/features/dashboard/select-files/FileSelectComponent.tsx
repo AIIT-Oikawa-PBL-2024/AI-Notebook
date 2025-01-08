@@ -314,72 +314,64 @@ export default function FileSelectComponent() {
 						<Alert variant="gradient">ファイルが見つかりません</Alert>
 					)}
 
-					{isAnyFileSelected && (
-						<div className="space-y-4">
-							<div>
-								<Typography variant="h6">選択されたファイル</Typography>
-								<Typography variant="small" className="text-gray-600">
-									{selectedFileNames}
-								</Typography>
-							</div>
-
-							<div>
-								<Typography variant="h6">タイトル</Typography>
-								<Input
-									value={title}
-									onChange={(e) => setTitle(e.target.value)}
-									placeholder="AI要約/練習問題のタイトルを入力してください（最大100文字）"
-									maxLength={100}
-									className="mt-1 focus:outline-none !border !border-gray-300 focus:!border-gray-900 rounded-lg"
-									labelProps={{
-										className: "before:content-none after:content-none",
-									}}
-									disabled={loading}
-								/>
-							</div>
-
-							{title && (
-								<div className="flex gap-4">
-									<Button
-										size="lg"
-										onClick={() => createAiContent("ai-output/stream")}
-										className="flex-1"
-										disabled={loading}
-									>
-										AI要約作成
-									</Button>
-									<Button
-										size="lg"
-										onClick={() => createAiContent("ai-exercise/stream")}
-										className="flex-1"
-										disabled={loading}
-									>
-										AI練習問題
-									</Button>
-									<Button
-										size="lg"
-										onClick={() =>
-											createAiContent("ai-exercise/multiple-choice")
-										}
-										className="flex-1"
-										disabled={loading}
-									>
-										選択問題テスト
-									</Button>
-									<Button
-										size="lg"
-										onClick={() =>
-											createAiContent("ai-exercise/essay-question")
-										}
-										className="flex-1"
-										disabled={loading}
-									>
-										記述問題テスト
-									</Button>
-								</div>
-							)}
+					<div className="space-y-4">
+						<div>
+							<Typography variant="h6">選択されたファイル</Typography>
+							<Typography variant="small" className="text-gray-600">
+								{selectedFileNames}
+							</Typography>
 						</div>
-					)}
+
+						<div>
+							<Typography variant="h6">タイトル</Typography>
+							<Input
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
+								placeholder="AI要約/練習問題のタイトルを入力してください（最大100文字）"
+								maxLength={100}
+								className="mt-1 focus:outline-none !border !border-gray-300 focus:!border-gray-900 rounded-lg"
+								labelProps={{
+									className: "before:content-none after:content-none",
+								}}
+								disabled={loading}
+							/>
+						</div>
+
+						<div className="flex gap-4">
+							<Button
+								size="lg"
+								onClick={() => createAiContent("ai-output/stream")}
+								className="flex-1"
+								disabled={loading || !isAnyFileSelected || !title}
+							>
+								AI要約作成
+							</Button>
+							<Button
+								size="lg"
+								onClick={() => createAiContent("ai-exercise/stream")}
+								className="flex-1"
+								disabled={loading || !isAnyFileSelected || !title}
+							>
+								AI練習問題
+							</Button>
+							<Button
+								size="lg"
+								onClick={() => createAiContent("ai-exercise/multiple-choice")}
+								className="flex-1"
+								disabled={loading || !isAnyFileSelected || !title}
+							>
+								選択問題テスト
+							</Button>
+							<Button
+								size="lg"
+								onClick={() => createAiContent("ai-exercise/essay-question")}
+								className="flex-1"
+								disabled={loading || !isAnyFileSelected || !title}
+							>
+								記述問題テスト
+							</Button>
+						</div>
+					</div>
 				</CardBody>
 			</Card>
 		</div>
