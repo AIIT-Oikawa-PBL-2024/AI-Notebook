@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -66,19 +66,33 @@ async def save_answers(
 @router.get(
     "/list",
     summary="ユーザーの回答データを取得するエンドポイント",
-    response_model=List[answers_schemas.AnswerResponse],
+    response_model=answers_schemas.AnswerListResponse,
 )
 async def get_my_answers(
     db: AsyncSession = db_dependency,
     uid: str = Depends(get_uid),  # ユーザーIDを取得
-) -> List[answers_schemas.AnswerResponse]:
+    skip: int = 0,
+    limit: int = 100,
+) -> answers_schemas.AnswerListResponse:
     """
-    現在のユーザーの回答データを取得します。
+    現在のユーザーの回答データを取得します（ページネーション対応）。
     """
     try:
-        answers = await answers_cruds.get_answers_by_user(db, uid)
-        logger.info(f"User {uid} の回答データを取得しました。件数: {len(answers)}")
-        return answers
+        # 合計件数を取得
+        total_count = await answers_cruds.count_user_answers(db, uid)
+
+        # ページネーションに従ったデータを取得
+        answers = await answers_cruds.get_answers_by_user(db, uid, skip=skip, limit=limit)
+        answer_responses = [
+            answers_schemas.AnswerResponse.model_validate(answer) for answer in answers
+        ]
+
+        logger.info(f"User {uid} の回答データを取得しました。件数: {len(answers)} / {total_count}")
+
+        return answers_schemas.AnswerListResponse(
+            total=total_count,
+            answers=answer_responses,
+        )
     except Exception as e:
         logger.error(f"回答の取得中にエラーが発生しました: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="内部サーバーエラーが発生しました。") from e
