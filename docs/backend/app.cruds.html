@@ -48,6 +48,7 @@
 <li><a class="reference internal" href="#">app.cruds package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-app.cruds.answers">app.cruds.answers module</a><ul>
+<li><a class="reference internal" href="#app.cruds.answers.count_user_answers"><code class="docutils literal notranslate"><span class="pre">count_user_answers()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.answers.delete_answer_by_user"><code class="docutils literal notranslate"><span class="pre">delete_answer_by_user()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.answers.delete_answers_by_user"><code class="docutils literal notranslate"><span class="pre">delete_answers_by_user()</span></code></a></li>
 <li><a class="reference internal" href="#app.cruds.answers.get_answers_by_user"><code class="docutils literal notranslate"><span class="pre">get_answers_by_user()</span></code></a></li>
@@ -127,6 +128,23 @@
 <section id="module-app.cruds.answers">
 <span id="app-cruds-answers-module"></span><h2>app.cruds.answers module<a class="headerlink" href="#module-app.cruds.answers" title="Link to this heading"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="app.cruds.answers.count_user_answers">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.answers.</span></span><span class="sig-name descname"><span class="pre">count_user_answers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/app/cruds/answers.html#count_user_answers"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.answers.count_user_answers" title="Link to this definition"></a></dt>
+<dd><p>指定されたユーザーIDに紐づく回答データの総件数を取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> -- SQLAlchemyの非同期セッション</p></li>
+<li><p><strong>user_id</strong> -- ユーザーID</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>回答データの総件数</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="app.cruds.answers.delete_answer_by_user">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.answers.</span></span><span class="sig-name descname"><span class="pre">delete_answer_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_answer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="app.models.html#app.models.answers.Answer" title="app.models.answers.Answer"><span class="pre">Answer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/cruds/answers.html#delete_answer_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.answers.delete_answer_by_user" title="Link to this definition"></a></dt>
 <dd><p>ユーザーIDと回答の情報から特定の回答を削除する関数</p>
@@ -179,13 +197,15 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.cruds.answers.get_answers_by_user">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.answers.</span></span><span class="sig-name descname"><span class="pre">get_answers_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.answers.AnswerResponse" title="app.schemas.answers.AnswerResponse"><span class="pre">AnswerResponse</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/answers.html#get_answers_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.answers.get_answers_by_user" title="Link to this definition"></a></dt>
-<dd><p>指定されたユーザーIDに紐づく回答データを取得します。</p>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.cruds.answers.</span></span><span class="sig-name descname"><span class="pre">get_answers_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="app.schemas.html#app.schemas.answers.AnswerResponse" title="app.schemas.answers.AnswerResponse"><span class="pre">AnswerResponse</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/cruds/answers.html#get_answers_by_user"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.cruds.answers.get_answers_by_user" title="Link to this definition"></a></dt>
+<dd><p>指定されたユーザーIDに紐づく回答データを取得します（ページネーション対応）。</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>db</strong> -- SQLAlchemyの非同期セッション</p></li>
 <li><p><strong>user_id</strong> -- ユーザーID</p></li>
+<li><p><strong>skip</strong> -- 取得をスキップする件数</p></li>
+<li><p><strong>limit</strong> -- 取得する最大件数</p></li>
 </ul>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
