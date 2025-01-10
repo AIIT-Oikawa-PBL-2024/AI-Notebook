@@ -171,6 +171,7 @@ async def request_content(
                 exercise = exercises_models.Exercise(
                     title=request.title,
                     response=final_content,
+                    difficulty=request.difficulty,
                     user_id=uid,
                     created_at=datetime.now(JST),
                     exercise_type="stream",
