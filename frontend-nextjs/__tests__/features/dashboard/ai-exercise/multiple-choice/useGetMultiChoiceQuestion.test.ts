@@ -1,3 +1,4 @@
+import { mock } from "node:test";
 import { useGetMultiChoiceQuestion } from "@/features/dashboard/ai-exercise/multiple-choice/useGetMultiChoiceQuestion";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -6,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mockExercise = {
 	id: 1,
 	title: "Test Exercise",
+	difficulty: "easy",
 	response: JSON.stringify({
 		content: [
 			{
@@ -104,6 +106,7 @@ describe("useGetMultiChoiceQuestion", () => {
 
 		mockLocalStorage.setItem("selectedFiles", JSON.stringify(["file1.pdf"]));
 		mockLocalStorage.setItem("title", "Test Title");
+		mockLocalStorage.setItem("difficulty", "easy");
 
 		const { result } = renderHook(() => useGetMultiChoiceQuestion());
 
@@ -123,6 +126,7 @@ describe("useGetMultiChoiceQuestion", () => {
 				body: JSON.stringify({
 					files: ["file1.pdf"],
 					title: "Test Title",
+					difficulty: "easy",
 				}),
 			},
 		);
@@ -132,6 +136,7 @@ describe("useGetMultiChoiceQuestion", () => {
 		// 必要なデータを設定
 		mockLocalStorage.setItem("selectedFiles", JSON.stringify(["file1.pdf"]));
 		mockLocalStorage.setItem("title", "Test Title");
+		mockLocalStorage.setItem("difficulty", "easy");
 
 		const mockError = new Error("API Error");
 		mockFetch.mockRejectedValueOnce(mockError);
@@ -217,6 +222,7 @@ describe("useGetMultiChoiceQuestion", () => {
 		// 必要なデータを設定
 		mockLocalStorage.setItem("selectedFiles", JSON.stringify(["file1.pdf"]));
 		mockLocalStorage.setItem("title", "Test Title");
+		mockLocalStorage.setItem("difficulty", "easy");
 
 		const invalidExercise = {
 			...mockExercise,

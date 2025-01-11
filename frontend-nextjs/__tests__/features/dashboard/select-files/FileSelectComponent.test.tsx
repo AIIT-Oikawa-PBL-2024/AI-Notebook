@@ -103,12 +103,13 @@ describe("FileSelectComponent", () => {
 		fireEvent.change(titleInput, { target: { value: "テストノート" } });
 
 		// AI要約作成ボタンをクリック
-		const createButton = screen.getByText("AI要約作成");
+		const createButton = screen.getByText("要約");
 		fireEvent.click(createButton);
 
 		// ローカルストレージの確認
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
 		expect(localStorage.getItem("title")).toBe("テストノート");
+		expect(localStorage.getItem("difficulty")).toBe("normal");
 
 		// ルーティングの確認
 		await waitFor(() => {
@@ -131,11 +132,12 @@ describe("FileSelectComponent", () => {
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト演習" } });
 
-		const createButton = screen.getByText("AI練習問題");
+		const createButton = screen.getByText("総合問題");
 		fireEvent.click(createButton);
 
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
 		expect(localStorage.getItem("title")).toBe("テスト演習");
+		expect(localStorage.getItem("difficulty")).toBe("normal");
 
 		await waitFor(() => {
 			expect(mockRouter.push).toHaveBeenCalledWith("/ai-exercise/stream");
@@ -162,6 +164,7 @@ describe("FileSelectComponent", () => {
 
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
 		expect(localStorage.getItem("title")).toBe("テスト選択問題");
+		expect(localStorage.getItem("difficulty")).toBe("normal");
 
 		await waitFor(() => {
 			expect(mockRouter.push).toHaveBeenCalledWith(
