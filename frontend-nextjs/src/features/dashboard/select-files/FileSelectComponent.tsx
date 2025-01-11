@@ -12,6 +12,7 @@ import {
 	CardBody,
 	CardHeader,
 	Input,
+	Radio,
 	Spinner,
 	Typography,
 } from "@material-tailwind/react";
@@ -55,6 +56,7 @@ export default function FileSelectComponent() {
 	const { user, error: authError, clearError, reAuthenticate } = useAuth();
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [title, setTitle] = useState("");
+	const [difficulty, setDifficulty] = useState("normal");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
@@ -165,12 +167,13 @@ export default function FileSelectComponent() {
 				localStorage.setItem("selectedFiles", JSON.stringify(selectedFiles));
 				localStorage.setItem("title", title);
 				localStorage.setItem("uid", user.uid);
+				localStorage.setItem("difficulty", difficulty);
 				router.push(`/${type}`);
 			} catch (err) {
 				setError("データの保存に失敗しました。もう一度お試しください。");
 			}
 		},
-		[files, title, router, user],
+		[files, title, difficulty, router, user],
 	);
 
 	const resetAll = useCallback(() => {
@@ -316,14 +319,18 @@ export default function FileSelectComponent() {
 
 					<div className="space-y-4">
 						<div>
-							<Typography variant="h6">選択されたファイル</Typography>
+							<Typography variant="h6" className="my-6">
+								選択されたファイル
+							</Typography>
 							<Typography variant="small" className="text-gray-600">
 								{selectedFileNames}
 							</Typography>
 						</div>
 
 						<div>
-							<Typography variant="h6">タイトル</Typography>
+							<Typography variant="h6" className="mt-6 mb-2">
+								タイトル
+							</Typography>
 							<Input
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
@@ -337,39 +344,72 @@ export default function FileSelectComponent() {
 							/>
 						</div>
 
-						<div className="flex gap-4">
-							<Button
-								size="lg"
-								onClick={() => createAiContent("ai-output/stream")}
-								className="flex-1"
-								disabled={loading || !isAnyFileSelected || !title}
-							>
-								AI要約作成
-							</Button>
-							<Button
-								size="lg"
-								onClick={() => createAiContent("ai-exercise/stream")}
-								className="flex-1"
-								disabled={loading || !isAnyFileSelected || !title}
-							>
-								AI練習問題
-							</Button>
-							<Button
-								size="lg"
-								onClick={() => createAiContent("ai-exercise/multiple-choice")}
-								className="flex-1"
-								disabled={loading || !isAnyFileSelected || !title}
-							>
-								選択問題テスト
-							</Button>
-							<Button
-								size="lg"
-								onClick={() => createAiContent("ai-exercise/essay-question")}
-								className="flex-1"
-								disabled={loading || !isAnyFileSelected || !title}
-							>
-								記述問題テスト
-							</Button>
+						<div className="flex-col gap-4">
+							<Typography variant="h6" className="mt-6">
+								問題の難易度
+							</Typography>
+							<Typography variant="small" className="mb-2">
+								要約作成の場合は適用されません。
+							</Typography>
+
+							<div className="flex gap-4 justify-stretch">
+								<Radio
+									name="type"
+									label="易しい"
+									onChange={() => setDifficulty("easy")}
+									checked={difficulty === "easy"}
+								/>
+								<Radio
+									name="type"
+									label="普通"
+									onChange={() => setDifficulty("normal")}
+									checked={difficulty === "normal"}
+									defaultChecked
+								/>
+								<Radio
+									name="type"
+									label="難しい"
+									onChange={() => setDifficulty("difficult")}
+									checked={difficulty === "difficult"}
+								/>
+							</div>
+							<Typography variant="h6" className="mt-6 mb-2">
+								AI生成物の種類
+							</Typography>
+							<div className="flex justify-stretch gap-4">
+								<Button
+									size="lg"
+									onClick={() => createAiContent("ai-output/stream")}
+									className="flex-1"
+									disabled={loading || !isAnyFileSelected || !title}
+								>
+									要約
+								</Button>
+								<Button
+									size="lg"
+									onClick={() => createAiContent("ai-exercise/stream")}
+									className="flex-1"
+									disabled={loading || !isAnyFileSelected || !title}
+								>
+									総合問題
+								</Button>
+								<Button
+									size="lg"
+									onClick={() => createAiContent("ai-exercise/multiple-choice")}
+									className="flex-1"
+									disabled={loading || !isAnyFileSelected || !title}
+								>
+									選択問題テスト
+								</Button>
+								<Button
+									size="lg"
+									onClick={() => createAiContent("ai-exercise/essay-question")}
+									className="flex-1"
+									disabled={loading || !isAnyFileSelected || !title}
+								>
+									記述問題テスト
+								</Button>
+							</div>
 						</div>
 					</div>
 				</CardBody>

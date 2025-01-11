@@ -45,8 +45,9 @@ export function useExerciseGenerator() {
 				localStorage.getItem("selectedFiles") || "[]",
 			);
 			const storedTitle = localStorage.getItem("title");
+			const difficulty = localStorage.getItem("difficulty");
 
-			if (!selectedFiles || !storedTitle) {
+			if (!selectedFiles || !storedTitle || !difficulty) {
 				throw new Error("必要な情報が見つかりません");
 			}
 
@@ -63,6 +64,7 @@ export function useExerciseGenerator() {
 					body: JSON.stringify({
 						files: selectedFiles,
 						title: title,
+						difficulty: difficulty,
 					}),
 				},
 			);
