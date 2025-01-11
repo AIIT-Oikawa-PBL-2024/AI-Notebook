@@ -81,7 +81,8 @@
 <a class="viewcode-back" href="../../../app.schemas.html#app.schemas.exercises.ExerciseRequest">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">ExerciseRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">difficulty</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 
@@ -117,11 +118,14 @@
 <span class="sd">    :type created_at: datetime</span>
 <span class="sd">    :param file_names: 関連するファイル名のリスト</span>
 <span class="sd">    :type file_names: List[str]</span>
+<span class="sd">    :param difficulty: 練習問題の難易度</span>
+<span class="sd">    :type difficulty: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ユーザーのFirebase UID&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
     <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;作成日時&quot;</span><span class="p">)</span>
-    <span class="n">file_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;関連するファイル名のリスト&quot;</span><span class="p">)</span></div>
+    <span class="n">file_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;関連するファイル名のリスト&quot;</span><span class="p">)</span>
+    <span class="n">difficulty</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;練習問題の難易度&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></div>
 
 
 
