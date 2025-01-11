@@ -1,0 +1,39 @@
+steps:
+  # 1. Docker イメージをビルド
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        "docker build -t gcr.io/$PROJECT_ID/fastapi-backend-app ./backend"
+      ]
+
+  # 2. ビルドしたイメージを Container Registry にプッシュ
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        "docker push gcr.io/$PROJECT_ID/fastapi-backend-app"
+      ]
+
+  # 3. Cloud Run にデプロイ
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "deploy-cloud-run-backend"
+    args:
+      [
+        "run", "deploy", "ai-notebook-backend-app",            # サービス名を指定
+        "--image", "gcr.io/$PROJECT_ID/fastapi-backend-app",
+        "--region", "asia-northeast1",                        # リージョンを指定
+        "--platform", "managed",
+        "--allow-unauthenticated"
+      ]
+
+# ビルドログを保存するバケットを指定
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+# 使用するイメージ
+images:
+  - "gcr.io/$PROJECT_ID/fastapi-backend-app"
+
