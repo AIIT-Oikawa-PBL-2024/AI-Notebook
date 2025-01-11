@@ -113,6 +113,7 @@ async def test_generate_essay_json_internal_server_error(
                 files=["test.pdf"],
                 uid=MOCK_UID,
                 title="Test title",
+                difficulty="easy",
                 model_name=MOCK_MODEL_NAME,
                 bucket_name=MOCK_BUCKET_NAME,
             )
@@ -196,6 +197,7 @@ async def test_generate_essay_json_pdf(
             files=["test.pdf"],
             uid=MOCK_UID,
             title="Test title",
+            difficulty="easy",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -226,6 +228,7 @@ async def test_generate_essay_json_image(
             files=["test.png"],
             uid=MOCK_UID,
             title="Test title",
+            difficulty="easy",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -248,6 +251,7 @@ async def test_generate_essay_json_file_not_found(
             files=["nonexistent.pdf"],
             uid=MOCK_UID,
             title="Test title",
+            difficulty="easy",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )
@@ -266,6 +270,7 @@ async def test_generate_essay_json_google_api_error(
             files=["test.pdf"],
             uid=MOCK_UID,
             title="Test title",
+            difficulty="easy",
             model_name=MOCK_MODEL_NAME,
             bucket_name=MOCK_BUCKET_NAME,
         )

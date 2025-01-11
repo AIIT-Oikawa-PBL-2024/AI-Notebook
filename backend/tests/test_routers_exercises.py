@@ -76,7 +76,7 @@ async def test_request_content_stream_file_not_found(mock_get_file_id: Mock) -> 
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/request_stream",
-            json={"files": ["file1.pdf"], "title": "ファイル分析課題"},
+            json={"files": ["file1.pdf"], "title": "ファイル分析課題", "difficulty": "easy"},
             headers=headers,
         )
     assert response.status_code == 404
@@ -114,7 +114,7 @@ async def test_request_content_stream_gcs_not_found(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/request_stream",
-            json={"files": ["file111111.pdf"], "title": "ファイル分析課題"},
+            json={"files": ["file111111.pdf"], "title": "ファイル分析課題", "difficulty": "easy"},
             headers=headers,
         )
 
@@ -153,7 +153,7 @@ async def test_request_content_stream_invalid_filename(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/request_stream",
-            json={"files": ["invalid/file/name.pdf"], "title": "テスト"},
+            json={"files": ["invalid/file/name.pdf"], "title": "テスト", "difficulty": "easy"},
             headers=headers,
         )
 
@@ -192,7 +192,7 @@ async def test_request_content_stream_google_api_error(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/request_stream",
-            json={"files": ["file1.pdf"], "title": "タイトル"},
+            json={"files": ["file1.pdf"], "title": "タイトル", "difficulty": "easy"},
             headers=headers,
         )
 
@@ -216,7 +216,7 @@ async def test_request_content_stream_file_id_error(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/request_stream",
-            json={"files": ["file1.pdf"], "title": "タイトル"},
+            json={"files": ["file1.pdf"], "title": "タイトル", "difficulty": "easy"},
             headers=headers,
         )
 
@@ -263,7 +263,7 @@ async def test_multiple_choice_success(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/multiple_choice",
-            json={"files": ["test_file.pdf"], "title": "タイトル"},
+            json={"files": ["test_file.pdf"], "title": "タイトル", "difficulty": "easy"},
             headers=headers,
         )
 
@@ -305,6 +305,7 @@ async def test_list_exercises_success(
             user_id="test_user",
             created_at=datetime.now(timezone(timedelta(hours=9))),
             exercise_type="multiple_choice",
+            difficulty="easy",
         )
         exercises.append(exercise)
         session_cleanup.add(exercise)
@@ -347,6 +348,7 @@ async def test_get_exercise_success(
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
         exercise_type="multiple_choice",
+        difficulty="easy",
     )
     session_cleanup.add(exercise)
     await session_cleanup.commit()
@@ -382,6 +384,7 @@ async def test_delete_exercise_success(
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
         exercise_type="multiple_choice",
+        difficulty="easy",
     )
     session_cleanup.add(exercise)
     await session_cleanup.commit()
@@ -440,7 +443,7 @@ async def test_essay_question_success(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/exercises/essay_question",
-            json={"files": ["test_file.pdf"], "title": "タイトル"},
+            json={"files": ["test_file.pdf"], "title": "タイトル", "difficulty": "easy"},
             headers=headers,
         )
 
@@ -456,7 +459,7 @@ async def test_essay_question_success(
 
     # データベースに保存されていることを確認
     stmt = select(Exercise).where(
-        Exercise.user_id == "test_user", Exercise.exercise_type == "essay_question"
+        Exercise.user_id == "test_user", Exercise.exercise_type == "essay_question", Exercise.difficulty == "easy"
     )
     result = await session_cleanup.execute(stmt)
     exercise = result.scalar_one_or_none()
@@ -482,6 +485,7 @@ async def test_user_answer_success(
         user_id="test_user",
         created_at=datetime.now(timezone(timedelta(hours=9))),
         exercise_type="multiple_choice",
+        difficulty="easy",
     )
     session_cleanup.add(exercise)
     await session_cleanup.commit()

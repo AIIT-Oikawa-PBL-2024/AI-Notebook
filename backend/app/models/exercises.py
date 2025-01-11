@@ -21,6 +21,8 @@ class Exercise(Base):
     :type exercise_type: str
     :param title: 練習問題のタイトル
     :type title: str
+    :param difficulty: 練習問題の難易度
+    :type difficulty: str
     """
 
     __tablename__ = "exercises"
@@ -31,6 +33,7 @@ class Exercise(Base):
     created_at = Column(DateTime, nullable=False)
     exercise_type = Column(String(128), nullable=False)
     user_id = Column(String(128), nullable=False, index=True)
+    difficulty = Column(String(10), nullable=False)
 
     # リレーションシップの定義
     files = relationship("File", secondary=exercise_file, back_populates="exercises")
