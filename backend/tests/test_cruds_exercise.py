@@ -47,6 +47,7 @@ def sample_exercise_create(sample_datetime: datetime) -> exercises_schemas.Exerc
         created_at=sample_datetime,
         file_names=["test1.py", "test2.py"],
         title="サンプル練習問題",  # タイトルを追加
+        difficulty="easy",
     )
 
 
@@ -60,6 +61,7 @@ def sample_exercise(sample_datetime: datetime) -> exercises_models.Exercise:
         exercise_type="python",
         created_at=sample_datetime,
         title="サンプル練習問題",  # タイトルを追加
+        difficulty="easy",
     )
 
 
@@ -135,6 +137,7 @@ async def test_create_exercise_success(
     assert result.user_id == sample_exercise_create.user_id
     assert result.exercise_type == sample_exercise_create.exercise_type
     assert result.title == sample_exercise_create.title  # タイトルの検証を追加
+    assert result.difficulty == sample_exercise_create.difficulty
 
 
 @pytest.mark.asyncio

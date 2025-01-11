@@ -148,7 +148,9 @@ async def test_generate_content_stream_attribute_error() -> None:
         instance.messages.stream.side_effect = AttributeError("Model attribute error")
 
         with pytest.raises(AttributeError, match="Model attribute error"):
-            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
+            async for _ in claude_request_stream.generate_content_stream(
+                files, "test_user", "easy"
+            ):
                 pass
 
 
@@ -161,7 +163,9 @@ async def test_generate_content_stream_type_error() -> None:
         instance.messages.stream.side_effect = TypeError("Type error in model generation")
 
         with pytest.raises(TypeError, match="Type error in model generation"):
-            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
+            async for _ in claude_request_stream.generate_content_stream(
+                files, "test_user", "easy"
+            ):
                 pass
 
 
@@ -174,7 +178,9 @@ async def test_generate_content_stream_internal_server_error() -> None:
         instance.messages.stream.side_effect = InternalServerError("Internal server error")
 
         with pytest.raises(InternalServerError, match="Internal server error"):
-            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
+            async for _ in claude_request_stream.generate_content_stream(
+                files, "test_user", "easy"
+            ):
                 pass
 
 
@@ -187,7 +193,9 @@ async def test_generate_content_stream_google_api_error() -> None:
         instance.messages.stream.side_effect = GoogleAPIError("Google API error")
 
         with pytest.raises(GoogleAPIError, match="Google API error"):
-            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
+            async for _ in claude_request_stream.generate_content_stream(
+                files, "test_user", "easy"
+            ):
                 pass
 
 
@@ -200,5 +208,7 @@ async def test_generate_content_stream_unexpected_error() -> None:
         instance.messages.stream.side_effect = Exception("Unexpected error")
 
         with pytest.raises(Exception, match="Unexpected error"):
-            async for _ in claude_request_stream.generate_content_stream(files, "test_user"):
+            async for _ in claude_request_stream.generate_content_stream(
+                files, "test_user", "easy"
+            ):
                 pass

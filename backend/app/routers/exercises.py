@@ -63,6 +63,8 @@ async def request_content(
     :type files: list[str]
     :param title: コンテンツのタイトル
     :type title: str
+    :param difficulty: コンテンツの難易度
+    :type difficulty: str
     :param uid: 現在のユーザーのID（Firebase UID）
     :type uid: str
     :param db: 非同期データベースセッション
@@ -72,6 +74,7 @@ async def request_content(
     :raises HTTPException: コンテンツ生成中に予期せぬエラーが発生した場合
     """
     logging.info(f"Requesting content generation for files: {request.files} by user: {uid}")
+    logging.info(f"Difficulty is set to: {request.difficulty}")
 
     # ユーザーIDとファイル名から関連するファイルIDを取得
     file_ids = []
@@ -106,7 +109,7 @@ async def request_content(
     # コンテンツ生成ストリームの開始
     try:
         logging.info("Starting content generation stream...")
-        response = generate_content_stream(request.files, uid)
+        response = generate_content_stream(request.files, uid, difficulty=request.difficulty)
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(
@@ -168,6 +171,7 @@ async def request_content(
                 exercise = exercises_models.Exercise(
                     title=request.title,
                     response=final_content,
+                    difficulty=request.difficulty,
                     user_id=uid,
                     created_at=datetime.now(JST),
                     exercise_type="stream",
@@ -210,6 +214,8 @@ async def request_choice_question_json(
     :type files: list[str]
     :param title: 選択問題のタイトル
     :type title: str
+    :param difficulty: 選択問題の難易度
+    :type difficulty: str
     :param uid: 現在のユーザーのID（Firebase UID）
     :type uid: str
     :param db: 非同期データベースセッション
@@ -255,7 +261,9 @@ async def request_choice_question_json(
             files=request.files,
             uid=uid,
             title=request.title,  # タイトルを追加
+            difficulty=request.difficulty,  # 難易度を追加
         )
+        logging.info(f"Difficulty is set to: {request.difficulty}")
         logging.info(f"Generated response: {response}")
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
@@ -293,6 +301,7 @@ async def request_choice_question_json(
                 user_id=uid,
                 created_at=datetime.now(JST),
                 exercise_type="multiple_choice",
+                difficulty=request.difficulty,
             )
 
             db.add(exercise)
@@ -465,6 +474,8 @@ async def request_essay_question_json(
     :type files: list[str]
     :param title: 記述問題のタイトル
     :type title: str
+    :difficulty: 記述問題の難易度
+    :type difficulty: str
     :param uid: 現在のユーザーのID（Firebase UID）
     :type uid: str
     :param db: 非同期データベースセッション
@@ -474,6 +485,7 @@ async def request_essay_question_json(
     :raises HTTPException: 生成中にエラーが発生した場合
     """
     logging.info(f"Requesting content generation for files: {request.files}")
+    logging.info(f"Difficulty is set to: {request.difficulty}")
 
     # ユーザーIDとファイル名から関連するファイルIDを取得
     file_ids = []
@@ -510,6 +522,7 @@ async def request_essay_question_json(
             files=request.files,
             uid=uid,
             title=request.title,  # タイトルを追加
+            difficulty=request.difficulty,  # 難易度を追加
         )
         logging.info(f"Generated response: {response}")
     except NotFound as e:
@@ -548,6 +561,7 @@ async def request_essay_question_json(
                 user_id=uid,
                 created_at=datetime.now(JST),
                 exercise_type="essay_question",
+                difficulty=request.difficulty,
             )
 
             db.add(exercise)
