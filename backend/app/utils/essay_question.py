@@ -192,7 +192,7 @@ async def generate_essay_json(
 
     content: list = []
     image_files: list[dict] = []
-    difficulty_jp = _convert_difficulty_in_japanese(difficulty)
+    difficulty_jp = await _convert_difficulty_in_japanese(difficulty)
 
     try:
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
