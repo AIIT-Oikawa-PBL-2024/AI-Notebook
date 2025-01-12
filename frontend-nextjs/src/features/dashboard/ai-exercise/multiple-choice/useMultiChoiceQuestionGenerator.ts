@@ -68,8 +68,9 @@ export function useMultiChoiceQuestionGenerator() {
 				localStorage.getItem("selectedFiles") || "[]",
 			);
 			const title = localStorage.getItem("title");
+			const difficulty = localStorage.getItem("difficulty");
 
-			if (!selectedFiles || !title) {
+			if (!selectedFiles || !title || !difficulty) {
 				throw new Error("必要な情報が見つかりません");
 			}
 
@@ -84,6 +85,7 @@ export function useMultiChoiceQuestionGenerator() {
 					body: JSON.stringify({
 						files: selectedFiles,
 						title: title,
+						difficulty: difficulty,
 					}),
 				},
 			);

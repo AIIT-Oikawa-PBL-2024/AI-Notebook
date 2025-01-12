@@ -126,7 +126,7 @@ async def generate_content_stream(
     bucket_name: str = BUCKET_NAME,
 ) -> AsyncGenerator[str, None]:
     print("generate_content_stream started")  # デバッグ用
-    difficulty_jp = _convert_difficulty_in_japanese(difficulty)
+    difficulty_jp = await _convert_difficulty_in_japanese(difficulty)
 
     image_files: list[dict] = []
     content: list = []

@@ -788,6 +788,7 @@ async def request_similar_question_json(
                 user_id=uid,
                 created_at=datetime.now(JST),
                 exercise_type="similar_multiple_choice",
+                difficulty="undefined" # nullにできないので、undefinedを挿入
             )
 
             db.add(exercise)

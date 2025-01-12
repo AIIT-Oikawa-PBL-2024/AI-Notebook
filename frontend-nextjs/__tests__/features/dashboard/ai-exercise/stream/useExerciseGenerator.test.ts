@@ -35,6 +35,7 @@ describe("useExerciseGenerator", () => {
 	const mockLocalStorageData = {
 		selectedFiles: JSON.stringify(["file1.pdf", "file2.pdf"]),
 		title: "テストタイトル",
+		difficulty: "easy",
 	};
 
 	beforeEach(() => {
@@ -87,6 +88,7 @@ describe("useExerciseGenerator", () => {
 				body: JSON.stringify({
 					files: ["file1.pdf", "file2.pdf"],
 					title: "テストタイトル",
+					difficulty: "easy",
 				}),
 			},
 		);

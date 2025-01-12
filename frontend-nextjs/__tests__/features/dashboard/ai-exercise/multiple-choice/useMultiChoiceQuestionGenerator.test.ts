@@ -64,6 +64,7 @@ describe("useMultiChoiceQuestionGenerator", () => {
 		// 必要な情報を設定（デフォルトの状態）
 		localStorage.setItem("selectedFiles", JSON.stringify(["file1.pdf"]));
 		localStorage.setItem("title", "Test Title");
+		localStorage.setItem("difficulty", "easy");
 	});
 
 	afterEach(() => {

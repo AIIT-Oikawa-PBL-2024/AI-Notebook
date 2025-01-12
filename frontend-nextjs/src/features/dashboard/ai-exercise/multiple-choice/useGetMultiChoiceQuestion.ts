@@ -109,11 +109,12 @@ export function useGetMultiChoiceQuestion(id?: string) {
 				localStorage.getItem("selectedFiles") || "[]",
 			);
 			const title = localStorage.getItem("title");
+			const difficulty = localStorage.getItem("difficulty");
 
 			console.log("問題生成時の selectedFiles:", selectedFiles);
 			console.log("問題生成時の title:", title);
 
-			if (!id && (!selectedFiles || !title)) {
+			if (!id && (!selectedFiles || !title || !difficulty)) {
 				throw new Error("必要な情報が見つかりません");
 			}
 
@@ -133,6 +134,7 @@ export function useGetMultiChoiceQuestion(id?: string) {
 						body: JSON.stringify({
 							files: selectedFiles,
 							title: title,
+							difficulty: difficulty,
 						}),
 					};
 
