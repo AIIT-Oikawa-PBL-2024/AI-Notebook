@@ -109,7 +109,7 @@ describe("FileSelectComponent", () => {
 		// ローカルストレージの確認
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
 		expect(localStorage.getItem("title")).toBe("テストノート");
-		expect(localStorage.getItem("difficulty")).toBe("normal");
+		expect(localStorage.getItem("difficulty")).toBe("medium");
 
 		// ルーティングの確認
 		await waitFor(() => {
@@ -137,7 +137,7 @@ describe("FileSelectComponent", () => {
 
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
 		expect(localStorage.getItem("title")).toBe("テスト演習");
-		expect(localStorage.getItem("difficulty")).toBe("normal");
+		expect(localStorage.getItem("difficulty")).toBe("medium");
 
 		await waitFor(() => {
 			expect(mockRouter.push).toHaveBeenCalledWith("/ai-exercise/stream");
@@ -164,7 +164,7 @@ describe("FileSelectComponent", () => {
 
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
 		expect(localStorage.getItem("title")).toBe("テスト選択問題");
-		expect(localStorage.getItem("difficulty")).toBe("normal");
+		expect(localStorage.getItem("difficulty")).toBe("medium");
 
 		await waitFor(() => {
 			expect(mockRouter.push).toHaveBeenCalledWith(

@@ -56,7 +56,7 @@ export default function FileSelectComponent() {
 	const { user, error: authError, clearError, reAuthenticate } = useAuth();
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [title, setTitle] = useState("");
-	const [difficulty, setDifficulty] = useState("normal");
+	const [difficulty, setDifficulty] = useState("medium");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
@@ -362,15 +362,15 @@ export default function FileSelectComponent() {
 								<Radio
 									name="type"
 									label="普通"
-									onChange={() => setDifficulty("normal")}
-									checked={difficulty === "normal"}
+									onChange={() => setDifficulty("medium")}
+									checked={difficulty === "medium"}
 									defaultChecked
 								/>
 								<Radio
 									name="type"
 									label="難しい"
-									onChange={() => setDifficulty("difficult")}
-									checked={difficulty === "difficult"}
+									onChange={() => setDifficulty("hard")}
+									checked={difficulty === "hard"}
 								/>
 							</div>
 							<Typography variant="h6" className="mt-6 mb-2">
