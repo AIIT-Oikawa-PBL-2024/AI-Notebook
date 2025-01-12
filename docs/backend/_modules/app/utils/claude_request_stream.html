@@ -211,7 +211,7 @@
     <span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BUCKET_NAME</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_content_stream started&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
-    <span class="n">difficulty_jp</span> <span class="o">=</span> <span class="n">_convert_difficulty_in_japanese</span><span class="p">(</span><span class="n">difficulty</span><span class="p">)</span>
+    <span class="n">difficulty_jp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_convert_difficulty_in_japanese</span><span class="p">(</span><span class="n">difficulty</span><span class="p">)</span>
 
     <span class="n">image_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">content</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
