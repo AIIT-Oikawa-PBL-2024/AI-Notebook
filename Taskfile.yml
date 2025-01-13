@@ -1,0 +1,27 @@
+version: "3"
+
+tasks:
+  up:
+    desc: "Start all services in detached mode"
+    cmds:
+      - docker compose up -d
+  build:
+    desc: "Build all services"
+    cmds:
+      - docker compose -f docker-compose.new.yml build
+  build-no-cache:
+    desc: "Build all services without cache"
+    cmds:
+      - docker compose -f docker-compose.new.yml build --no-cache
+  build-dev:
+    desc: "Build only the dev stage for all services"
+    cmds:
+      - docker compose -f docker-compose.new.yml --target dev build
+  logs:
+    desc: "View logs for all services"
+    cmds:
+      - docker compose logs -f
+  down:
+    desc: "docker compose down"
+    cmds:
+      - docker compose down
