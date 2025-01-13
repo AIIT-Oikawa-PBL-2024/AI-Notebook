@@ -27,4 +27,5 @@ COPY . /backend/
 
 EXPOSE 8000
 
-ENTRYPOINT ["poetry", "run", "hypercorn", "app.main:app", "--bind", "0.0.0.0:8000", "--reload"]
+# FastAPIの起動(ホットリロード、ワーカー数4)
+ENTRYPOINT ["poetry", "run", "hypercorn", "app.main:app", "--bind", "0.0.0.0:8000", "--workers", "4", "--reload"]
