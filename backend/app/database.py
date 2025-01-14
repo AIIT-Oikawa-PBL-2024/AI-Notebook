@@ -18,8 +18,14 @@ DB_NAME = os.getenv("DB_NAME", "dev-db")
 # データベースURLを作成
 ASYNC_DB_URL = f"mysql+aiomysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
 
-# データベースエンジンを作成
-async_engine = create_async_engine(ASYNC_DB_URL, echo=True)
+# データベースエンジンを作成（接続プール設定を追加）
+async_engine = create_async_engine(
+    ASYNC_DB_URL,
+    echo=True,
+    pool_size=10,
+    max_overflow=20,
+    pool_recycle=3600,
+)
 
 # セッションを作成
 async_session = async_sessionmaker(
