@@ -92,7 +92,7 @@ async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
 
 
 # ファイル拡張子から適切なmedia_typeを返す
-def get_media_type(extension: str) -> str:
+async def get_media_type(extension: str) -> str:
     """
     ファイル拡張子から適切なmedia_typeを返す
     """
@@ -170,7 +170,7 @@ async def generate_content_stream(
                             "type": "image",
                             "source": {
                                 "type": "base64",
-                                "media_type": get_media_type(file_extension),
+                                "media_type": await get_media_type(file_extension),
                                 "data": image_file,
                             },
                         }
@@ -186,16 +186,16 @@ async def generate_content_stream(
                 if file_name.lower().endswith(".mp4"):
                     # ファイルを音声ファイルに変換する
                     logging.info(f"Converting {file_name} to mp3 format.")
-                    if convert_mp4_to_mp3(bucket_name, file_name):
+                    if await convert_mp4_to_mp3(bucket_name, file_name):
                         print(f"Successfully converted {file_name} to mp3 format.")
-                        extracted_text = extract_text_from_audio(bucket_name, file_name)
+                        extracted_text = await extract_text_from_audio(bucket_name, file_name)
                         content.append({"type": "text", "text": extracted_text})
                         print("Added extracted text to content")  # デバッグ用
                     else:
                         logging.error(f"Failed to convert {file_name} to mp3 format.")
                         raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
                 if file_name.lower().endswith(".mp3") or file_name.lower().endswith(".wav"):
-                    extracted_text = extract_text_from_audio(bucket_name, file_name)
+                    extracted_text = await extract_text_from_audio(bucket_name, file_name)
                     content.append({"type": "text", "text": extracted_text})
                     print("Added extracted text to content")  # デバッグ用
 
