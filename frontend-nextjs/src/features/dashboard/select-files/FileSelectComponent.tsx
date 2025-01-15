@@ -12,7 +12,9 @@ import {
 	CardBody,
 	CardHeader,
 	Input,
+	Option,
 	Radio,
+	Select,
 	Spinner,
 	Typography,
 } from "@material-tailwind/react";
@@ -61,6 +63,12 @@ export default function FileSelectComponent() {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
 	const authFetch = useAuthFetch();
+	const [selectedContentType, setSelectedContentType] = useState<
+		| "ai-output/stream"
+		| "ai-exercise/stream"
+		| "ai-exercise/multiple-choice"
+		| "ai-exercise/essay-question"
+	>("ai-output/stream");
 
 	const handleAuthError = useCallback(
 		async (error: { message: string }) => {
@@ -344,72 +352,102 @@ export default function FileSelectComponent() {
 							/>
 						</div>
 
-						<div className="flex-col gap-4">
-							<Typography variant="h6" className="mt-6">
-								問題の難易度
-							</Typography>
-							<Typography variant="small" className="mb-2">
-								要約作成の場合は適用されません。
-							</Typography>
+						<Typography variant="h6" className="mt-6 mb-2">
+							AI生成物の種類
+						</Typography>
+						<div className="flex justify-stretch gap-4">
+							<Button
+								variant={
+									selectedContentType === "ai-output/stream"
+										? "filled"
+										: "outlined"
+								}
+								onClick={() => setSelectedContentType("ai-output/stream")}
+								className="flex-1"
+								disabled={loading}
+							>
+								要約
+							</Button>
+							<Button
+								variant={
+									selectedContentType === "ai-exercise/stream"
+										? "filled"
+										: "outlined"
+								}
+								onClick={() => setSelectedContentType("ai-exercise/stream")}
+								className="flex-1"
+								disabled={loading}
+							>
+								総合問題
+							</Button>
+							<Button
+								variant={
+									selectedContentType === "ai-exercise/multiple-choice"
+										? "filled"
+										: "outlined"
+								}
+								onClick={() =>
+									setSelectedContentType("ai-exercise/multiple-choice")
+								}
+								className="flex-1"
+								disabled={loading}
+							>
+								選択問題テスト
+							</Button>
+							<Button
+								variant={
+									selectedContentType === "ai-exercise/essay-question"
+										? "filled"
+										: "outlined"
+								}
+								onClick={() =>
+									setSelectedContentType("ai-exercise/essay-question")
+								}
+								className="flex-1"
+								disabled={loading}
+							>
+								記述問題テスト
+							</Button>
+						</div>
 
-							<div className="flex gap-4 justify-stretch">
-								<Radio
-									name="type"
-									label="易しい"
-									onChange={() => setDifficulty("easy")}
-									checked={difficulty === "easy"}
-								/>
-								<Radio
-									name="type"
-									label="普通"
-									onChange={() => setDifficulty("medium")}
-									checked={difficulty === "medium"}
-									defaultChecked
-								/>
-								<Radio
-									name="type"
-									label="難しい"
-									onChange={() => setDifficulty("hard")}
-									checked={difficulty === "hard"}
-								/>
-							</div>
-							<Typography variant="h6" className="mt-6 mb-2">
-								AI生成物の種類
-							</Typography>
-							<div className="flex justify-stretch gap-4">
-								<Button
-									size="lg"
-									onClick={() => createAiContent("ai-output/stream")}
-									className="flex-1"
-									disabled={loading || !isAnyFileSelected || !title}
-								>
-									要約
-								</Button>
-								<Button
-									size="lg"
-									onClick={() => createAiContent("ai-exercise/stream")}
-									className="flex-1"
-									disabled={loading || !isAnyFileSelected || !title}
-								>
-									総合問題
-								</Button>
-								<Button
-									size="lg"
-									onClick={() => createAiContent("ai-exercise/multiple-choice")}
-									className="flex-1"
-									disabled={loading || !isAnyFileSelected || !title}
-								>
-									選択問題テスト
-								</Button>
-								<Button
-									size="lg"
-									onClick={() => createAiContent("ai-exercise/essay-question")}
-									className="flex-1"
-									disabled={loading || !isAnyFileSelected || !title}
-								>
-									記述問題テスト
-								</Button>
-							</div>
+						<Typography variant="h6" className="mt-6">
+							問題の難易度
+						</Typography>
+
+						<div className="flex gap-4 justify-stretch">
+							<Radio
+								name="type"
+								label="易しい"
+								onChange={() => setDifficulty("easy")}
+								checked={difficulty === "easy"}
+								disabled={selectedContentType === "ai-output/stream"}
+							/>
+							<Radio
+								name="type"
+								label="普通"
+								onChange={() => setDifficulty("medium")}
+								checked={difficulty === "medium"}
+								defaultChecked
+								disabled={selectedContentType === "ai-output/stream"}
+							/>
+							<Radio
+								name="type"
+								label="難しい"
+								onChange={() => setDifficulty("hard")}
+								checked={difficulty === "hard"}
+								disabled={selectedContentType === "ai-output/stream"}
+							/>
+						</div>
+
+						<div className="flex justify-stretch gap-4 mt-4">
+							<Button
+								size="lg"
+								onClick={() => createAiContent(selectedContentType)}
+								className="flex-1"
+								disabled={loading || !isAnyFileSelected || !title}
+							>
+								作成
+							</Button>
 						</div>
 					</div>
 				</CardBody>

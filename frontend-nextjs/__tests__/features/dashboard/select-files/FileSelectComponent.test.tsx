@@ -102,8 +102,12 @@ describe("FileSelectComponent", () => {
 		);
 		fireEvent.change(titleInput, { target: { value: "テストノート" } });
 
-		// AI要約作成ボタンをクリック
-		const createButton = screen.getByText("要約");
+		// AI要約ボタンをクリック
+		const summaryButton = screen.getByText("要約");
+		fireEvent.click(summaryButton);
+
+		// 作成ボタンをクリック
+		const createButton = screen.getByText("作成");
 		fireEvent.click(createButton);
 
 		// ローカルストレージの確認
@@ -132,7 +136,10 @@ describe("FileSelectComponent", () => {
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト演習" } });
 
-		const createButton = screen.getByText("総合問題");
+		const exerciseButton = screen.getByText("総合問題");
+		fireEvent.click(exerciseButton);
+
+		const createButton = screen.getByText("作成");
 		fireEvent.click(createButton);
 
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
@@ -159,7 +166,10 @@ describe("FileSelectComponent", () => {
 		);
 		fireEvent.change(titleInput, { target: { value: "テスト選択問題" } });
 
-		const createButton = screen.getByText("選択問題テスト");
+		const multipleChoiceButton = screen.getByText("選択問題テスト");
+		fireEvent.click(multipleChoiceButton);
+
+		const createButton = screen.getByText("作成");
 		fireEvent.click(createButton);
 
 		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
@@ -171,6 +181,57 @@ describe("FileSelectComponent", () => {
 				"/ai-exercise/multiple-choice",
 			);
 		});
+	});
+
+	it("ファイルを選択して記述問題を作成できること", async () => {
+		render(<FileSelectComponent />);
+
+		await waitFor(() => {
+			expect(screen.getByText("test1.pdf")).toBeInTheDocument();
+		});
+
+		const checkboxes = screen.getAllByRole("checkbox");
+		fireEvent.click(checkboxes[1]);
+
+		const titleInput = screen.getByPlaceholderText(
+			"AI要約/練習問題のタイトルを入力してください（最大100文字）",
+		);
+		fireEvent.change(titleInput, { target: { value: "テスト記述問題" } });
+
+		const essayQuestionButton = screen.getByText("記述問題テスト");
+		fireEvent.click(essayQuestionButton);
+
+		const createButton = screen.getByText("作成");
+		fireEvent.click(createButton);
+
+		expect(localStorage.getItem("selectedFiles")).toBe('["test1.pdf"]');
+		expect(localStorage.getItem("title")).toBe("テスト記述問題");
+		expect(localStorage.getItem("difficulty")).toBe("medium");
+
+		await waitFor(() => {
+			expect(mockRouter.push).toHaveBeenCalledWith(
+				"/ai-exercise/essay-question",
+			);
+		});
+	});
+
+	it("要約を選択したときに問題の難易度がグレーアウトされること", async () => {
+		render(<FileSelectComponent />);
+
+		await waitFor(() => {
+			expect(screen.getByText("test1.pdf")).toBeInTheDocument();
+		});
+
+		const summaryButton = screen.getByText("要約");
+		fireEvent.click(summaryButton);
+
+		const easyRadio = screen.getByLabelText("易しい");
+		const mediumRadio = screen.getByLabelText("普通");
+		const hardRadio = screen.getByLabelText("難しい");
+
+		expect(easyRadio).toBeDisabled();
+		expect(mediumRadio).toBeDisabled();
+		expect(hardRadio).toBeDisabled();
 	});
 
 	it("認証エラー時に適切なエラーメッセージが表示されること", async () => {
