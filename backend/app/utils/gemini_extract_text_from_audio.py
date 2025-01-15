@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from typing import List
@@ -32,14 +33,14 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 logging.basicConfig(level=logging.INFO)
 
 
-def extract_text_from_audio(
+async def extract_text_from_audio(
     bucket_name: str,
     file_name: str,
     model_name: str = MODEL_NAME,
     generation_config: GenerationConfig = GENERATION_CONFIG,
 ) -> str:
     """
-    音声ファイルからテキストを抽出する同期関数
+    音声ファイルからテキストを抽出する非同期関数
 
     Args:
         bucket_name (str): GCSバケット名
@@ -90,8 +91,9 @@ def extract_text_from_audio(
         # コンテンツリストを作成
         contents = audio_files + [prompt]
 
-        # 同期的にコンテンツを生成
-        response = model.generate_content(
+        # 同期的にコンテンツを生成（非同期に実行）
+        response = await asyncio.to_thread(
+            model.generate_content,
             contents,
             generation_config=generation_config,
             stream=False,  # ストリーミングを無効化

@@ -238,16 +238,16 @@ async def generate_essay_json(
 
                 elif file_name.lower().endswith(".mp4"):
                     logging.info(f"Converting {file_name} to mp3 format.")
-                    if convert_mp4_to_mp3(bucket_name, file_name):
+                    if await convert_mp4_to_mp3(bucket_name, file_name):
                         print(f"Successfully converted {file_name} to mp3 format.")
-                        audio_text = extract_text_from_audio(bucket_name, file_name)
+                        audio_text = await extract_text_from_audio(bucket_name, file_name)
                         all_extracted_text += f"\n=== {file_name} ===\n{audio_text}"
                     else:
                         logging.error(f"Failed to convert {file_name} to mp3 format.")
                         raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
 
                 elif file_name.lower().endswith((".mp3", ".wav")):
-                    audio_text = extract_text_from_audio(bucket_name, file_name)
+                    audio_text = await extract_text_from_audio(bucket_name, file_name)
                     all_extracted_text += f"\n=== {file_name} ===\n{audio_text}"
 
         # まず抽出したテキストをコンテンツに追加

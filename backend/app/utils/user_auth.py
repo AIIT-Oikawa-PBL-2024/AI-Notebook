@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from typing import List
@@ -36,7 +37,7 @@ else:
     logger.info("Skipping Firebase initialization in test environment")
 
 
-def is_allowed_domain(email: str, allowed_domains: List[str]) -> bool:
+async def is_allowed_domain(email: str, allowed_domains: List[str]) -> bool:
     """
     メールアドレスのドメインが許可リストに含まれているか確認する
 
@@ -51,7 +52,7 @@ def is_allowed_domain(email: str, allowed_domains: List[str]) -> bool:
     return any(domain == allowed_domain.lower().strip() for allowed_domain in allowed_domains)
 
 
-def authenticate_request(
+async def authenticate_request(
     request: Request, credentials: HTTPAuthorizationCredentials = dependency
 ) -> None:
     """
@@ -74,8 +75,8 @@ def authenticate_request(
 
     token = credentials.credentials
     try:
-        # Firebaseトークンを検証
-        decoded_token = auth.verify_id_token(token)
+        # Firebaseトークンを非同期に検証
+        decoded_token = await asyncio.to_thread(auth.verify_id_token, token)
 
         # UIDとEmailを取得
         uid = decoded_token.get("uid")
@@ -98,7 +99,7 @@ def authenticate_request(
             )
 
         # ドメインの検証
-        if not is_allowed_domain(email, ALLOWED_DOMAINS):
+        if not await is_allowed_domain(email, ALLOWED_DOMAINS):
             error_msg = f"Email domain not allowed: {email}"
             logger.error(error_msg)
             raise HTTPException(
@@ -133,7 +134,7 @@ def authenticate_request(
         ) from err
 
 
-def get_uid(request: Request) -> str:
+async def get_uid(request: Request) -> str:
     """
     リクエストのstateからUIDを取得する依存関数
 
@@ -152,7 +153,7 @@ def get_uid(request: Request) -> str:
     return uid
 
 
-def get_email(request: Request) -> str:
+async def get_email(request: Request) -> str:
     """
     リクエストのstateからEmailを取得する依存関数
 

@@ -1,6 +1,8 @@
+import asyncio
 import json
 import logging
 import os
+from typing import Any, Callable, cast
 
 from anthropic import AnthropicVertex
 from dotenv import load_dotenv
@@ -17,7 +19,6 @@ PROJECT_ID = str(os.getenv("PROJECT_ID"))
 REGION = "us-east5"  # リージョンは固定
 MODEL_NAME = "claude-3-5-sonnet@20240620"  # Claudeモデル名は固定
 BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
-
 
 # ロギングの設定
 logging.basicConfig(level=logging.INFO)
@@ -127,19 +128,25 @@ async def generate_scoring_result_json(
 
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
 
-        response = client.messages.create(
-            max_tokens=4096,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": content,
-                }
-            ],
-            model=model_name,
-            tools=[tool_definition],  # type: ignore
-            tool_choice={"type": "tool", "name": tool_name},
+        # ブロッキングする可能性のあるclient.messages.create呼び出しを非同期化
+        # 型キャストを使ってラムダを定義
+        create_message_call: Callable[[], Any] = cast(
+            Callable[[], Any],
+            lambda: client.messages.create(
+                max_tokens=4096,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": content,
+                    }
+                ],
+                model=model_name,
+                tools=[tool_definition],  # type: ignore
+                tool_choice={"type": "tool", "name": tool_name},
+            ),
         )
+        response = await asyncio.to_thread(create_message_call)
 
         # レスポンスの検証
         if response.content and len(response.content) > 0:
