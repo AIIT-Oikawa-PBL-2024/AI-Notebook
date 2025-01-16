@@ -63,8 +63,6 @@ async def request_content(
     :type files: list[str]
     :param title: コンテンツのタイトル
     :type title: str
-    :param difficulty: コンテンツの難易度
-    :type difficulty: str
     :param uid: 現在のユーザーのID（Firebase UID）
     :type uid: str
     :param db: 非同期データベースセッション
@@ -171,7 +169,6 @@ async def request_content(
                 exercise = exercises_models.Exercise(
                     title=request.title,
                     response=final_content,
-                    difficulty=request.difficulty,
                     user_id=uid,
                     created_at=datetime.now(JST),
                     exercise_type="stream",
@@ -788,7 +785,6 @@ async def request_similar_question_json(
                 user_id=uid,
                 created_at=datetime.now(JST),
                 exercise_type="similar_multiple_choice",
-                difficulty="undefined" # nullにできないので、undefinedを挿入
             )
 
             db.add(exercise)
