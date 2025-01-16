@@ -174,7 +174,7 @@
 <span class="c1"># ファイル拡張子から適切なmedia_typeを返す</span>
 <div class="viewcode-block" id="get_media_type">
 <a class="viewcode-back" href="../../../app.utils.html#app.utils.claude_request_stream.get_media_type">[ドキュメント]</a>
-<span class="k">def</span> <span class="nf">get_media_type</span><span class="p">(</span><span class="n">extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_media_type</span><span class="p">(</span><span class="n">extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ファイル拡張子から適切なmedia_typeを返す</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -255,7 +255,7 @@
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">{</span>
                                 <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;base64&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;media_type&quot;</span><span class="p">:</span> <span class="n">get_media_type</span><span class="p">(</span><span class="n">file_extension</span><span class="p">),</span>
+                                <span class="s2">&quot;media_type&quot;</span><span class="p">:</span> <span class="k">await</span> <span class="n">get_media_type</span><span class="p">(</span><span class="n">file_extension</span><span class="p">),</span>
                                 <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">image_file</span><span class="p">,</span>
                             <span class="p">},</span>
                         <span class="p">}</span>
@@ -271,16 +271,16 @@
                 <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">):</span>
                     <span class="c1"># ファイルを音声ファイルに変換する</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converting </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="k">await</span> <span class="n">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
                         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully converted </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
-                        <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                        <span class="n">extracted_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
                         <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">extracted_text</span><span class="p">})</span>
                         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added extracted text to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
                         <span class="k">raise</span> <span class="n">InternalServerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> to mp3 format.&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp3&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.wav&quot;</span><span class="p">):</span>
-                    <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">extracted_text</span> <span class="o">=</span> <span class="k">await</span> <span class="n">extract_text_from_audio</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
                     <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">extracted_text</span><span class="p">})</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added extracted text to content&quot;</span><span class="p">)</span>  <span class="c1"># デバッグ用</span>
 

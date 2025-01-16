@@ -69,7 +69,8 @@
            <div itemprop="articleBody">
              
   <h1>app.utils.gemini_extract_text_from_audio のソースコード</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
@@ -105,14 +106,14 @@
 
 <div class="viewcode-block" id="extract_text_from_audio">
 <a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_extract_text_from_audio.extract_text_from_audio">[ドキュメント]</a>
-<span class="k">def</span> <span class="nf">extract_text_from_audio</span><span class="p">(</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">extract_text_from_audio</span><span class="p">(</span>
     <span class="n">bucket_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MODEL_NAME</span><span class="p">,</span>
     <span class="n">generation_config</span><span class="p">:</span> <span class="n">GenerationConfig</span> <span class="o">=</span> <span class="n">GENERATION_CONFIG</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    音声ファイルからテキストを抽出する同期関数</span>
+<span class="sd">    音声ファイルからテキストを抽出する非同期関数</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        bucket_name (str): GCSバケット名</span>
@@ -163,8 +164,9 @@
         <span class="c1"># コンテンツリストを作成</span>
         <span class="n">contents</span> <span class="o">=</span> <span class="n">audio_files</span> <span class="o">+</span> <span class="p">[</span><span class="n">prompt</span><span class="p">]</span>
 
-        <span class="c1"># 同期的にコンテンツを生成</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">(</span>
+        <span class="c1"># 同期的にコンテンツを生成（非同期に実行）</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">,</span>
             <span class="n">contents</span><span class="p">,</span>
             <span class="n">generation_config</span><span class="o">=</span><span class="n">generation_config</span><span class="p">,</span>
             <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># ストリーミングを無効化</span>

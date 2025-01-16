@@ -205,7 +205,7 @@
                     <span class="n">image_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">):</span>
                     <span class="c1"># ファイルを音声ファイルに変換する</span>
-                    <span class="k">if</span> <span class="n">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="k">await</span> <span class="n">convert_mp4_to_mp3</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
                         <span class="c1"># 音声ファイルに変換したファイルのURL</span>
                         <span class="n">mp3_file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.mp4&quot;</span><span class="p">,</span> <span class="s2">&quot;.mp3&quot;</span><span class="p">)</span>
                         <span class="n">mp3_file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">/mp3/</span><span class="si">{</span><span class="n">mp3_file_name</span><span class="si">}</span><span class="s2">&quot;</span>
