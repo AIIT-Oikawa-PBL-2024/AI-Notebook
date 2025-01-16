@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import io
 import logging
@@ -87,10 +88,11 @@ async def upload_files(ext_correct_files: list[UploadFile], uid: str) -> dict:
         file_obj.seek(0)
         try:
             # アップロードの実行
-            blob.upload_from_file(file_obj)
+            await asyncio.to_thread(blob.upload_from_file, file_obj)
 
             # アップロードの結果をチェック
-            if blob.exists():
+            exists = await asyncio.to_thread(blob.exists)
+            if exists:
                 success_message = f"ファイル {file.filename} のアップロードが成功しました"
                 success_files.append({"message": success_message, "filename": file.filename})
             else:
@@ -147,7 +149,8 @@ async def delete_files_from_gcs(files: list[str], uid: str) -> dict:
 
         try:
             # ファイルの存在確認を追加
-            if not blob.exists():
+            exists = await asyncio.to_thread(blob.exists)
+            if not exists:
                 error_message = f"ファイル {normalized_blobname} が存在しません"
                 failed_files.append(error_message)
                 logging.warning(error_message)
@@ -157,7 +160,7 @@ async def delete_files_from_gcs(files: list[str], uid: str) -> dict:
             blob_metadata = blob.metadata if blob.metadata else {}
             logging.info(f"削除開始: {normalized_blobname}, メタデータ: {blob_metadata}")
 
-            blob.delete()
+            await asyncio.to_thread(blob.delete)
             success_message = f"ファイル {normalized_blobname} が削除されました"
             success_files.append({"message": success_message, "filename": normalized_blobname})
             logging.info(success_message)
@@ -214,11 +217,10 @@ async def generate_upload_signed_url_v4(files: list[str], uid: str) -> dict:
         normalized_blobname = unicodedata.normalize("NFC", uid + "/" + file)
         blob = bucket.blob(normalized_blobname)
 
-        url = blob.generate_signed_url(
+        url = await asyncio.to_thread(
+            blob.generate_signed_url,
             version="v4",
-            # This URL is valid for 15 minutes
             expiration=datetime.timedelta(minutes=15),
-            # Allow PUT requests using this URL.
             method="PUT",
             content_type="application/octet-stream",
         )
@@ -261,7 +263,8 @@ async def generate_download_signed_url_v4(files: list[str], uid: str) -> dict:
             blob = bucket.blob(normalized_blobname)
 
             # ファイルの存在確認
-            if not blob.exists():
+            exists = await asyncio.to_thread(blob.exists)
+            if not exists:
                 logging.warning(f"ファイル {normalized_blobname} が存在しません")
                 continue
 
@@ -277,15 +280,12 @@ async def generate_download_signed_url_v4(files: list[str], uid: str) -> dict:
             else:
                 response_type = "application/octet-stream"
 
-            url = blob.generate_signed_url(
+            url = await asyncio.to_thread(
+                blob.generate_signed_url,
                 version="v4",
-                # URLの有効期限を15分に設定
                 expiration=datetime.timedelta(minutes=15),
-                # GETリクエストを許可
                 method="GET",
-                # Content-Dispositionをinlineに設定
                 response_disposition="inline",
-                # Content-Typeを設定
                 response_type=response_type,
             )
 

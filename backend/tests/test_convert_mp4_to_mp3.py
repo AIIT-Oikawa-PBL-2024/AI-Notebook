@@ -1,7 +1,5 @@
-import os
 import pytest
 from unittest import mock
-from google.cloud import storage
 from app.utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
 from typing import Generator
 
@@ -24,7 +22,8 @@ def mock_os() -> Generator[mock.MagicMock, None, None]:
         yield mock_os
 
 
-def test_convert_mp4_to_mp3_success(
+@pytest.mark.asyncio
+async def test_convert_mp4_to_mp3_success(
     mock_storage_client: mock.MagicMock, mock_ffmpeg: mock.MagicMock, mock_os: mock.MagicMock
 ) -> None:
     bucket_name = "test-bucket"
@@ -33,6 +32,7 @@ def test_convert_mp4_to_mp3_success(
     # モックのセットアップ
     mock_client = mock_storage_client.return_value
     mock_bucket = mock_client.bucket.return_value
+    # blob は複数回呼ばれるため、それぞれの場合に対応するように side_effect を使用
     mock_blob = mock_bucket.blob.return_value
     mock_blob.exists.return_value = True
 
@@ -49,7 +49,7 @@ def test_convert_mp4_to_mp3_success(
     mock_output.run.return_value = None
 
     # テスト対象の関数を呼び出し
-    result = convert_mp4_to_mp3(bucket_name, file_name)
+    result = await convert_mp4_to_mp3(bucket_name, file_name)
 
     # 呼び出しの検証
     mock_storage_client.assert_called_once()
@@ -72,7 +72,8 @@ def test_convert_mp4_to_mp3_success(
     assert result is True
 
 
-def test_convert_mp4_to_mp3_upload_failure(
+@pytest.mark.asyncio
+async def test_convert_mp4_to_mp3_upload_failure(
     mock_storage_client: mock.MagicMock, mock_ffmpeg: mock.MagicMock, mock_os: mock.MagicMock
 ) -> None:
     bucket_name = "test-bucket"
@@ -81,6 +82,7 @@ def test_convert_mp4_to_mp3_upload_failure(
     # モックのセットアップ
     mock_client = mock_storage_client.return_value
     mock_bucket = mock_client.bucket.return_value
+    # blob は複数回呼ばれるため、それぞれの場合に対応するように side_effect を使用
     mock_blob = mock_bucket.blob.return_value
     mock_blob.exists.return_value = False
 
@@ -96,6 +98,6 @@ def test_convert_mp4_to_mp3_upload_failure(
     mock_input.output.return_value = mock_output
     mock_output.run.return_value = None
 
-    result = convert_mp4_to_mp3(bucket_name, file_name)
+    result = await convert_mp4_to_mp3(bucket_name, file_name)
 
     assert result is False
