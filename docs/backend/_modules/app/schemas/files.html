@@ -114,8 +114,8 @@
 <span class="k">class</span> <span class="nc">FileUpdate</span><span class="p">(</span><span class="n">FileBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    FileBaseクラスを継承したファイル更新を表すクラス。</span>
-<span class="sd">    :param created_at: 作成日時</span>
-<span class="sd">    :type created_at: datetime</span>
+<span class="sd">    :param updated_at: 更新日時</span>
+<span class="sd">    :type updated_at: datetime</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -135,6 +135,8 @@
 <span class="sd">    :type user_id: str</span>
 <span class="sd">    :param created_at: 作成日時</span>
 <span class="sd">    :type created_at: datetime</span>
+<span class="sd">    :param updated_at: 更新日時</span>
+<span class="sd">    :type updated_at: datetime</span>
 <span class="sd">    :param model_config: モデルの設定辞書</span>
 <span class="sd">    :type model_config: ConfigDict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -142,6 +144,7 @@
     <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">updated_at</span><span class="p">:</span> <span class="n">datetime</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">from_attributes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
