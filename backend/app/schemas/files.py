@@ -35,8 +35,8 @@ class FileCreate(FileBase):
 class FileUpdate(FileBase):
     """
     FileBaseクラスを継承したファイル更新を表すクラス。
-    :param created_at: 作成日時
-    :type created_at: datetime
+    :param updated_at: 更新日時
+    :type updated_at: datetime
     """
 
     user_id: str
@@ -53,6 +53,8 @@ class File(FileBase):
     :type user_id: str
     :param created_at: 作成日時
     :type created_at: datetime
+    :param updated_at: 更新日時
+    :type updated_at: datetime
     :param model_config: モデルの設定辞書
     :type model_config: ConfigDict
     """
@@ -60,5 +62,6 @@ class File(FileBase):
     id: int
     user_id: str
     created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

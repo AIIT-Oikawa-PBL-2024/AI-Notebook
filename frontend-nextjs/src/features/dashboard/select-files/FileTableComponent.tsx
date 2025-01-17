@@ -14,6 +14,7 @@ interface FileData {
 	file_name: string;
 	file_size: string | number;
 	created_at: string;
+	updated_at: string;
 	select?: boolean;
 	id?: string;
 	user_id?: string;
@@ -28,7 +29,7 @@ interface FileTableProps {
 	formatDate: (dateStr: string) => string;
 }
 
-type SortKey = "file_name" | "file_size" | "created_at";
+type SortKey = "file_name" | "file_size" | "created_at" | "updated_at";
 type SortDirection = "asc" | "desc";
 
 const FileTable: React.FC<FileTableProps> = ({
@@ -39,8 +40,8 @@ const FileTable: React.FC<FileTableProps> = ({
 	areAllFilesSelected,
 	formatDate,
 }) => {
-	const [sortKey, setSortKey] = useState<SortKey>("file_name");
-	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+	const [sortKey, setSortKey] = useState<SortKey>("updated_at");
+	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFile, setSelectedFile] = useState<string | null>(null);
 	const { previewUrls, generatePreviewUrl } = useFilePreview();
@@ -113,7 +114,7 @@ const FileTable: React.FC<FileTableProps> = ({
 				const aBytes = getFileSizeInBytes(a[sortKey]);
 				const bBytes = getFileSizeInBytes(b[sortKey]);
 				compareValue = aBytes - bBytes;
-			} else if (sortKey === "created_at") {
+			} else if (sortKey === "created_at" || sortKey === "updated_at") {
 				compareValue =
 					new Date(a[sortKey]).getTime() - new Date(b[sortKey]).getTime();
 			} else {
@@ -142,88 +143,136 @@ const FileTable: React.FC<FileTableProps> = ({
 					className="w-full max-w-xs px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
 				/>
 			</div>
-			<table className="w-full min-w-max table-auto text-left">
-				<thead>
-					<tr>
-						<th className="border-b p-4">
-							<Checkbox
-								checked={areAllFilesSelected}
-								onChange={(e) => handleSelectAll(e.target.checked)}
-								disabled={loading}
-							/>
-						</th>
-						<th
-							className="border-b p-4 cursor-pointer"
-							onClick={() => handleSort("file_name")}
-							onKeyUp={(e) => e.key === "Enter" && handleSort("file_name")}
-						>
-							<Typography variant="small" className="font-normal leading-none">
-								ファイル名 {getSortIcon("file_name")}
-							</Typography>
-						</th>
-						<th
-							className="border-b p-4 cursor-pointer"
-							onClick={() => handleSort("file_size")}
-							onKeyUp={(e) => e.key === "Enter" && handleSort("file_size")}
-						>
-							<Typography variant="small" className="font-normal leading-none">
-								サイズ {getSortIcon("file_size")}
-							</Typography>
-						</th>
-						<th
-							className="border-b p-4 cursor-pointer"
-							onClick={() => handleSort("created_at")}
-							onKeyUp={(e) => e.key === "Enter" && handleSort("created_at")}
-						>
-							<Typography variant="small" className="font-normal leading-none">
-								作成日時 {getSortIcon("created_at")}
-							</Typography>
-						</th>
-						<th className="border-b p-4">
-							<Typography variant="small" className="font-normal leading-none">
-								プレビュー
-							</Typography>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					{getSortedFiles().map((file) => (
-						<tr key={file.file_name}>
-							<td className="p-4">
-								<Checkbox
-									checked={file.select}
-									onChange={(e) =>
-										handleSelect(file.file_name, e.target.checked)
-									}
-									disabled={loading}
-								/>
-							</td>
-							<td className="p-4">
-								<Typography variant="small">{file.file_name}</Typography>
-							</td>
-							<td className="p-4">
-								<Typography variant="small">
-									{formatFileSize(getFileSizeInBytes(file.file_size))}
-								</Typography>
-							</td>
-							<td className="p-4">
-								<Typography variant="small">
-									{formatDate(file.created_at)}
-								</Typography>
-							</td>
-							<td className="p-4">
-								<IconButton
-									variant="text"
-									color="blue-gray"
-									onClick={() => handlePreview(file.file_name)}
-								>
-									<EyeIcon className="h-4 w-4" />
-								</IconButton>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+			<div className="overflow-x-auto">
+				<div className="inline-block min-w-full align-middle">
+					<div className="overflow-hidden">
+						<table className="min-w-full divide-y divide-gray-200">
+							<thead>
+								<tr>
+									<th className="border-b p-4">
+										<Checkbox
+											checked={areAllFilesSelected}
+											onChange={(e) => handleSelectAll(e.target.checked)}
+											disabled={loading}
+										/>
+									</th>
+									<th
+										className="border-b p-4 cursor-pointer"
+										onClick={() => handleSort("file_name")}
+										onKeyUp={(e) =>
+											e.key === "Enter" && handleSort("file_name")
+										}
+									>
+										<Typography
+											variant="small"
+											className="font-normal leading-none"
+										>
+											ファイル名 {getSortIcon("file_name")}
+										</Typography>
+									</th>
+									<th
+										className="border-b p-4 cursor-pointer hidden sm:table-cell"
+										onClick={() => handleSort("file_size")}
+										onKeyUp={(e) =>
+											e.key === "Enter" && handleSort("file_size")
+										}
+									>
+										<Typography
+											variant="small"
+											className="font-normal leading-none"
+										>
+											サイズ {getSortIcon("file_size")}
+										</Typography>
+									</th>
+									<th
+										className="border-b p-4 cursor-pointer hidden md:table-cell"
+										onClick={() => handleSort("created_at")}
+										onKeyUp={(e) =>
+											e.key === "Enter" && handleSort("created_at")
+										}
+									>
+										<Typography
+											variant="small"
+											className="font-normal leading-none"
+										>
+											作成日時 {getSortIcon("created_at")}
+										</Typography>
+									</th>
+									<th
+										className="border-b p-4 cursor-pointer hidden md:table-cell"
+										onClick={() => handleSort("updated_at")}
+										onKeyUp={(e) =>
+											e.key === "Enter" && handleSort("updated_at")
+										}
+									>
+										<Typography
+											variant="small"
+											className="font-normal leading-none"
+										>
+											更新日時 {getSortIcon("updated_at")}
+										</Typography>
+									</th>
+									<th className="border-b p-4">
+										<Typography
+											variant="small"
+											className="font-normal leading-none"
+										>
+											プレビュー
+										</Typography>
+									</th>
+								</tr>
+							</thead>
+							<tbody className="divide-y divide-gray-200">
+								{getSortedFiles().map((file) => (
+									<tr key={file.file_name}>
+										<td className="p-4">
+											<Checkbox
+												checked={file.select}
+												onChange={(e) =>
+													handleSelect(file.file_name, e.target.checked)
+												}
+												disabled={loading}
+											/>
+										</td>
+										<td className="p-4 max-w-xs">
+											<Typography
+												variant="small"
+												className="whitespace-normal break-words"
+											>
+												{file.file_name}
+											</Typography>
+										</td>
+										<td className="p-4 hidden sm:table-cell">
+											<Typography variant="small">
+												{formatFileSize(getFileSizeInBytes(file.file_size))}
+											</Typography>
+										</td>
+										<td className="p-4 hidden md:table-cell">
+											<Typography variant="small">
+												{formatDate(file.created_at)}
+											</Typography>
+										</td>
+										<td className="p-4 hidden md:table-cell">
+											<Typography variant="small">
+												{formatDate(file.updated_at)}
+											</Typography>
+										</td>
+										<td className="p-4">
+											<IconButton
+												variant="text"
+												color="blue-gray"
+												onClick={() => handlePreview(file.file_name)}
+											>
+												<EyeIcon className="h-4 w-4" />
+											</IconButton>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 
 			{selectedFile && previewUrls[selectedFile] && (
 				<FilePreviewComponent
