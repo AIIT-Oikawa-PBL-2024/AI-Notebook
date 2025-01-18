@@ -8,7 +8,7 @@ import {
 	Typography,
 } from "@material-tailwind/react";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FileData {
 	file_name: string;
@@ -45,6 +45,11 @@ const FileTable: React.FC<FileTableProps> = ({
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedFile, setSelectedFile] = useState<string | null>(null);
 	const { previewUrls, generatePreviewUrl } = useFilePreview();
+
+	useEffect(() => {
+		// Reset selected file when files change to prevent infinite loop
+		setSelectedFile(null);
+	}, []);
 
 	const handlePreview = async (fileName: string) => {
 		if (!previewUrls[fileName]) {
