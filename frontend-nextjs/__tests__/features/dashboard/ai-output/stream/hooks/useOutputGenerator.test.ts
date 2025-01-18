@@ -1,3 +1,4 @@
+import { styleText } from "node:util";
 import { useOutputGenerator } from "@/features/dashboard/ai-output/stream/hooks/useOutputGenerator";
 import * as useAuthFetchModule from "@/hooks/useAuthFetch";
 import { renderHook, waitFor } from "@testing-library/react";
@@ -35,6 +36,7 @@ describe("useOutputGenerator", () => {
 	const mockLocalStorageData = {
 		selectedFiles: JSON.stringify(["file1.pdf", "file2.pdf"]),
 		title: "テストタイトル",
+		style: "casual",
 	};
 
 	beforeEach(() => {
@@ -87,6 +89,7 @@ describe("useOutputGenerator", () => {
 				body: JSON.stringify({
 					files: ["file1.pdf", "file2.pdf"],
 					title: "テストタイトル",
+					style: "casual",
 				}),
 			},
 		);

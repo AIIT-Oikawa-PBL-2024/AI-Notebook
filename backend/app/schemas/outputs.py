@@ -75,3 +75,4 @@ class OutputRead(OutputBase):
 class OutputRequest(BaseModel):
     files: list[str]
     title: str
+    style: str

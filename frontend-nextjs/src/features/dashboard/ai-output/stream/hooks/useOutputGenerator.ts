@@ -37,6 +37,7 @@ export function useOutputGenerator() {
 				localStorage.getItem("selectedFiles") || "[]",
 			);
 			const title = localStorage.getItem("title");
+			const style = localStorage.getItem("style");
 
 			if (!selectedFiles || !title) {
 				throw new Error("必要な情報が見つかりません");
@@ -53,6 +54,7 @@ export function useOutputGenerator() {
 					body: JSON.stringify({
 						files: selectedFiles,
 						title: title,
+						style: style,
 					}),
 				},
 			);

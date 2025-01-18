@@ -93,7 +93,7 @@ async def request_content(
 
     try:
         # ファイル名のリストを元に、コンテンツを生成
-        response = generate_content_stream(request.files, uid)
+        response = generate_content_stream(request.files, uid, request.style)
     except NotFound as e:
         logging.error(f"File not found in Google Cloud Storage: {e}")
         raise HTTPException(

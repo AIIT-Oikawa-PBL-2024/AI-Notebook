@@ -28,6 +28,7 @@ interface FileData {
 	file_name: string;
 	file_size: string;
 	created_at: string;
+	updated_at: string;
 	select?: boolean;
 	id?: string;
 	user_id?: string;
@@ -59,6 +60,7 @@ export default function FileSelectComponent() {
 	const [files, setFiles] = useState<FileData[]>([]);
 	const [title, setTitle] = useState("");
 	const [difficulty, setDifficulty] = useState("medium");
+	const [style, setStyle] = useState("casual");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
@@ -176,12 +178,13 @@ export default function FileSelectComponent() {
 				localStorage.setItem("title", title);
 				localStorage.setItem("uid", user.uid);
 				localStorage.setItem("difficulty", difficulty);
+				localStorage.setItem("style", style);
 				router.push(`/${type}`);
 			} catch (err) {
 				setError("データの保存に失敗しました。もう一度お試しください。");
 			}
 		},
-		[files, title, difficulty, router, user],
+		[files, title, difficulty, router, user, style],
 	);
 
 	const resetAll = useCallback(() => {
@@ -408,6 +411,35 @@ export default function FileSelectComponent() {
 							>
 								記述問題テスト
 							</Button>
+						</div>
+
+						<Typography variant="h6" className="mt-6">
+							要約のスタイル
+						</Typography>
+						<div className="flex gap-4 justify-stretch">
+							<Radio
+								name="style"
+								label="カジュアル"
+								onChange={() => setStyle("casual")}
+								checked={style === "casual"}
+								defaultChecked
+								disabled={
+									selectedContentType === "ai-exercise/stream" ||
+									selectedContentType === "ai-exercise/multiple-choice" ||
+									selectedContentType === "ai-exercise/essay-question"
+								}
+							/>
+							<Radio
+								name="style"
+								label="シンプル"
+								onChange={() => setStyle("simple")}
+								checked={style === "simple"}
+								disabled={
+									selectedContentType === "ai-exercise/stream" ||
+									selectedContentType === "ai-exercise/multiple-choice" ||
+									selectedContentType === "ai-exercise/essay-question"
+								}
+							/>
 						</div>
 
 						<Typography variant="h6" className="mt-6">
