@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import Optional
 
 from app.schemas.files import File
 
@@ -61,11 +62,14 @@ class ExerciseRead(ExerciseBase):
     :type created_at: datetime
     :param files: 関連するファイル情報のリスト
     :type files: List[FileBase]
+    :param difficulty: 練習問題の難易度
+    :type difficulty: str
     """
 
     id: int = Field(..., description="出力データのID")
     user_id: str = Field(..., description="ユーザーのFirebase UID", max_length=128)
     created_at: datetime = Field(..., description="作成日時")
     files: List[File] = Field(default_factory=list, description="関連するファイル情報のリスト")
+    difficulty: Optional[str] = Field(..., description="練習問題の難易度", max_length=10)
 
     model_config = ConfigDict(from_attributes=True)
