@@ -58,10 +58,10 @@ async def test_request_content_stream_success(
     mock_get_file_id.return_value = file_data.id
 
     # モックストリームを返すようにパッチ
-    async def mock_streamer(file_names: list[str]) -> AsyncGenerator[str, None]:
+    async def mock_streamer(file_names: list[str], style: str) -> AsyncGenerator[str, None]:
         yield "生成されたコンテンツ"
 
-    mock_generate_content_stream.return_value = mock_streamer(["file1.pdf"])
+    mock_generate_content_stream.return_value = mock_streamer(["file1.pdf"], "casual")
 
 
 # ファイルが見つからない場合のテスト
@@ -76,14 +76,14 @@ async def test_request_content_stream_file_not_found(mock_get_file_id: Mock) -> 
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/outputs/request_stream",
-            json={"files": ["file1.pdf"], "title": "ファイル分析課題"},
+            json={"files": ["file1.pdf"], "title": "ファイル分析課題", "style": "casual"},
             headers=headers,
         )
     assert response.status_code == 404
     assert "指定されたファイルの一部がデータベースに存在しません" in response.text
 
 
-# Google Cloud Storageでファイルが見つからない場合のテスト
+# Google Cloud Storageでファイルが見つからない場���のテスト
 @pytest.mark.asyncio
 @patch("app.routers.outputs_stream.get_file_id_by_name_and_userid")
 @patch("app.routers.outputs_stream.generate_content_stream")
@@ -114,7 +114,7 @@ async def test_request_content_stream_gcs_not_found(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/outputs/request_stream",
-            json={"files": ["file111111.pdf"], "title": "ファイル分析課題"},
+            json={"files": ["file111111.pdf"], "title": "ファイル分析課題", "style": "casual"},
             headers=headers,
         )
 
@@ -153,7 +153,7 @@ async def test_request_content_stream_invalid_filename(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/outputs/request_stream",
-            json={"files": ["invalid/file/name.pdf"], "title": "テスト"},
+            json={"files": ["invalid/file/name.pdf"], "title": "テスト", "style": "casual"},
             headers=headers,
         )
 
@@ -192,7 +192,7 @@ async def test_request_content_stream_google_api_error(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/outputs/request_stream",
-            json={"files": ["file1.pdf"], "title": "タイトル"},
+            json={"files": ["file1.pdf"], "title": "タイトル", "style": "casual"},
             headers=headers,
         )
 
@@ -217,7 +217,7 @@ async def test_request_content_stream_file_id_error(
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post(
             "/outputs/request_stream",
-            json={"files": ["file1.pdf"], "title": "タイトル"},
+            json={"files": ["file1.pdf"], "title": "タイトル", "style": "casual"},
             headers=headers,
         )
 
