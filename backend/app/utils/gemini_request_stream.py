@@ -152,7 +152,7 @@ async def generate_content_stream(
                     image_files.append(image_file)
                 elif file_name.endswith(".mp4"):
                     # ファイルを音声ファイルに変換する
-                    if convert_mp4_to_mp3(bucket_name, file_name):
+                    if await convert_mp4_to_mp3(bucket_name, file_name):
                         # 音声ファイルに変換したファイルのURL
                         mp3_file_name = file_name.replace(".mp4", ".mp3")
                         mp3_file_url = f"gs://{bucket_name}/mp3/{mp3_file_name}"
