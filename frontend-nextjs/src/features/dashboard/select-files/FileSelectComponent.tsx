@@ -69,6 +69,7 @@ export default function FileSelectComponent() {
 		| "ai-exercise/multiple-choice"
 		| "ai-exercise/essay-question"
 	>("ai-output/stream");
+	const [style, setStyle] = useState<"casual" | "simple">("casual");
 
 	const handleAuthError = useCallback(
 		async (error: { message: string }) => {
@@ -176,12 +177,15 @@ export default function FileSelectComponent() {
 				localStorage.setItem("title", title);
 				localStorage.setItem("uid", user.uid);
 				localStorage.setItem("difficulty", difficulty);
+				if (type === "ai-output/stream") {
+					localStorage.setItem("style", style);
+				}
 				router.push(`/${type}`);
 			} catch (err) {
 				setError("データの保存に失敗しました。もう一度お試しください。");
 			}
 		},
-		[files, title, difficulty, router, user],
+		[files, title, difficulty, router, user, style],
 	);
 
 	const resetAll = useCallback(() => {
@@ -436,6 +440,24 @@ export default function FileSelectComponent() {
 								onChange={() => setDifficulty("hard")}
 								checked={difficulty === "hard"}
 								disabled={selectedContentType === "ai-output/stream"}
+							/>
+						</div>
+
+						<Typography variant="h6" className="mt-6">
+							要約のスタイル
+						</Typography>
+						<div className="flex gap-4 justify-stretch">
+							<Radio
+								name="style"
+								label="カジュアル"
+								onChange={() => setStyle("casual")}
+								checked={style === "casual"}
+							/>
+							<Radio
+								name="style"
+								label="シンプル"
+								onChange={() => setStyle("simple")}
+								checked={style === "simple"}
 							/>
 						</div>
 
