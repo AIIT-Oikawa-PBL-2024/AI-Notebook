@@ -26,6 +26,7 @@ class Output(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     title = Column(String(100), nullable=False)
     user_id = Column(String(128), nullable=False, index=True)
+    style = Column(String(10), nullable=True)
     output = Column(TEXT, nullable=False)
     created_at = Column(DateTime, nullable=False)
 

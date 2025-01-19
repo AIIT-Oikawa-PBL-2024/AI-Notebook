@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import Optional
 
 from app.schemas.files import File
 
@@ -14,10 +15,13 @@ class OutputBase(BaseModel):
     :type title: str
     :param output: 出力の文字列
     :type output: str
+    :param style: 出力のスタイル
+    :type style: str
     """
 
     title: str
     output: str
+    style: str
 
 
 class OutputCreate(OutputBase):
@@ -33,6 +37,7 @@ class OutputCreate(OutputBase):
     user_id: str
     created_at: datetime
     file_names: List[str] = Field(default_factory=list, description="関連するファイル名のリスト")
+    style: str
 
 
 class Output(OutputCreate):
@@ -68,6 +73,7 @@ class OutputRead(OutputBase):
     user_id: str = Field(..., description="ユーザーのFirebase UID", max_length=128)
     created_at: datetime = Field(..., description="作成日時")
     files: List[File] = Field(default_factory=list, description="関連するファイル情報のリスト")
+    style: Optional[str] = Field(..., description="出力のスタイル", max_length=10)
 
     model_config = ConfigDict(from_attributes=True)
 

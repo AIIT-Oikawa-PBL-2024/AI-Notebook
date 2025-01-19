@@ -26,11 +26,13 @@ async def test_create_output(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         title="テストタイトル",
         output="テストマークダウン🚀",
+        style="casual",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
     output = await outputs_cruds.create_output(session, output_create)
     assert output.title == "テストタイトル"
+    assert output.style == "casual"
     assert output.output == "テストマークダウン🚀"
     assert output.user_id == test_user_id
 
@@ -41,6 +43,7 @@ async def test_get_outputs(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         title="テストタイトル",
         output="テストマークダウン🚀",
+        style="casual",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
@@ -49,6 +52,7 @@ async def test_get_outputs(session: AsyncSession, test_user_id: str) -> None:
     outputs = await outputs_cruds.get_outputs(session)
     assert len(outputs) > 0
     assert outputs[0].title == "テストタイトル"
+    assert outputs[0].style == "casual"
     assert outputs[0].output == "テストマークダウン🚀"
     assert outputs[0].user_id == test_user_id
 
@@ -59,6 +63,7 @@ async def test_get_output_by_id_and_user(session: AsyncSession, test_user_id: st
     output_create = outputs_schemas.OutputCreate(
         title="テストタイトル",
         output="テストマークダウン🚀",
+        style="casual",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
@@ -70,6 +75,7 @@ async def test_get_output_by_id_and_user(session: AsyncSession, test_user_id: st
     )
     assert retrieved_output is not None
     assert retrieved_output.title == output.title
+    assert retrieved_output.style == output.style
     assert retrieved_output.id == output.id
     assert retrieved_output.output == output.output
     assert retrieved_output.user_id == output.user_id
@@ -81,6 +87,7 @@ async def test_delete_output(session: AsyncSession, test_user_id: str) -> None:
     output_create = outputs_schemas.OutputCreate(
         title="テストタイトル",
         output="テストマークダウン🚀",
+        style="casual",
         user_id=test_user_id,
         created_at=datetime.now(JST),
     )
