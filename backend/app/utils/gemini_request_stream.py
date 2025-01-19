@@ -54,6 +54,7 @@ def check_file_exists(bucket_name: str, file_name: str) -> bool:
 async def generate_content_stream(
     files: list[str],
     uid: str,
+    style: str,
     model_name: str = MODEL_NAME,
     generation_config: GenerationConfig = GENERATION_CONFIG,
     bucket_name: str = BUCKET_NAME,
@@ -77,7 +78,7 @@ async def generate_content_stream(
     )
 
     # プロンプト（指示文）
-    prompt = f"""
+    casual_prompt = f"""
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
         - #input_files: {file_list_str} は、大学院の講義資料です。
         - #instruction: {file_list_str} のファイルを読み解いて、
@@ -94,6 +95,28 @@ async def generate_content_stream(
         - #condition6: 最後に"用語解説"の一覧を箇条書き形式で表示してください。
         - #format: タイトルを付けて、8000文字程度のMarkdownで出力してください。
     """
+
+    simple_prompt = f"""
+        - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
+        - #input_files: {file_list_str} は、大学院の講義資料です。
+        - #instruction: {file_list_str} のファイルを読み解いて、
+            読みやすい解説がついて、誰もが理解できる整理ノートを日本語で作成して下さい。
+            imageファイルが複数ある場合、それぞれの画像に対して解説を行ってください。
+        - #style: ビジュアル的にもわかりやすくするため、マークダウンで文字の大きさ、
+            強調表示などのスタイルを追加してください。
+        - #condition1: "絵文字"を使わずに、シンプルな表現にしてください。
+        - #condition2: ”表形式”は禁止します。”箇条書き”を使用してください。
+        - #condition3: URLを含むリンクを表示することは禁止します。
+        - #condition4: 画像ファイルを挿入することは禁止します。
+        - #condition5: 興味深い"コラム"の欄を設けてください。
+        - #condition6: 最後に"用語解説"の一覧を箇条書き形式で表示してください。
+        - #format: タイトルを付けて、8000文字程度のMarkdownで出力してください。
+    """
+
+    if style == "casual":
+        prompt = casual_prompt
+    else:
+        prompt = simple_prompt
 
     logging.info(f"Prompt: {prompt}")
     try:
@@ -129,7 +152,7 @@ async def generate_content_stream(
                     image_files.append(image_file)
                 elif file_name.endswith(".mp4"):
                     # ファイルを音声ファイルに変換する
-                    if await convert_mp4_to_mp3(bucket_name, file_name):
+                    if convert_mp4_to_mp3(bucket_name, file_name):
                         # 音声ファイルに変換したファイルのURL
                         mp3_file_name = file_name.replace(".mp4", ".mp3")
                         mp3_file_url = f"gs://{bucket_name}/mp3/{mp3_file_name}"
@@ -213,7 +236,7 @@ async def generate_content_stream(
 # テスト用のコード
 async def main() -> None:
     response: AsyncGenerator = generate_content_stream(
-        ["kougi_sample.png", "kougi_sample2.png"], "test_uid"
+        ["kougi_sample.png", "kougi_sample2.png"], "test_uid", "casual"
     )
     async for content in response:
         # まず辞書形式に変換
