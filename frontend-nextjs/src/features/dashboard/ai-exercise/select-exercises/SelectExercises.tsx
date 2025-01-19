@@ -37,6 +37,7 @@ interface Exercise {
 	title: string;
 	response: string;
 	exercise_type: string;
+	difficulty: string;
 	user_id: string;
 	created_at: string;
 	files: File[];
@@ -46,6 +47,7 @@ type SortField =
 	| "exercise_type"
 	| "created_at"
 	| "response"
+	| "difficulty"
 	| "files"
 	| "title";
 type SortDirection = "asc" | "desc";
@@ -134,6 +136,11 @@ export default function ExerciseSelectComponent() {
 	};
 
 	const truncateResponse = (str: string): string => {
+		if (str === "easy") return "易しい";
+		if (str === "medium") return "普通";
+		if (str === "hard") return "難しい";
+		if (str === "undefined") return "";
+
 		return str.length > 50 ? `${str.substring(0, 50)}...` : str;
 	};
 
@@ -195,6 +202,8 @@ export default function ExerciseSelectComponent() {
 						return direction * a.title.localeCompare(b.title);
 					case "exercise_type":
 						return direction * a.exercise_type.localeCompare(b.exercise_type);
+					case "difficulty":
+						return direction * a.difficulty.localeCompare(b.difficulty);
 					case "created_at":
 						return (
 							direction *
@@ -354,7 +363,7 @@ export default function ExerciseSelectComponent() {
 					) : !exercises.length ? (
 						<Alert variant="gradient">練習問題が見つかりません</Alert>
 					) : (
-						<table className="w-full min-w-max table-auto text-left">
+						<table className="w-full table-auto">
 							<thead>
 								<tr>
 									<th className="border-b p-4">Select</th>
@@ -416,6 +425,21 @@ export default function ExerciseSelectComponent() {
 												内容
 											</Typography>
 											<span>{getSortIcon("response")}</span>
+										</button>
+									</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("response")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none text-center"
+											>
+												難易度
+											</Typography>
+											<span>{getSortIcon("difficulty")}</span>
 										</button>
 									</th>
 									<th className="border-b p-4">
@@ -484,6 +508,15 @@ export default function ExerciseSelectComponent() {
 													{truncateResponse(exercise.response)}
 												</Typography>
 											</button>
+										</td>
+										<td className="p-4 max-w-[200px]">
+											<Typography
+												variant="small"
+												className="font-normal break-words text-xs text-center"
+											>
+												{exercise.difficulty &&
+													truncateResponse(exercise.difficulty)}
+											</Typography>
 										</td>
 										<td className="p-4">
 											<Typography
