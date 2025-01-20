@@ -3,6 +3,7 @@ import base64
 import io
 import logging
 import os
+import random
 import unicodedata
 from typing import AsyncGenerator
 
@@ -117,6 +118,60 @@ async def _convert_difficulty_in_japanese(original: str) -> str:
         return ""
 
 
+# ストリーム処理にリトライ機能を追加
+async def retry_stream_with_backoff(
+    client: AnthropicVertex,
+    messages: list,
+    model_name: str,
+    max_retries: int = 3,
+    base_delay: float = 30.0,
+    max_delay: float = 300.0,
+    exponential_base: float = 2.0,
+    retryable_status_codes: set | None = None,
+) -> AsyncGenerator[str, None]:
+    if retryable_status_codes is None:
+        retryable_status_codes = {429, 503, 504}
+    retry_count = 0
+
+    while True:
+        try:
+            with client.messages.stream(
+                max_tokens=4096,
+                temperature=0.1,
+                messages=messages,
+                model=model_name,
+            ) as stream:
+                for text in stream.text_stream:
+                    yield text
+                break
+
+        except Exception as e:
+            status_code = None
+            if hasattr(e, "status_code"):
+                status_code = e.status_code
+            elif "429" in str(e):
+                status_code = 429
+
+            if status_code in retryable_status_codes:
+                retry_count += 1
+                if retry_count > max_retries:
+                    logging.error(f"Max retries ({max_retries}) exceeded. Final error: {e}")
+                    raise e
+
+                delay = min(base_delay * (exponential_base ** (retry_count - 1)), max_delay)
+                jitter = random.uniform(0, 0.1 * delay)
+                final_delay = delay + jitter
+
+                logging.warning(
+                    f"Received status {status_code}. Attempt {retry_count}/{max_retries}. "
+                    f"Retrying in {final_delay:.2f} seconds..."
+                )
+                await asyncio.sleep(final_delay)
+            else:
+                logging.error(f"Non-retryable error occurred: {e}")
+                raise e
+
+
 # 複数のpdf, imageファイルを入力してコンテンツを生成
 async def generate_content_stream(
     files: list[str],
@@ -210,19 +265,16 @@ async def generate_content_stream(
         print(f"contents: {content}")
 
         print(f"Starting stream with model: {model_name}")  # デバッグ用
-        with client.messages.stream(
-            max_tokens=4096,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": content,
-                }
-            ],
-            model=model_name,
-        ) as stream:
-            for text in stream.text_stream:
-                yield text
+
+        # ストリーム処理部分をリトライ機能付きの関数に置き換え
+        messages = [{"role": "user", "content": content}]
+        async for text in retry_stream_with_backoff(
+            client=client,
+            messages=messages,
+            model_name=model_name,
+            retryable_status_codes={429, 503, 504},
+        ):
+            yield text
 
         print("generate_content_stream finished")  # デバッグ用
 

@@ -2,8 +2,9 @@ import asyncio
 import json
 import logging
 import os
+import random
 import unicodedata
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Callable, Iterator, Optional, Set, TypeVar
 
 import vertexai
 from dotenv import load_dotenv
@@ -41,6 +42,50 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 # ロギングの設定
 logging.basicConfig(level=logging.INFO)
 
+T = TypeVar("T")
+
+
+async def retry_create_with_backoff(
+    create_func: Callable[[], T],
+    max_retries: int = 3,
+    base_delay: float = 10.0,
+    max_delay: float = 300.0,
+    exponential_base: float = 2.0,
+    retryable_status_codes: Optional[Set[int]] = None,
+) -> T:
+    if retryable_status_codes is None:
+        retryable_status_codes = {429, 503, 504}
+    retry_count = 0
+
+    while True:
+        try:
+            return await asyncio.to_thread(create_func)
+        except Exception as e:
+            status_code: Any = None
+            if hasattr(e, "status_code"):
+                status_code = getattr(e, "status_code", None)
+            elif "429" in str(e):
+                status_code = 429
+
+            if status_code in retryable_status_codes:
+                retry_count += 1
+                if retry_count > max_retries:
+                    logging.error(f"Max retries ({max_retries}) exceeded. Final error: {e}")
+                    raise e
+
+                delay = min(base_delay * (exponential_base ** (retry_count - 1)), max_delay)
+                jitter = random.uniform(0, 0.1 * delay)
+                final_delay = delay + jitter
+
+                logging.warning(
+                    f"Received status {status_code}. Attempt {retry_count}/{max_retries}. "
+                    f"Retrying in {final_delay:.2f} seconds..."
+                )
+                await asyncio.sleep(final_delay)
+            else:
+                logging.error(f"Non-retryable error occurred: {e}")
+                raise e
+
 
 # Google Cloud Storageでファイルが存在するかチェック
 def check_file_exists(bucket_name: str, file_name: str) -> bool:
@@ -65,9 +110,6 @@ async def generate_content_stream(
     wav_files: list[Part] = []
 
     file_names = files
-    # ファイル名をプロンプト内に挿入する
-    # mp4だけ拡張子をmp3に変更する
-    # 拡張子が.mp4のファイルを.mp3に変更する
     file_list_str = ", ".join(
         [
             f"`{os.path.splitext(file_name)[0]}.mp3`"
@@ -77,7 +119,6 @@ async def generate_content_stream(
         ]
     )
 
-    # プロンプト（指示文）
     casual_prompt = f"""
         - #role: あなたは、わかりやすく丁寧に教えることで評判の大学の「AI教授」です。
         - #input_files: {file_list_str} は、大学院の講義資料です。
@@ -121,57 +162,39 @@ async def generate_content_stream(
     logging.info(f"Prompt: {prompt}")
     try:
         for file_name in files:
-            # ブロブ名を正規化
             if file_name:
-                # ユーザーIDの検証
                 if not uid or not uid.strip():
                     raise ValueError("Invalid user ID")
-
-                # パスの正規化
                 safe_uid = uid.strip().rstrip("/")
                 file_name = unicodedata.normalize("NFC", f"{safe_uid}/{file_name}")
-            # ファイルがGCSに存在するかチェック
             if check_file_exists(bucket_name, file_name):
                 if file_name.endswith(".pdf"):
-                    # PDFファイルのURI
                     pdf_file_uri = f"gs://{bucket_name}/{file_name}"
-                    # PDFファイルのパートを作成
                     pdf_file = Part.from_uri(pdf_file_uri, mime_type="application/pdf")
                     pdf_files.append(pdf_file)
                 elif file_name.endswith(".jpg") or file_name.endswith(".jpeg"):
-                    # imageファイルのURI
                     image_file_uri = f"gs://{bucket_name}/{file_name}"
-                    # imageファイルのパートを作成
                     image_file = Part.from_uri(image_file_uri, mime_type="image/jpeg")
                     image_files.append(image_file)
                 elif file_name.endswith(".png"):
-                    # imageファイルのURI
                     image_file_uri = f"gs://{bucket_name}/{file_name}"
-                    # imageファイルのパートを作成
                     image_file = Part.from_uri(image_file_uri, mime_type="image/png")
                     image_files.append(image_file)
                 elif file_name.endswith(".mp4"):
-                    # ファイルを音声ファイルに変換する
-                    if convert_mp4_to_mp3(bucket_name, file_name):
-                        # 音声ファイルに変換したファイルのURL
+                    if await convert_mp4_to_mp3(bucket_name, file_name):
                         mp3_file_name = file_name.replace(".mp4", ".mp3")
                         mp3_file_url = f"gs://{bucket_name}/mp3/{mp3_file_name}"
-                        # 音声ファイルのパートを作成
                         mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
                         mp3_files.append(mp3_file)
                     else:
                         logging.error(f"Failed to convert {file_name} to mp3 format.")
                         raise InternalServerError(f"Failed to convert {file_name} to mp3 format.")
                 elif file_name.endswith(".mp3"):
-                    # 音声ファイルのURL
                     mp3_file_url = f"gs://{bucket_name}/{file_name}"
-                    # 音声ファイルのパートを作成
                     mp3_file = Part.from_uri(mp3_file_url, mime_type="audio/mp3")
                     mp3_files.append(mp3_file)
                 elif file_name.endswith(".wav"):
-                    # 音声ファイルのURL
                     wav_file_url = f"gs://{bucket_name}/{file_name}"
-                    # 音声ファイルのパートを作成
                     wav_file = Part.from_uri(wav_file_url, mime_type="audio/wav")
                     wav_files.append(wav_file)
                 else:
@@ -205,13 +228,15 @@ async def generate_content_stream(
         # コンテンツリストを作成
         contents = pdf_files + image_files + mp3_files + wav_files + [prompt]
 
-        # 同期関数を非同期にラップする
-        sync_response = await asyncio.to_thread(
-            model.generate_content,
-            contents,
-            generation_config=generation_config,
-            stream=True,
-        )
+        def create_request() -> Iterator[GenerationResponse]:
+            return model.generate_content(
+                contents,
+                generation_config=generation_config,
+                stream=True,
+            )
+
+        # リトライロジックを適用して同期的にコンテンツを生成
+        sync_response = await retry_create_with_backoff(create_request)
 
         for content in sync_response:
             yield content

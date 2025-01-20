@@ -3,7 +3,9 @@ import base64
 import io
 import logging
 import os
+import random
 import unicodedata
+from typing import Any, Callable, Dict, List, Optional, Protocol, Set, TypeVar
 
 import fitz
 from anthropic import AnthropicVertex
@@ -17,6 +19,19 @@ from google.cloud import storage
 from app.utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
 from app.utils.gemini_extract_text_from_audio import extract_text_from_audio
 
+
+# プロトコルの定義
+class MessageContent(Protocol):
+    type: str
+    input: Dict[str, Any]
+
+
+class Response(Protocol):
+    content: List[MessageContent]
+
+    def to_dict(self) -> Dict[str, Any]: ...
+
+
 # 環境変数を読み込む
 load_dotenv()
 
@@ -26,9 +41,53 @@ REGION = "us-east5"  # リージョンは固定
 MODEL_NAME = "claude-3-5-sonnet-v2@20241022"  # Claudeモデル名は固定
 BUCKET_NAME: str = str(os.getenv("BUCKET_NAME"))
 
-
 # ロギングの設定
 logging.basicConfig(level=logging.INFO)
+
+T = TypeVar("T")
+
+
+async def retry_create_with_backoff(
+    create_func: Callable[[], T],
+    max_retries: int = 3,
+    base_delay: float = 30.0,
+    max_delay: float = 300.0,
+    exponential_base: float = 2.0,
+    retryable_status_codes: Optional[Set[int]] = None,
+) -> T:
+    if retryable_status_codes is None:
+        retryable_status_codes = {429, 503, 504}
+    retry_count = 0
+
+    while True:
+        try:
+            return await asyncio.to_thread(create_func)
+        except Exception as e:
+            status_code: Any = None
+            if hasattr(e, "status_code"):
+                status_code = getattr(e, "status_code", None)
+            elif "429" in str(e):
+                status_code = 429
+
+            if status_code in retryable_status_codes:
+                retry_count += 1
+                if retry_count > max_retries:
+                    logging.error(f"Max retries ({max_retries}) exceeded. Final error: {e}")
+                    raise e
+
+                delay = min(base_delay * (exponential_base ** (retry_count - 1)), max_delay)
+                jitter = random.uniform(0, 0.1 * delay)
+                final_delay = delay + jitter
+
+                logging.warning(
+                    f"Received status {status_code}. Attempt {retry_count}/{max_retries}. "
+                    f"Retrying in {final_delay:.2f} seconds..."
+                )
+                await asyncio.sleep(final_delay)
+            else:
+                logging.error(f"Non-retryable error occurred: {e}")
+                raise e
+
 
 # ツールの設定
 tool_name = "print_multiple_choice_questions"
@@ -133,63 +192,33 @@ tool_definition = {
     },
 }
 
-
 prompt = f"""
 {tool_name} ツールのみを利用すること。
 """
 
 
-# Google Cloud Storageでファイルが存在するかチェック
 async def check_file_exists(bucket_name: str, file_name: str) -> bool:
-    """
-    Google Cloud Storageで指定されたバケット内のファイルが存在するかどうかを確認
-
-    :param bucket_name: バケット名
-    :param file_name: ファイル名
-    :return: ファイルの存在を示す真偽値
-    """
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(file_name)
     return blob.exists()
 
 
-# GCSのファイル読み込み
 async def read_file(bucket_name: str, file_name: str) -> str:
-    """
-    Google Cloud Storageからファイルを読み込み、base64エンコードされた文字列として返す
-
-    :param bucket_name: バケット名
-    :param file_name: ファイル名
-    :return: base64エンコードされたファイル内容
-    """
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(file_name)
-    # asyncio.to_threadを使用して同期的な操作を非同期に変換
     file_content = await asyncio.to_thread(blob.download_as_bytes)
-    # base64エンコーディング
     base64_encoded = base64.b64encode(file_content).decode("utf-8")
     return base64_encoded
 
 
-# pdfからテキスト抽出
 async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
-    """
-    指定されたPDFファイルからテキストを抽出して返す
-
-    :param bucket_name: バケット名
-    :param file_name: PDFファイル名
-    :return: 抽出されたテキスト
-    """
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(file_name)
-    # blobの内容をメモリにダウンロード
     pdf_content = await asyncio.to_thread(blob.download_as_bytes)
-    # BytesIOオブジェクトを作成
     pdf_file = io.BytesIO(pdf_content)
-    # PDFファイルを開く
     doc = await asyncio.to_thread(fitz.open, stream=pdf_file, filetype="pdf")
     extracted_text = ""
     for i, page in enumerate(doc):
@@ -198,11 +227,7 @@ async def extract_text_from_pdf(bucket_name: str, file_name: str) -> str:
     return extracted_text
 
 
-# ファイル拡張子から適切なmedia_typeを返す
 def get_media_type(extension: str) -> str:
-    """
-    ファイル拡張子から適切なmedia_typeを返す
-    """
     media_types = {
         "jpg": "image/jpeg",
         "jpeg": "image/jpeg",
@@ -213,7 +238,6 @@ def get_media_type(extension: str) -> str:
     return media_types.get(extension.lower(), "image/jpeg")
 
 
-# 複数のpdf, image, 動画ファイルを入力してコンテンツを生成
 async def generate_content_json(
     files: list[str],
     uid: str,
@@ -230,8 +254,6 @@ async def generate_content_json(
 
     try:
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
-
-        # 全ファイルからのテキストを結合するための変数
         all_extracted_text = ""
 
         for file_name in files:
@@ -249,13 +271,11 @@ async def generate_content_json(
                     print(f"Extracting text from PDF: {file_name}")
                     extracted_text = await extract_text_from_pdf(bucket_name, file_name)
                     print(f"Extracted text length: {len(extracted_text)}")
-                    # テキストを結合
                     all_extracted_text += f"\n=== {file_name} ===\n{extracted_text}"
 
                 elif file_name.lower().endswith((".png", ".jpg", ".jpeg")):
                     print(f"Reading image file: {file_name}")
                     image_file = await read_file(bucket_name, file_name)
-
                     file_extension = file_name.split(".")[-1].lower()
                     image_files.append(
                         {
@@ -267,7 +287,6 @@ async def generate_content_json(
                             },
                         }
                     )
-
                     print(f"Added image file: {file_name} to image_files")
 
                 elif file_name.lower().endswith(".mp4"):
@@ -284,18 +303,15 @@ async def generate_content_json(
                     audio_text = await extract_text_from_audio(bucket_name, file_name)
                     all_extracted_text += f"\n=== {file_name} ===\n{audio_text}"
 
-        # まず抽出したテキストをコンテンツに追加
         if all_extracted_text:
             content.append({"type": "text", "text": f"講義テキスト:\n{all_extracted_text}"})
             print(f"Added extracted text to content (length: {len(all_extracted_text)})")
 
-        # 画像ファイルを追加
         if image_files:
             for i, image in enumerate(image_files, 1):
                 content.extend([{"type": "text", "text": f"Image {i}:"}, image])
             print(f"Added {len(image_files)} images to content")
 
-        # 最後にプロンプトを追加
         content.append(
             {
                 "type": "text",
@@ -306,7 +322,6 @@ async def generate_content_json(
         )
         print("Added prompt to content")
 
-        # デバッグ用にコンテンツの内容を出力
         print("Content structure:")
         for i, item in enumerate(content, 1):
             if item["type"] == "text":
@@ -318,21 +333,25 @@ async def generate_content_json(
                     + f"Size: {len(image_info['data'])//1024}KB"
                 )
 
-        response = client.messages.create(
-            max_tokens=4096,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": content,
-                }
-            ],
-            model=model_name,
-            tools=[tool_definition],  # type: ignore
-            tool_choice={"type": "tool", "name": tool_name},
+        def create_request() -> Response:
+            return client.messages.create(
+                max_tokens=4096,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": content,
+                    }
+                ],
+                model=model_name,
+                tools=[tool_definition],  # type: ignore
+                tool_choice={"type": "tool", "name": tool_name},
+            )
+
+        response = await retry_create_with_backoff(
+            create_request, retryable_status_codes={429, 503, 504}
         )
 
-        # レスポンスの検証
         if response.content and len(response.content) > 0:
             if response.content[0].type == "tool_use":
                 questions = response.content[0].input.get("questions", [])
@@ -345,23 +364,23 @@ async def generate_content_json(
 
     except AttributeError as e:
         logging.error(f"Model attribute error: {e}")
-        print(f"AttributeError: {e}")  # デバッグ用
+        print(f"AttributeError: {e}")
         raise
     except TypeError as e:
         logging.error(f"Type error in model generation: {e}")
-        print(f"TypeError: {e}")  # デバッグ用
+        print(f"TypeError: {e}")
         raise
     except InternalServerError as e:
         logging.error(f"Internal server error: {e}")
-        print(f"InternalServerError: {e}")  # デバッグ用
+        print(f"InternalServerError: {e}")
         raise
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
-        print(f"GoogleAPIError: {e}")  # デッグ用
+        print(f"GoogleAPIError: {e}")
         raise
     except Exception as e:
         logging.error(f"Unexpected error during content generation: {e}")
-        print(f"Unexpected error: {e}")  # デバッグ用
+        print(f"Unexpected error: {e}")
         raise
 
 
@@ -376,7 +395,6 @@ async def _convert_difficulty_in_japanese(original: str) -> str:
         return ""
 
 
-# ファイル情報とユーザーの解答を入力して類似問題を生成
 async def generate_similar_questions_json(
     files: list[str],
     uid: str,
@@ -392,8 +410,6 @@ async def generate_similar_questions_json(
 
     try:
         client = AnthropicVertex(region=REGION, project_id=PROJECT_ID)
-
-        # 全ファイルからのテキストを結合するための変数
         all_extracted_text = ""
 
         for file_name in files:
@@ -411,13 +427,11 @@ async def generate_similar_questions_json(
                     print(f"Extracting text from PDF: {file_name}")
                     extracted_text = await extract_text_from_pdf(bucket_name, file_name)
                     print(f"Extracted text length: {len(extracted_text)}")
-                    # テキストを結合
                     all_extracted_text += f"\n=== {file_name} ===\n{extracted_text}"
 
                 elif file_name.lower().endswith((".png", ".jpg", ".jpeg")):
                     print(f"Reading image file: {file_name}")
                     image_file = await read_file(bucket_name, file_name)
-
                     file_extension = file_name.split(".")[-1].lower()
                     image_files.append(
                         {
@@ -429,7 +443,6 @@ async def generate_similar_questions_json(
                             },
                         }
                     )
-
                     print(f"Added image file: {file_name} to image_files")
 
                 elif file_name.lower().endswith(".mp4"):
@@ -446,18 +459,15 @@ async def generate_similar_questions_json(
                     audio_text = await extract_text_from_audio(bucket_name, file_name)
                     all_extracted_text += f"\n=== {file_name} ===\n{audio_text}"
 
-        # まず抽出したテキストをコンテンツに追加
         if all_extracted_text:
             content.append({"type": "text", "text": f"講義テキスト:\n{all_extracted_text}"})
             print(f"Added extracted text to content (length: {len(all_extracted_text)})")
 
-        # 画像ファイルを追加
         if image_files:
             for i, image in enumerate(image_files, 1):
                 content.extend([{"type": "text", "text": f"Image {i}:"}, image])
             print(f"Added {len(image_files)} images to content")
 
-        # 最後にプロンプトを追加
         content.append(
             {
                 "type": "text",
@@ -479,7 +489,6 @@ async def generate_similar_questions_json(
         )
         print("Added prompt to content")
 
-        # デバッグ用にコンテンツの内容を出力
         print("Content structure:")
         for i, item in enumerate(content, 1):
             if item["type"] == "text":
@@ -491,21 +500,25 @@ async def generate_similar_questions_json(
                     + f"Size: {len(image_info['data'])//1024}KB"
                 )
 
-        response = client.messages.create(
-            max_tokens=4096,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": content,
-                }
-            ],
-            model=model_name,
-            tools=[tool_definition],  # type: ignore
-            tool_choice={"type": "tool", "name": tool_name},
+        def create_request() -> Response:
+            return client.messages.create(
+                max_tokens=4096,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": content,
+                    }
+                ],
+                model=model_name,
+                tools=[tool_definition],  # type: ignore
+                tool_choice={"type": "tool", "name": tool_name},
+            )
+
+        response = await retry_create_with_backoff(
+            create_request, retryable_status_codes={429, 503, 504}
         )
 
-        # レスポンスの検証
         if response.content and len(response.content) > 0:
             if response.content[0].type == "tool_use":
                 questions = response.content[0].input.get("questions", [])
@@ -518,40 +531,21 @@ async def generate_similar_questions_json(
 
     except AttributeError as e:
         logging.error(f"Model attribute error: {e}")
-        print(f"AttributeError: {e}")  # デバッグ用
+        print(f"AttributeError: {e}")
         raise
     except TypeError as e:
         logging.error(f"Type error in model generation: {e}")
-        print(f"TypeError: {e}")  # デバッグ用
+        print(f"TypeError: {e}")
         raise
     except InternalServerError as e:
         logging.error(f"Internal server error: {e}")
-        print(f"InternalServerError: {e}")  # デバッグ用
+        print(f"InternalServerError: {e}")
         raise
     except GoogleAPIError as e:
         logging.error(f"Google API error: {e}")
-        print(f"GoogleAPIError: {e}")  # デッグ用
+        print(f"GoogleAPIError: {e}")
         raise
     except Exception as e:
         logging.error(f"Unexpected error during content generation: {e}")
-        print(f"Unexpected error: {e}")  # デバッグ用
+        print(f"Unexpected error: {e}")
         raise
-
-
-# テスト用のコード
-async def main() -> None:
-    """
-    メイン関数。generate_content_json関数をテストするためのコード
-    """
-    response: dict = await generate_content_json(
-        # ["kougi_sample.png", "kougi_sample2.png"],
-        ["1_ソフトウェア工学の誕生.pdf"],
-        uid="test_uid",
-        title="test_title",
-        difficulty="easy",
-    )
-    print(response)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
