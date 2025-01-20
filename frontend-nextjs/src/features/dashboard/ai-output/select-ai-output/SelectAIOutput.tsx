@@ -39,9 +39,10 @@ interface Output {
 	user_id: string;
 	created_at: string;
 	files: File[];
+	style: string; // Added new property
 }
 
-type SortField = "created_at" | "output" | "files" | "title";
+type SortField = "created_at" | "output" | "files" | "title" | "style";
 type SortDirection = "asc" | "desc";
 
 export default function OutputSelectComponent() {
@@ -136,6 +137,17 @@ export default function OutputSelectComponent() {
 		return new Date(dateStr).toLocaleString();
 	}, []);
 
+	const formatStyle = (style: string | null): string => {
+		switch (style) {
+			case "simple":
+				return "シンプル";
+			case "casual":
+				return "カジュアル";
+			default:
+				return "";
+		}
+	};
+
 	const handleSelect = useCallback((id: number) => {
 		setSelectedOutputId(id);
 	}, []);
@@ -156,6 +168,17 @@ export default function OutputSelectComponent() {
 	};
 
 	const filteredAndSortedOutputs = useMemo(() => {
+		const formatStyle = (style: string | null): string => {
+			switch (style) {
+				case "simple":
+					return "シンプル";
+				case "casual":
+					return "カジュアル";
+				default:
+					return "";
+			}
+		};
+
 		return [...outputs]
 			.filter((output) => {
 				if (!debouncedSearchTerm) return true;
@@ -166,7 +189,8 @@ export default function OutputSelectComponent() {
 					output.files.some((file) =>
 						file.file_name.toLowerCase().includes(searchLower),
 					) ||
-					formatDate(output.created_at).toLowerCase().includes(searchLower)
+					formatDate(output.created_at).toLowerCase().includes(searchLower) ||
+					formatStyle(output.style).toLowerCase().includes(searchLower) // Fixed search by style
 				);
 			})
 			.sort((a, b) => {
@@ -188,6 +212,8 @@ export default function OutputSelectComponent() {
 						const bFiles = b.files.map((f) => f.file_name).join(", ");
 						return direction * aFiles.localeCompare(bFiles);
 					}
+					case "style": // Added new case for sorting by style
+						return direction * a.style.localeCompare(b.style);
 					default:
 						return 0;
 				}
@@ -284,7 +310,7 @@ export default function OutputSelectComponent() {
 						</Button>
 						<PopupDialog
 							buttonTitle="AI要約を削除"
-							title="選択したAI要約を削除しますか？"
+							title="��択したAI要約を削除しますか？"
 							actionProps={{ onClick: handleDelete }}
 							triggerButtonProps={{ disabled: !selectedOutputId || isDeleting }}
 						/>
@@ -332,6 +358,21 @@ export default function OutputSelectComponent() {
 												関連ファイル
 											</Typography>
 											<span>{getSortIcon("files")}</span>
+										</button>
+									</th>
+									<th className="border-b p-4">
+										<button
+											type="button"
+											onClick={() => handleSort("style")}
+											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
+										>
+											<Typography
+												variant="small"
+												className="font-normal leading-none"
+											>
+												スタイル
+											</Typography>
+											<span>{getSortIcon("style")}</span>
 										</button>
 									</th>
 									<th className="border-b p-4">
@@ -390,6 +431,14 @@ export default function OutputSelectComponent() {
 												className="font-normal break-words text-xs"
 											>
 												{output.files.map((file) => file.file_name).join(", ")}
+											</Typography>
+										</td>
+										<td className="p-4">
+											<Typography
+												variant="small"
+												className="font-normal text-xs"
+											>
+												{formatStyle(output.style)}
 											</Typography>
 										</td>
 										<td className="p-4">
