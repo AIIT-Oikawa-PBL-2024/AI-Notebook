@@ -21,7 +21,7 @@ class OutputBase(BaseModel):
 
     title: str
     output: str
-    style: str
+    style: Optional[str]
 
 
 class OutputCreate(OutputBase):
