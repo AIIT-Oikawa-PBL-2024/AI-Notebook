@@ -258,25 +258,39 @@ async def generate_content_stream(
         raise
 
 
-# テスト用のコード
+# 429エラーテスト用のコード
+async def process_single_request(request_id: int) -> None:
+    try:
+        response: AsyncGenerator = generate_content_stream(
+            ["1_ソフトウェア工学の誕生.pdf"], "test_uid", "casual"
+        )
+        async for content in response:
+            content_dict = content.to_dict()
+            json_string = json.dumps(content_dict)
+            data = json.loads(json_string)
+            text_value = data["candidates"][0]["content"]["parts"][0]["text"]
+            print(f"Request {request_id}: {text_value[:50]}...")  # 最初の50文字だけ表示
+    except Exception as e:
+        print(f"Request {request_id} failed with error: {str(e)}")
+
+
 async def main() -> None:
-    response: AsyncGenerator = generate_content_stream(
-        ["kougi_sample.png", "kougi_sample2.png"], "test_uid", "casual"
-    )
-    async for content in response:
-        # まず辞書形式に変換
-        content_dict = content.to_dict()
+    # 同時に実行するリクエスト数
+    num_requests = 10
 
-        # 辞書をJSON文字列に変換
-        json_string = json.dumps(content_dict)
+    # すべてのリクエストを並列で実行
+    tasks = []
+    for i in range(num_requests):
+        tasks.append(process_single_request(i))
 
-        # JSON文字列をパース
-        data = json.loads(json_string)
-
-        # textの値を出力
-        text_value = data["candidates"][0]["content"]["parts"][0]["text"]
-        print(text_value, end="")
+    print(f"Starting {num_requests} parallel requests...")
+    await asyncio.gather(*tasks)
+    print("All requests completed")
 
 
 if __name__ == "__main__":
+    # ログレベルを設定
+    logging.basicConfig(level=logging.INFO)
+
+    # メイン関数を実行
     asyncio.run(main())
