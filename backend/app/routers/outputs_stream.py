@@ -167,6 +167,7 @@ async def request_content(
                     output = outputs_models.Output(
                         title=request.title,
                         output=final_content,
+                        style=request.style,
                         user_id=uid,
                         created_at=datetime.now(JST),
                     )
@@ -189,7 +190,6 @@ async def request_content(
                     logging.error(f"Error saving output to database: {e}")
                     raise HTTPException(
                         status_code=500,
-                        detail="コンテンツをデータベースに保存中にエラーが発生しました。システム管理者に連絡してください。",
                     ) from e
 
             # ログに出力
@@ -233,7 +233,6 @@ async def list_outputs(
         logging.error(f"Database error while retrieving outputs: {se}")
         raise HTTPException(
             status_code=500,
-            detail="データベースの操作中にエラーが発生しました。システム管理者に連絡してください。",
         ) from se
 
     except Exception as e:

@@ -60,6 +60,7 @@ async def get_outputs(db: AsyncSession) -> list[outputs_schemas.Output]:
         select(
             outputs_models.Output.title,
             outputs_models.Output.id,
+            outputs_models.Output.style,
             outputs_models.Output.output,
             outputs_models.Output.user_id,
             outputs_models.Output.created_at,
@@ -71,6 +72,7 @@ async def get_outputs(db: AsyncSession) -> list[outputs_schemas.Output]:
             title=output.title,
             id=output.id,
             output=output.output,
+            style=output.style,
             user_id=output.user_id,
             created_at=output.created_at,
         )
