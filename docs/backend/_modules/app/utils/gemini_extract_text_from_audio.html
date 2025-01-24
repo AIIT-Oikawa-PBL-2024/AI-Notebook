@@ -72,7 +72,8 @@
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">vertexai</span>
 <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
@@ -84,6 +85,15 @@
     <span class="n">GenerativeModel</span><span class="p">,</span>
     <span class="n">Part</span><span class="p">,</span>
 <span class="p">)</span>
+
+
+<span class="c1"># プロトコルの定義</span>
+<div class="viewcode-block" id="Response">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_extract_text_from_audio.Response">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">Response</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
 
 <span class="c1"># 環境変数を読み込む</span>
 <span class="n">load_dotenv</span><span class="p">()</span>
@@ -102,6 +112,53 @@
 
 <span class="c1"># ロギングの設定</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="retry_create_with_backoff">
+<a class="viewcode-back" href="../../../app.utils.html#app.utils.gemini_extract_text_from_audio.retry_create_with_backoff">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">retry_create_with_backoff</span><span class="p">(</span>
+    <span class="n">create_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">],</span>
+    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">base_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+    <span class="n">max_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
+    <span class="n">exponential_base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">retryable_status_codes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">retryable_status_codes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">retryable_status_codes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">429</span><span class="p">,</span> <span class="mi">503</span><span class="p">,</span> <span class="mi">504</span><span class="p">}</span>
+    <span class="n">retry_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">create_func</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">status_code</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;status_code&quot;</span><span class="p">):</span>
+                <span class="n">status_code</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;status_code&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;429&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+                <span class="n">status_code</span> <span class="o">=</span> <span class="mi">429</span>
+
+            <span class="k">if</span> <span class="n">status_code</span> <span class="ow">in</span> <span class="n">retryable_status_codes</span><span class="p">:</span>
+                <span class="n">retry_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;</span> <span class="n">max_retries</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max retries (</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">) exceeded. Final error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+
+                <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">base_delay</span> <span class="o">*</span> <span class="p">(</span><span class="n">exponential_base</span> <span class="o">**</span> <span class="p">(</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">max_delay</span><span class="p">)</span>
+                <span class="n">jitter</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">delay</span><span class="p">)</span>
+                <span class="n">final_delay</span> <span class="o">=</span> <span class="n">delay</span> <span class="o">+</span> <span class="n">jitter</span>
+
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Received status </span><span class="si">{</span><span class="n">status_code</span><span class="si">}</span><span class="s2">. Attempt </span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Retrying in </span><span class="si">{</span><span class="n">final_delay</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds...&quot;</span>
+                <span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">final_delay</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Non-retryable error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span></div>
+
 
 
 <div class="viewcode-block" id="extract_text_from_audio">
@@ -164,13 +221,14 @@
         <span class="c1"># コンテンツリストを作成</span>
         <span class="n">contents</span> <span class="o">=</span> <span class="n">audio_files</span> <span class="o">+</span> <span class="p">[</span><span class="n">prompt</span><span class="p">]</span>
 
-        <span class="c1"># 同期的にコンテンツを生成（非同期に実行）</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">,</span>
-            <span class="n">contents</span><span class="p">,</span>
-            <span class="n">generation_config</span><span class="o">=</span><span class="n">generation_config</span><span class="p">,</span>
-            <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># ストリーミングを無効化</span>
-        <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">create_request</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">(</span>
+                <span class="n">contents</span><span class="p">,</span>
+                <span class="n">generation_config</span><span class="o">=</span><span class="n">generation_config</span><span class="p">,</span>
+                <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">retry_create_with_backoff</span><span class="p">(</span><span class="n">create_request</span><span class="p">)</span>
 
         <span class="c1"># レスポンスからテキストを取得</span>
         <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>

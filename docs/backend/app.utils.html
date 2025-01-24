@@ -54,6 +54,7 @@
 <li><a class="reference internal" href="#app.utils.claude_request_stream.get_media_type"><code class="docutils literal notranslate"><span class="pre">get_media_type()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.claude_request_stream.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.claude_request_stream.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.claude_request_stream.retry_stream_with_backoff"><code class="docutils literal notranslate"><span class="pre">retry_stream_with_backoff()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.utils.convert_mp4_to_mp3">app.utils.convert_mp4_to_mp3 module</a><ul>
@@ -61,32 +62,60 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.utils.essay_question">app.utils.essay_question module</a><ul>
+<li><a class="reference internal" href="#app.utils.essay_question.MessageContent"><code class="docutils literal notranslate"><span class="pre">MessageContent</span></code></a><ul>
+<li><a class="reference internal" href="#app.utils.essay_question.MessageContent.input"><code class="docutils literal notranslate"><span class="pre">MessageContent.input</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.essay_question.MessageContent.type"><code class="docutils literal notranslate"><span class="pre">MessageContent.type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.utils.essay_question.Response"><code class="docutils literal notranslate"><span class="pre">Response</span></code></a><ul>
+<li><a class="reference internal" href="#app.utils.essay_question.Response.content"><code class="docutils literal notranslate"><span class="pre">Response.content</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.essay_question.Response.to_dict"><code class="docutils literal notranslate"><span class="pre">Response.to_dict()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#app.utils.essay_question.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.essay_question.extract_text_from_pdf"><code class="docutils literal notranslate"><span class="pre">extract_text_from_pdf()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.essay_question.generate_essay_json"><code class="docutils literal notranslate"><span class="pre">generate_essay_json()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.essay_question.get_media_type"><code class="docutils literal notranslate"><span class="pre">get_media_type()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.essay_question.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.essay_question.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.essay_question.retry_create_with_backoff"><code class="docutils literal notranslate"><span class="pre">retry_create_with_backoff()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.utils.gemini_extract_text_from_audio">app.utils.gemini_extract_text_from_audio module</a><ul>
+<li><a class="reference internal" href="#app.utils.gemini_extract_text_from_audio.Response"><code class="docutils literal notranslate"><span class="pre">Response</span></code></a><ul>
+<li><a class="reference internal" href="#app.utils.gemini_extract_text_from_audio.Response.text"><code class="docutils literal notranslate"><span class="pre">Response.text</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#app.utils.gemini_extract_text_from_audio.extract_text_from_audio"><code class="docutils literal notranslate"><span class="pre">extract_text_from_audio()</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.gemini_extract_text_from_audio.retry_create_with_backoff"><code class="docutils literal notranslate"><span class="pre">retry_create_with_backoff()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.utils.gemini_request_stream">app.utils.gemini_request_stream module</a><ul>
 <li><a class="reference internal" href="#app.utils.gemini_request_stream.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.gemini_request_stream.generate_content_stream"><code class="docutils literal notranslate"><span class="pre">generate_content_stream()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.gemini_request_stream.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.gemini_request_stream.process_single_request"><code class="docutils literal notranslate"><span class="pre">process_single_request()</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.gemini_request_stream.retry_create_with_backoff"><code class="docutils literal notranslate"><span class="pre">retry_create_with_backoff()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.utils.multiple_choice_question">app.utils.multiple_choice_question module</a><ul>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.MessageContent"><code class="docutils literal notranslate"><span class="pre">MessageContent</span></code></a><ul>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.MessageContent.input"><code class="docutils literal notranslate"><span class="pre">MessageContent.input</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.MessageContent.type"><code class="docutils literal notranslate"><span class="pre">MessageContent.type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.Response"><code class="docutils literal notranslate"><span class="pre">Response</span></code></a><ul>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.Response.content"><code class="docutils literal notranslate"><span class="pre">Response.content</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.Response.to_dict"><code class="docutils literal notranslate"><span class="pre">Response.to_dict()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#app.utils.multiple_choice_question.check_file_exists"><code class="docutils literal notranslate"><span class="pre">check_file_exists()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.multiple_choice_question.extract_text_from_pdf"><code class="docutils literal notranslate"><span class="pre">extract_text_from_pdf()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.multiple_choice_question.generate_content_json"><code class="docutils literal notranslate"><span class="pre">generate_content_json()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.multiple_choice_question.generate_similar_questions_json"><code class="docutils literal notranslate"><span class="pre">generate_similar_questions_json()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.multiple_choice_question.get_media_type"><code class="docutils literal notranslate"><span class="pre">get_media_type()</span></code></a></li>
-<li><a class="reference internal" href="#app.utils.multiple_choice_question.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li><a class="reference internal" href="#app.utils.multiple_choice_question.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li><a class="reference internal" href="#app.utils.multiple_choice_question.retry_create_with_backoff"><code class="docutils literal notranslate"><span class="pre">retry_create_with_backoff()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-app.utils.operate_cloud_storage">app.utils.operate_cloud_storage module</a><ul>
@@ -206,6 +235,11 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.claude_request_stream.retry_stream_with_backoff">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.claude_request_stream.</span></span><span class="sig-name descname"><span class="pre">retry_stream_with_backoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnthropicVertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponential_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retryable_status_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/claude_request_stream.html#retry_stream_with_backoff"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.claude_request_stream.retry_stream_with_backoff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-app.utils.convert_mp4_to_mp3">
 <span id="app-utils-convert-mp4-to-mp3-module"></span><h2>app.utils.convert_mp4_to_mp3 module<a class="headerlink" href="#module-app.utils.convert_mp4_to_mp3" title="Link to this heading"></a></h2>
@@ -217,6 +251,38 @@
 </section>
 <section id="module-app.utils.essay_question">
 <span id="app-utils-essay-question-module"></span><h2>app.utils.essay_question module<a class="headerlink" href="#module-app.utils.essay_question" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.utils.essay_question.MessageContent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.essay_question.</span></span><span class="sig-name descname"><span class="pre">MessageContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/utils/essay_question.html#MessageContent"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.MessageContent" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.essay_question.MessageContent.input">
+<span class="sig-name descname"><span class="pre">input</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.utils.essay_question.MessageContent.input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.essay_question.MessageContent.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#app.utils.essay_question.MessageContent.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.utils.essay_question.Response">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.essay_question.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/utils/essay_question.html#Response"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.Response" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.essay_question.Response.content">
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#app.utils.essay_question.MessageContent" title="app.utils.essay_question.MessageContent"><span class="pre">MessageContent</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.utils.essay_question.Response.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.utils.essay_question.Response.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/essay_question.html#Response.to_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.Response.to_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.essay_question.check_file_exists">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.essay_question.</span></span><span class="sig-name descname"><span class="pre">check_file_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/essay_question.html#check_file_exists"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.check_file_exists" title="Link to this definition"></a></dt>
@@ -253,7 +319,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.essay_question.generate_essay_json">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.essay_question.</span></span><span class="sig-name descname"><span class="pre">generate_essay_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difficulty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-3-5-sonnet-v2&#64;20241022'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/app/utils/essay_question.html#generate_essay_json"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.generate_essay_json" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.essay_question.</span></span><span class="sig-name descname"><span class="pre">generate_essay_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difficulty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'claude-3-5-sonnet-v2&#64;20241022'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/essay_question.html#generate_essay_json"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.generate_essay_json" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -285,9 +351,25 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.essay_question.retry_create_with_backoff">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.essay_question.</span></span><span class="sig-name descname"><span class="pre">retry_create_with_backoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponential_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retryable_status_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/app/utils/essay_question.html#retry_create_with_backoff"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.essay_question.retry_create_with_backoff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-app.utils.gemini_extract_text_from_audio">
 <span id="app-utils-gemini-extract-text-from-audio-module"></span><h2>app.utils.gemini_extract_text_from_audio module<a class="headerlink" href="#module-app.utils.gemini_extract_text_from_audio" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.utils.gemini_extract_text_from_audio.Response">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_extract_text_from_audio.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/utils/gemini_extract_text_from_audio.html#Response"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_extract_text_from_audio.Response" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.gemini_extract_text_from_audio.Response.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#app.utils.gemini_extract_text_from_audio.Response.text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.gemini_extract_text_from_audio.extract_text_from_audio">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_extract_text_from_audio.</span></span><span class="sig-name descname"><span class="pre">extract_text_from_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'gemini-1.5-pro-001'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation_config:</span> <span class="pre">~vertexai.generative_models._generative_models.GenerationConfig</span> <span class="pre">=</span> <span class="pre">temperature:</span> <span class="pre">0</span> <span class="pre">max_output_tokens:</span> <span class="pre">8192</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_extract_text_from_audio.html#extract_text_from_audio"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_extract_text_from_audio.extract_text_from_audio" title="Link to this definition"></a></dt>
@@ -310,6 +392,11 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.gemini_extract_text_from_audio.retry_create_with_backoff">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_extract_text_from_audio.</span></span><span class="sig-name descname"><span class="pre">retry_create_with_backoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponential_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retryable_status_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_extract_text_from_audio.html#retry_create_with_backoff"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_extract_text_from_audio.retry_create_with_backoff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-app.utils.gemini_request_stream">
 <span id="app-utils-gemini-request-stream-module"></span><h2>app.utils.gemini_request_stream module<a class="headerlink" href="#module-app.utils.gemini_request_stream" title="Link to this heading"></a></h2>
@@ -328,42 +415,60 @@
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#main"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.main" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.gemini_request_stream.process_single_request">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">process_single_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#process_single_request"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.process_single_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.gemini_request_stream.retry_create_with_backoff">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.gemini_request_stream.</span></span><span class="sig-name descname"><span class="pre">retry_create_with_backoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponential_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retryable_status_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/app/utils/gemini_request_stream.html#retry_create_with_backoff"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.gemini_request_stream.retry_create_with_backoff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-app.utils.multiple_choice_question">
 <span id="app-utils-multiple-choice-question-module"></span><h2>app.utils.multiple_choice_question module<a class="headerlink" href="#module-app.utils.multiple_choice_question" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.MessageContent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">MessageContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#MessageContent"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.MessageContent" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.MessageContent.input">
+<span class="sig-name descname"><span class="pre">input</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.utils.multiple_choice_question.MessageContent.input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.MessageContent.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#app.utils.multiple_choice_question.MessageContent.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.Response">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">Response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#Response"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.Response" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.Response.content">
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#app.utils.multiple_choice_question.MessageContent" title="app.utils.multiple_choice_question.MessageContent"><span class="pre">MessageContent</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#app.utils.multiple_choice_question.Response.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.Response.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#Response.to_dict"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.Response.to_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.multiple_choice_question.check_file_exists">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">check_file_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#check_file_exists"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.check_file_exists" title="Link to this definition"></a></dt>
-<dd><p>Google Cloud Storageで指定されたバケット内のファイルが存在するかどうかを確認</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket_name</strong> -- バケット名</p></li>
-<li><p><strong>file_name</strong> -- ファイル名</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>ファイルの存在を示す真偽値</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.multiple_choice_question.extract_text_from_pdf">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">extract_text_from_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#extract_text_from_pdf"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.extract_text_from_pdf" title="Link to this definition"></a></dt>
-<dd><p>指定されたPDFファイルからテキストを抽出して返す</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket_name</strong> -- バケット名</p></li>
-<li><p><strong>file_name</strong> -- PDFファイル名</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>抽出されたテキスト</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.multiple_choice_question.generate_content_json">
@@ -378,31 +483,17 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.multiple_choice_question.get_media_type">
 <span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">get_media_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#get_media_type"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.get_media_type" title="Link to this definition"></a></dt>
-<dd><p>ファイル拡張子から適切なmedia_typeを返す</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="app.utils.multiple_choice_question.main">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#main"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.main" title="Link to this definition"></a></dt>
-<dd><p>メイン関数。generate_content_json関数をテストするためのコード</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.utils.multiple_choice_question.read_file">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">read_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bucket_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#read_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.read_file" title="Link to this definition"></a></dt>
-<dd><p>Google Cloud Storageからファイルを読み込み、base64エンコードされた文字列として返す</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bucket_name</strong> -- バケット名</p></li>
-<li><p><strong>file_name</strong> -- ファイル名</p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>base64エンコードされたファイル内容</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.utils.multiple_choice_question.retry_create_with_backoff">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.utils.multiple_choice_question.</span></span><span class="sig-name descname"><span class="pre">retry_create_with_backoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponential_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retryable_status_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/app/utils/multiple_choice_question.html#retry_create_with_backoff"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#app.utils.multiple_choice_question.retry_create_with_backoff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-app.utils.operate_cloud_storage">
