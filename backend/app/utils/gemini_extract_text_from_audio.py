@@ -1,7 +1,8 @@
 import asyncio
 import logging
 import os
-from typing import List
+import random
+from typing import Any, Callable, List, Optional, Protocol, Set, TypeVar
 
 import vertexai
 from dotenv import load_dotenv
@@ -13,6 +14,12 @@ from vertexai.generative_models import (
     GenerativeModel,
     Part,
 )
+
+
+# プロトコルの定義
+class Response(Protocol):
+    text: str
+
 
 # 環境変数を読み込む
 load_dotenv()
@@ -31,6 +38,50 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 
 # ロギングの設定
 logging.basicConfig(level=logging.INFO)
+
+T = TypeVar("T")
+
+
+async def retry_create_with_backoff(
+    create_func: Callable[[], T],
+    max_retries: int = 3,
+    base_delay: float = 10.0,
+    max_delay: float = 300.0,
+    exponential_base: float = 2.0,
+    retryable_status_codes: Optional[Set[int]] = None,
+) -> T:
+    if retryable_status_codes is None:
+        retryable_status_codes = {429, 503, 504}
+    retry_count = 0
+
+    while True:
+        try:
+            return await asyncio.to_thread(create_func)
+        except Exception as e:
+            status_code: Any = None
+            if hasattr(e, "status_code"):
+                status_code = getattr(e, "status_code", None)
+            elif "429" in str(e):
+                status_code = 429
+
+            if status_code in retryable_status_codes:
+                retry_count += 1
+                if retry_count > max_retries:
+                    logging.error(f"Max retries ({max_retries}) exceeded. Final error: {e}")
+                    raise e
+
+                delay = min(base_delay * (exponential_base ** (retry_count - 1)), max_delay)
+                jitter = random.uniform(0, 0.1 * delay)
+                final_delay = delay + jitter
+
+                logging.warning(
+                    f"Received status {status_code}. Attempt {retry_count}/{max_retries}. "
+                    f"Retrying in {final_delay:.2f} seconds..."
+                )
+                await asyncio.sleep(final_delay)
+            else:
+                logging.error(f"Non-retryable error occurred: {e}")
+                raise e
 
 
 async def extract_text_from_audio(
@@ -91,13 +142,14 @@ async def extract_text_from_audio(
         # コンテンツリストを作成
         contents = audio_files + [prompt]
 
-        # 同期的にコンテンツを生成（非同期に実行）
-        response = await asyncio.to_thread(
-            model.generate_content,
-            contents,
-            generation_config=generation_config,
-            stream=False,  # ストリーミングを無効化
-        )
+        def create_request() -> Response:
+            return model.generate_content(
+                contents,
+                generation_config=generation_config,
+                stream=False,
+            )
+
+        response = await retry_create_with_backoff(create_request)
 
         # レスポンスからテキストを取得
         return response.text
