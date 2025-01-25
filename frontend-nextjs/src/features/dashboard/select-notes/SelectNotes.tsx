@@ -1,6 +1,7 @@
 "use client";
 
 import { PopupDialog } from "@/components/elements/PopupDialog";
+import NotesTable from "@/features/dashboard/select-notes/NotesTable";
 import { useNoteDelete } from "@/features/dashboard/select-notes/useNoteDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { useAuth } from "@/providers/AuthProvider";
@@ -236,101 +237,16 @@ export default function SelectNotesComponent() {
 					) : !notes.length ? (
 						<Alert variant="gradient">ノートが見つかりません</Alert>
 					) : (
-						<table className="w-full min-w-max table-auto text-left">
-							<thead>
-								<tr>
-									<th className="border-b p-4">Select</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("title")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												タイトル
-											</Typography>
-											<span>{getSortIcon("title")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("content")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												内容
-											</Typography>
-											<span>{getSortIcon("content")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("updated_at")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												更新日時
-											</Typography>
-											<span>{getSortIcon("updated_at")}</span>
-										</button>
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{filteredAndSortedNotes.map((note) => (
-									<tr key={note.id}>
-										<td className="p-4">
-											<Radio
-												name="note-select"
-												checked={selectedNoteId === note.id}
-												onChange={() => handleSelect(note.id)}
-											/>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className="font-normal break-words text-xs"
-											>
-												{note.title}
-											</Typography>
-										</td>
-										<td className="p-4">
-											<button
-												type="button"
-												className="w-full text-left cursor-pointer hover:bg-gray-50"
-												onClick={() => handleOpenModal(note.content)}
-											>
-												<Typography
-													variant="small"
-													className="font-normal max-w-xs whitespace-pre-wrap text-xs"
-												>
-													{truncateContent(note.content)}
-												</Typography>
-											</button>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className="font-normal text-xs"
-											>
-												{formatDate(note.updated_at)}
-											</Typography>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+						<NotesTable
+							notes={filteredAndSortedNotes}
+							selectedNoteId={selectedNoteId}
+							handleSelect={handleSelect}
+							handleOpenModal={handleOpenModal}
+							getSortIcon={getSortIcon}
+							handleSort={handleSort}
+							formatDate={formatDate}
+							truncateContent={truncateContent}
+						/>
 					)}
 				</CardBody>
 			</Card>

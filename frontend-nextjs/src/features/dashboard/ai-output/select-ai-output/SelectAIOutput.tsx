@@ -1,5 +1,7 @@
 "use client";
+
 import { PopupDialog } from "@/components/elements/PopupDialog";
+import OutputTable from "@/features/dashboard/ai-output/select-ai-output/OutputTable";
 import { useNoteInitialData } from "@/features/dashboard/ai-output/select-ai-output/useNoteInitialData";
 import { useOutputDelete } from "@/features/dashboard/ai-output/select-ai-output/useOutputDelete";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
@@ -24,6 +26,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 const BACKEND_HOST = process.env.NEXT_PUBLIC_BACKEND_HOST;
 const BACKEND_API_URL_GET_OUTPUTS = `${BACKEND_HOST}/outputs/list`;
 
+// ファイルに関する型定義
 interface File {
 	id: string;
 	file_name: string;
@@ -32,6 +35,7 @@ interface File {
 	user_id: string;
 }
 
+// 出力に関する型定義
 interface Output {
 	id: number;
 	title: string;
@@ -39,7 +43,7 @@ interface Output {
 	user_id: string;
 	created_at: string;
 	files: File[];
-	style: string; // Added new property
+	style: string; // 新しいプロパティを追加
 }
 
 type SortField = "created_at" | "output" | "files" | "title" | "style";
@@ -67,6 +71,7 @@ export default function OutputSelectComponent() {
 	const authFetch = useAuthFetch();
 	const { setInitialData } = useNoteInitialData();
 
+	// 出力データを取得する関数
 	const fetchOutputs = useCallback(async () => {
 		if (!user) {
 			setError("認証が必要です");
@@ -98,6 +103,7 @@ export default function OutputSelectComponent() {
 		}
 	}, [user, authFetch]);
 
+	// JSON文字列をパースする関数
 	const tryParseJSON = (str: string): string => {
 		try {
 			const parsed = JSON.parse(str);
@@ -117,14 +123,17 @@ export default function OutputSelectComponent() {
 		}
 	};
 
+	// レスポンスを切り捨てる関数
 	const truncateResponse = (str: string): string => {
 		return str.length > 50 ? `${str.substring(0, 50)}...` : str;
 	};
 
+	// コンポーネントのマウント時に出力データを取得
 	useEffect(() => {
 		fetchOutputs();
 	}, [fetchOutputs]);
 
+	// 検索語のデバウンス処理
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearchTerm(searchTerm);
@@ -133,10 +142,12 @@ export default function OutputSelectComponent() {
 		return () => clearTimeout(timer);
 	}, [searchTerm]);
 
+	// 日付をフォーマットする関数
 	const formatDate = useCallback((dateStr: string) => {
 		return new Date(dateStr).toLocaleString();
 	}, []);
 
+	// スタイルを日本語に変換する関数
 	const formatStyle = (style: string | null): string => {
 		switch (style) {
 			case "simple":
@@ -148,15 +159,18 @@ export default function OutputSelectComponent() {
 		}
 	};
 
+	// 出力の選択を処理する関数
 	const handleSelect = useCallback((id: number) => {
 		setSelectedOutputId(id);
 	}, []);
 
+	// モーダルを開く関数
 	const handleOpenModal = (content: string) => {
 		setSelectedContent(content);
 		setOpenModal(true);
 	};
 
+	// ソートを処理する関数
 	const handleSort = (field: SortField) => {
 		setSortConfig((prevConfig) => ({
 			field,
@@ -167,8 +181,9 @@ export default function OutputSelectComponent() {
 		}));
 	};
 
+	// フィルタリングおよびソートされた出力を取得
 	const filteredAndSortedOutputs = useMemo(() => {
-		const formatStyle = (style: string | null): string => {
+		const formatStyleLocal = (style: string | null): string => {
 			switch (style) {
 				case "simple":
 					return "シンプル";
@@ -190,7 +205,7 @@ export default function OutputSelectComponent() {
 						file.file_name.toLowerCase().includes(searchLower),
 					) ||
 					formatDate(output.created_at).toLowerCase().includes(searchLower) ||
-					formatStyle(output.style).toLowerCase().includes(searchLower) // Fixed search by style
+					formatStyleLocal(output.style).toLowerCase().includes(searchLower) // スタイルでの検索を修正
 				);
 			})
 			.sort((a, b) => {
@@ -212,7 +227,7 @@ export default function OutputSelectComponent() {
 						const bFiles = b.files.map((f) => f.file_name).join(", ");
 						return direction * aFiles.localeCompare(bFiles);
 					}
-					case "style": // Added new case for sorting by style
+					case "style": // スタイルでのソートを追加
 						return direction * a.style.localeCompare(b.style);
 					default:
 						return 0;
@@ -220,11 +235,13 @@ export default function OutputSelectComponent() {
 			});
 	}, [outputs, sortConfig, debouncedSearchTerm, formatDate]);
 
+	// ソートアイコンを取得する関数
 	const getSortIcon = (field: SortField) => {
 		if (sortConfig.field !== field) return "↕️";
 		return sortConfig.direction === "asc" ? "↑" : "↓";
 	};
 
+	// 選択したAI要約ページに移動する関数
 	const handleNavigate = useCallback(() => {
 		if (!selectedOutputId) {
 			alert("アイテムを選択してください。");
@@ -242,6 +259,7 @@ export default function OutputSelectComponent() {
 		router.push(`/ai-output/stream/${selectedOutput.id}`);
 	}, [selectedOutputId, outputs, router]);
 
+	// 出力の削除を処理するフック
 	const { deleteOutput, isDeleting } = useOutputDelete({
 		onSuccess: () => {
 			setSelectedOutputId(null);
@@ -252,11 +270,13 @@ export default function OutputSelectComponent() {
 		},
 	});
 
+	// 出力を削除する関数
 	const handleDelete = async () => {
 		if (!selectedOutputId) return;
 		await deleteOutput(selectedOutputId);
 	};
 
+	// ノートを作成する関数
 	const handleCreateNote = useCallback(() => {
 		if (!selectedOutputId) {
 			alert("アイテムを選択してください。");
@@ -295,7 +315,7 @@ export default function OutputSelectComponent() {
 						</Alert>
 					)}
 
-					<div className="p-4 flex flex-row items-center gap-4">
+					<div className="p-4 flex flex-col md:flex-row items-center gap-4">
 						<div className="flex-grow md:flex-grow-0 md:w-72">
 							<Input
 								type="search"
@@ -310,7 +330,7 @@ export default function OutputSelectComponent() {
 						</Button>
 						<PopupDialog
 							buttonTitle="AI要約を削除"
-							title="��択したAI要約を削除しますか？"
+							title="選択したAI要約を削除しますか？"
 							actionProps={{ onClick: handleDelete }}
 							triggerButtonProps={{ disabled: !selectedOutputId || isDeleting }}
 						/>
@@ -326,147 +346,17 @@ export default function OutputSelectComponent() {
 					) : !outputs.length ? (
 						<Alert variant="gradient">AI要約が見つかりません</Alert>
 					) : (
-						<table className="w-full min-w-max table-auto text-left">
-							<thead>
-								<tr>
-									<th className="border-b p-4">Select</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("title")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												タイトル
-											</Typography>
-											<span>{getSortIcon("title")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("files")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												関連ファイル
-											</Typography>
-											<span>{getSortIcon("files")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("style")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												スタイル
-											</Typography>
-											<span>{getSortIcon("style")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("output")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												内容
-											</Typography>
-											<span>{getSortIcon("output")}</span>
-										</button>
-									</th>
-									<th className="border-b p-4">
-										<button
-											type="button"
-											onClick={() => handleSort("created_at")}
-											className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-										>
-											<Typography
-												variant="small"
-												className="font-normal leading-none"
-											>
-												作成日時
-											</Typography>
-											<span>{getSortIcon("created_at")}</span>
-										</button>
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{filteredAndSortedOutputs.map((output) => (
-									<tr key={output.id}>
-										<td className="p-4">
-											<Radio
-												name="output-select"
-												checked={selectedOutputId === output.id}
-												onChange={() => handleSelect(output.id)}
-											/>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className="font-normal break-words text-xs"
-											>
-												{output.title}
-											</Typography>
-										</td>
-										<td className="p-4 max-w-[200px]">
-											<Typography
-												variant="small"
-												className="font-normal break-words text-xs"
-											>
-												{output.files.map((file) => file.file_name).join(", ")}
-											</Typography>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className="font-normal text-xs"
-											>
-												{formatStyle(output.style)}
-											</Typography>
-										</td>
-										<td className="p-4">
-											<button
-												type="button"
-												className="w-full text-left cursor-pointer hover:bg-gray-50"
-												onClick={() => handleOpenModal(output.output)}
-											>
-												<Typography
-													variant="small"
-													className="font-normal max-w-xs whitespace-pre-wrap text-xs"
-												>
-													{truncateResponse(output.output)}
-												</Typography>
-											</button>
-										</td>
-										<td className="p-4">
-											<Typography
-												variant="small"
-												className="font-normal text-xs"
-											>
-												{formatDate(output.created_at)}
-											</Typography>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+						<OutputTable
+							outputs={filteredAndSortedOutputs}
+							selectedOutputId={selectedOutputId}
+							handleSelect={handleSelect}
+							getSortIcon={getSortIcon}
+							handleSort={handleSort}
+							handleOpenModal={handleOpenModal}
+							formatStyle={formatStyle}
+							formatDate={formatDate}
+							truncateResponse={truncateResponse}
+						/>
 					)}
 				</CardBody>
 			</Card>

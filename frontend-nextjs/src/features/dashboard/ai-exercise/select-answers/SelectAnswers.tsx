@@ -22,6 +22,7 @@ import {
 } from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AnswersTable } from "./AnswersTable"; // AnswersTableコンポーネントをインポート
 
 // クリアすべきローカルストレージキーの定義
 const STORAGE_KEYS_TO_CLEAR = [
@@ -362,161 +363,18 @@ export default function SelectAnswers() {
 						<Alert variant="gradient">解答が見つかりません</Alert>
 					) : (
 						<>
-							<table className="w-full min-w-max table-auto text-left">
-								<thead>
-									<tr>
-										<th className="border-b p-4">
-											<Checkbox
-												checked={isAllSelected}
-												onChange={handleSelectAll}
-												aria-label="全選択"
-											/>
-										</th>
-										<th className="border-b p-4">
-											<button
-												type="button"
-												onClick={() => handleSort("title")}
-												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-											>
-												<Typography
-													variant="small"
-													className="font-normal leading-none"
-												>
-													タイトル
-												</Typography>
-												<span>{getSortIcon("title")}</span>
-											</button>
-										</th>
-										<th className="border-b p-4">
-											<button
-												type="button"
-												onClick={() => handleSort("question_text")}
-												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-											>
-												<Typography
-													variant="small"
-													className="font-normal leading-none"
-												>
-													質問文
-												</Typography>
-												<span>{getSortIcon("question_text")}</span>
-											</button>
-										</th>
-										<th className="border-b p-4">選択肢</th>
-										<th className="border-b p-4">
-											<button
-												type="button"
-												onClick={() => handleSort("is_correct")}
-												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-											>
-												<Typography
-													variant="small"
-													className="font-normal leading-none"
-												>
-													正誤
-												</Typography>
-												<span>{getSortIcon("is_correct")}</span>
-											</button>
-										</th>
-										<th className="border-b p-4">
-											<button
-												type="button"
-												onClick={() => handleSort("updated_at")}
-												className="flex items-center gap-1 hover:bg-gray-50 px-2 py-1 rounded"
-											>
-												<Typography
-													variant="small"
-													className="font-normal leading-none"
-												>
-													更新日時
-												</Typography>
-												<span>{getSortIcon("updated_at")}</span>
-											</button>
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									{filteredAndSortedAnswers.map((answer) => (
-										<tr key={answer.id} className="hover:bg-gray-100">
-											<td className="p-4">
-												<Checkbox
-													name={`answer-select-${answer.id}`}
-													checked={selectedAnswerIds.includes(answer.id)}
-													onChange={(e) => {
-														e.stopPropagation();
-														handleSelect(answer.id);
-													}}
-													aria-label={`選択 ${answer.title}`}
-												/>
-											</td>
-											<td className="p-4 max-w-[200px]">
-												<Typography
-													variant="small"
-													className="font-normal break-words text-xs"
-												>
-													{answer.title}
-												</Typography>
-											</td>
-											<td className="p-4 max-w-[300px]">
-												{/* 質問文をクリック可能にする */}
-												<button
-													type="button"
-													onClick={(e) => {
-														e.stopPropagation(); // 他のイベントの発火を防ぐ
-														handleOpenModal(answer);
-													}}
-													onKeyDown={(e) => {
-														if (e.key === "Enter" || e.key === " ") {
-															e.preventDefault();
-															handleOpenModal(answer);
-														}
-													}}
-													className="w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-													aria-label={`質問文を開く: ${answer.question_text}`}
-												>
-													<Typography
-														variant="small"
-														className="font-normal max-w-xs whitespace-pre-wrap text-xs hover:underline"
-													>
-														{truncateContent(answer.question_text, 100)}
-													</Typography>
-												</button>
-											</td>
-											<td className="p-4 max-w-[300px]">
-												<Typography
-													variant="small"
-													className="font-normal break-words text-xs"
-												>
-													A: {answer.choice_a} <br />
-													B: {answer.choice_b} <br />
-													C: {answer.choice_c} <br />
-													D: {answer.choice_d}
-												</Typography>
-											</td>
-											<td className="p-4">
-												<Typography
-													variant="small"
-													className={`font-normal text-xs ${
-														answer.is_correct
-															? "text-green-600"
-															: "text-red-600"
-													}`}
-												>
-													{answer.is_correct ? "正解" : "不正解"}
-												</Typography>
-											</td>
-											<td className="p-4">
-												<Typography
-													variant="small"
-													className="font-normal text-xs"
-												>
-													{formatDate(answer.updated_at)}
-												</Typography>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
+							{/* AnswersTableコンポーネントを使用 */}
+							<AnswersTable
+								answers={filteredAndSortedAnswers}
+								selectedAnswerIds={selectedAnswerIds}
+								handleSelect={handleSelect}
+								handleSelectAll={handleSelectAll}
+								isAllSelected={isAllSelected}
+								handleSort={handleSort}
+								getSortIcon={getSortIcon}
+								truncateContent={truncateContent}
+								handleOpenModal={handleOpenModal}
+							/>
 
 							{/* ▼ ページネーション UI */}
 							<div className="mt-4 flex flex-wrap items-center justify-between gap-4">
