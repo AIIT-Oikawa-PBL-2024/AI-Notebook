@@ -1,3 +1,6 @@
+# Need to install taskfile to work with this file
+# https://taskfile.dev/installation/
+
 version: "3"
 
 tasks:
