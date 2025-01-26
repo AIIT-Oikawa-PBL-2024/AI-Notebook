@@ -172,6 +172,7 @@ async def request_content(
                     user_id=uid,
                     created_at=datetime.now(JST),
                     exercise_type="stream",
+                    difficulty=request.difficulty,
                 )
 
                 db.add(exercise)

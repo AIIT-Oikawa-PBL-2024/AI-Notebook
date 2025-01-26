@@ -459,7 +459,9 @@ async def test_essay_question_success(
 
     # データベースに保存されていることを確認
     stmt = select(Exercise).where(
-        Exercise.user_id == "test_user", Exercise.exercise_type == "essay_question", Exercise.difficulty == "easy"
+        Exercise.user_id == "test_user",
+        Exercise.exercise_type == "essay_question",
+        Exercise.difficulty == "easy",
     )
     result = await session_cleanup.execute(stmt)
     exercise = result.scalar_one_or_none()
