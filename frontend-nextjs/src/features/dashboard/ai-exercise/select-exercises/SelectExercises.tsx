@@ -366,7 +366,7 @@ export default function ExerciseSelectComponent() {
 						<table className="w-full table-auto">
 							<thead>
 								<tr>
-									<th className="border-b p-4">Select</th>
+									<th className="border-b p-4">選択</th>
 									<th className="border-b p-4">
 										<button
 											type="button"

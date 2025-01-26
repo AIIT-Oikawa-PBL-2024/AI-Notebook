@@ -200,32 +200,22 @@ describe("SelectNotesComponent", () => {
 			expect(screen.getByText("テストノート1")).toBeInTheDocument();
 		});
 
-		// モーダルを開くために内容のセルをクリック
-		const contentCells = screen.getAllByText("テスト内容1");
-		const tableCell = contentCells.find(
-			(element) => element.classList.contains("max-w-xs"), // テーブルセル内のテキストを特定
-		);
-		expect(tableCell).toBeInTheDocument();
-
-		const contentButton = tableCell?.closest("button");
+		// モーダルを開くために内容のセル内のボタンを取得
+		const contentButton = screen.getByRole("button", { name: /テスト内容1/i });
 		expect(contentButton).toBeInTheDocument();
 
 		await act(async () => {
-			if (contentButton) {
-				fireEvent.click(contentButton);
-			} else {
-				throw new Error("Content button not found");
-			}
+			fireEvent.click(contentButton);
 		});
 
 		// モーダルの表示を確認
 		await waitFor(() => {
-			expect(screen.getByText("ノートの内容")).toBeInTheDocument();
-			// モーダル内のテキストを特定
-			const modalContent = screen.getAllByText("テスト内容1").find(
-				(element) => element.classList.contains("text-base"), // モーダル内のテキストを特定
-			);
-			expect(modalContent).toBeInTheDocument();
+			const dialog = screen.getByRole("dialog");
+			expect(dialog).toBeInTheDocument();
+
+			// モーダル内でテキストを確認
+			expect(within(dialog).getByText("ノートの内容")).toBeInTheDocument();
+			expect(within(dialog).getByText("テスト内容1")).toBeInTheDocument();
 		});
 	});
 
