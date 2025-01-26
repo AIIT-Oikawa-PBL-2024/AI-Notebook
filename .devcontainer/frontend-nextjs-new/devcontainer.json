@@ -1,0 +1,8 @@
+{
+ "name": "new-frontend-nextjs-dev-container",
+ "dockerComposeFile": "../../docker-compose.new.yml",
+ "service": "frontend-nextjs",
+ "workspaceFolder": "/frontend-nextjs",
+ "forwardPorts": [3000],
+ "postCreateCommand": "pnpm install"
+} 

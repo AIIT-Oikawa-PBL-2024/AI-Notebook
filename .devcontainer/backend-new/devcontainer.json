@@ -1,0 +1,7 @@
+{
+ "name": "new-backend-dev-container",
+ "dockerComposeFile": "../../docker-compose.new.yml",
+ "service": "backend",
+ "workspaceFolder": "/backend",
+ "postCreateCommand": "poetry install"
+} 
