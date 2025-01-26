@@ -1,0 +1,59 @@
+# Use light-weight Python image
+FROM python:3.11-slim AS base
+
+# For unbuffered logging
+ENV PYTHONUNBUFFERED=1
+# Store poetry cache in image
+ENV POETRY_CACHE_DIR=/root/.cache/pypoetry
+# No need to set PYTHONPATH maybe
+# because we set WORKDIR
+
+WORKDIR /backend
+
+# Install FFmpeg and curl
+# Remove cache to reduce image size
+# https://genzouw.com/entry/2019/09/04/085135/1718/
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    curl \
+    gnupg \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install --no-cache-dir poetry==1.8.3
+
+# Copy and install dependencies
+COPY pyproject.toml poetry.lock ./
+
+RUN poetry config virtualenvs.in-project true \
+    && poetry install --no-root
+
+# Copy the application code
+COPY . .
+
+# Dev stage
+FROM base AS dev
+ENV ENVIRONMENT=development
+EXPOSE 8000
+CMD ["poetry", "run", "hypercorn", "app.main:app", "--bind", "0.0.0.0:8000", "--reload"]
+
+# Production stage
+FROM base AS prod
+
+# Install Google Cloud SDK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg \
+    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+    | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
+    && apt-get update -y \
+    && apt-get install google-cloud-sdk --no-install-recommends -y \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install dependencies without dev dependencies and no cache
+RUN poetry install --no-root --no-dev --no-cache
+
+ENV ENVIRONMENT=production
+COPY entrypoint.sh ./entrypoint.sh
+EXPOSE 8000
+ENTRYPOINT ["bash", "./entrypoint.sh"]

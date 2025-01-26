@@ -1,0 +1,73 @@
+services:
+  frontend-nextjs:
+    build:
+      context: ./frontend-nextjs
+      dockerfile: Dockerfile.frontend-nextjs.new # 改善版の Dockerfile を指定
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_HOST: http://localhost:8000
+    volumes:
+      - ./frontend-nextjs:/frontend
+      - ./frontend-nextjs/node_modules:/frontend/node_modules
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend.new # 改善版の Dockerfile を指定
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/backend
+    networks:
+      - app-network
+
+  dev-db:
+    image: mysql:8.0
+    platform: linux/x86_64
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "dev-db"
+      TZ: "Asia/Tokyo"
+    volumes:
+      - dev-mysql-data:/var/lib/mysql
+      - ./backend/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - 3306:3306
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+  test-db:
+    image: mysql:8.0
+    platform: linux/x86_64
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "test-db"
+      TZ: "Asia/Tokyo"
+    volumes:
+      - test-mysql-data:/var/lib/mysql
+      - ./backend/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - 3307:3306
+    networks:
+      - app-network
+
+volumes:
+  dev-mysql-data:
+  test-mysql-data:
+
+networks:
+  app-network:
+    driver: bridge
