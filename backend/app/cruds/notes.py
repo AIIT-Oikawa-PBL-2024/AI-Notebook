@@ -13,11 +13,10 @@ JST = timezone(timedelta(hours=9))
 
 
 async def create_note(db: AsyncSession, note_create: notes_schemas.NoteCreate) -> notes_models.Note:
-    note = notes_models.Note(**note_create.model_dump())
-    # 日本時間の現在日時を取得
+    note_dict = note_create.model_dump()
     now_japan = datetime.now(JST)
-    note.created_at = now_japan
-    note.updated_at = now_japan
+    note_dict.update({"created_at": now_japan, "updated_at": now_japan})
+    note = notes_models.Note(**note_dict)
     db.add(note)
     await db.commit()
     await db.refresh(note)
