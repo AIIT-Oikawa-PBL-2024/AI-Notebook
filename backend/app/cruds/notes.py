@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Sequence
 
 from sqlalchemy import select
@@ -7,11 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.models.notes as notes_models
 import app.schemas.notes as notes_schemas
 
+# 日本時間のタイムゾーン
+JST = timezone(timedelta(hours=9))
 
-async def create_note(
-    db: AsyncSession, note_create: notes_schemas.NoteCreate
-) -> notes_models.Note:
-    note = notes_models.Note(**note_create.model_dump())
+
+async def create_note(db: AsyncSession, note_create: notes_schemas.NoteCreate) -> notes_models.Note:
+    note_dict = note_create.model_dump()
+    now_japan = datetime.now(JST)
+    note_dict.update({"created_at": now_japan, "updated_at": now_japan})
+    note = notes_models.Note(**note_dict)
     db.add(note)
     await db.commit()
     await db.refresh(note)
@@ -26,12 +31,8 @@ async def get_note_by_id(db: AsyncSession, note_id: int) -> Optional[notes_model
     return note
 
 
-async def get_notes(
-    db: AsyncSession, offset: int, limit: int
-) -> Sequence[notes_models.Note]:
-    result: Result = await db.execute(
-        select(notes_models.Note).offset(offset).limit(limit)
-    )
+async def get_notes(db: AsyncSession, offset: int, limit: int) -> Sequence[notes_models.Note]:
+    result: Result = await db.execute(select(notes_models.Note).offset(offset).limit(limit))
     notes = result.scalars().all()
     return notes
 
@@ -60,6 +61,11 @@ async def update_note(
 
     for key, value in note_update.model_dump().items():
         setattr(note, key, value)
+
+    # 日本時間の現在日時を取得
+    now_japan = datetime.now(JST)
+    note.updated_at = now_japan
+
     db.add(note)
     await db.commit()
     await db.refresh(note)
