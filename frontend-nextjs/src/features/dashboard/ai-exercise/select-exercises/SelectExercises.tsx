@@ -179,15 +179,33 @@ export default function ExerciseSelectComponent() {
 		}));
 	};
 
+	const getDifficultyInJapanese = useCallback((difficulty: string): string => {
+		switch (difficulty?.toLowerCase()) {
+			case "easy":
+				return "易しい";
+			case "medium":
+				return "普通";
+			case "hard":
+				return "難しい";
+			default:
+				return "";
+		}
+	}, []);
+
 	const filteredAndSortedExercises = useMemo(() => {
 		return [...exercises]
 			.filter((exercise) => {
 				if (!debouncedSearchTerm) return true;
 				const searchLower = debouncedSearchTerm.toLowerCase();
+
+				// 難易度の日本語表現を取得
+				const difficultyJP = getDifficultyInJapanese(exercise.difficulty || "");
+
 				return (
 					exercise.title.toLowerCase().includes(searchLower) ||
 					exercise.exercise_type.toLowerCase().includes(searchLower) ||
 					exercise.response.toLowerCase().includes(searchLower) ||
+					(exercise.difficulty && difficultyJP.includes(searchLower)) ||
 					exercise.files.some((file) =>
 						file.file_name.toLowerCase().includes(searchLower),
 					) ||
@@ -221,7 +239,13 @@ export default function ExerciseSelectComponent() {
 						return 0;
 				}
 			});
-	}, [exercises, sortConfig, debouncedSearchTerm, formatDate]);
+	}, [
+		exercises,
+		sortConfig,
+		debouncedSearchTerm,
+		formatDate,
+		getDifficultyInJapanese,
+	]);
 
 	const getExerciseTypeLabel = (type: string) => {
 		switch (type) {
